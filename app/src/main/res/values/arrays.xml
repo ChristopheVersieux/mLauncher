@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Theme Mode -->
+    <string-array name="theme_mode_entries">
+        <item>@string/system_default</item>
+        <item>@string/dark</item>
+        <item>@string/light</item>
+    </string-array>
+    <string-array name="theme_mode_values">
+        <item>System</item>
+        <item>Dark</item>
+        <item>Light</item>
+    </string-array>
+
+    <!-- Language -->
+    <string-array name="language_entries">
+        <item>@string/system_default</item>
+        <item>@string/lang_arabic</item>
+        <item>@string/lang_czech</item>
+        <item>@string/lang_dutch</item>
+        <item>@string/lang_english</item>
+        <item>@string/lang_french</item>
+        <item>@string/lang_german</item>
+        <item>@string/lang_hebrew</item>
+        <item>@string/lang_italian</item>
+        <item>@string/lang_japanese</item>
+        <item>@string/lang_korean</item>
+        <item>@string/lang_lithuanian</item>
+        <item>@string/lang_polish</item>
+        <item>@string/lang_portuguese</item>
+        <item>@string/lang_romanian</item>
+        <item>@string/lang_russian</item>
+        <item>@string/lang_slovak</item>
+        <item>@string/lang_spanish</item>
+        <item>@string/lang_thai</item>
+        <item>@string/lang_turkish</item>
+    </string-array>
+    <string-array name="language_values">
+        <item>System</item>
+        <item>Arabic</item>
+        <item>Czech</item>
+        <item>Dutch</item>
+        <item>English</item>
+        <item>French</item>
+        <item>German</item>
+        <item>Hebrew</item>
+        <item>Italian</item>
+        <item>Japanese</item>
+        <item>Korean</item>
+        <item>Lithuanian</item>
+        <item>Polish</item>
+        <item>Portuguese</item>
+        <item>Romanian</item>
+        <item>Russian</item>
+        <item>Slovak</item>
+        <item>Spanish</item>
+        <item>Thai</item>
+        <item>Turkish</item>
+    </string-array>
+
+    <!-- Font Family -->
+    <string-array name="font_family_entries">
+        <item>@string/system_default</item>
+        <item>@string/system_custom</item>
+        <item>@string/settings_font_bitter</item>
+        <item>@string/settings_font_doto</item>
+        <item>@string/settings_font_firacode</item>
+        <item>@string/settings_font_hack</item>
+        <item>@string/settings_font_lato</item>
+        <item>@string/settings_font_merriweather</item>
+        <item>@string/settings_font_montserrat</item>
+        <item>@string/settings_font_quicksand</item>
+        <item>@string/settings_font_raleway</item>
+        <item>@string/settings_font_roboto</item>
+        <item>@string/settings_font_sourcecodepro</item>
+    </string-array>
+    <string-array name="font_family_values">
+        <item>System</item>
+        <item>Custom</item>
+        <item>Bitter</item>
+        <item>Doto</item>
+        <item>FiraCode</item>
+        <item>Hack</item>
+        <item>Lato</item>
+        <item>Merriweather</item>
+        <item>Montserrat</item>
+        <item>Quicksand</item>
+        <item>Raleway</item>
+        <item>Roboto</item>
+        <item>SourceCodePro</item>
+    </string-array>
+
+    <!-- Search Engine -->
+    <string-array name="search_engine_entries">
+        <item>@string/search_bing</item>
+        <item>@string/search_brave</item>
+        <item>@string/search_duckduckgo</item>
+        <item>@string/search_google</item>
+        <item>@string/search_mojeek</item>
+        <item>@string/search_qwant</item>
+        <item>@string/search_seznam</item>
+        <item>@string/search_startpage</item>
+        <item>@string/search_swisscow</item>
+        <item>@string/search_yahoo</item>
+        <item>@string/search_yandex</item>
+    </string-array>
+    <string-array name="search_engine_values">
+        <item>Bing</item>
+        <item>Brave</item>
+        <item>DuckDuckGo</item>
+        <item>Google</item>
+        <item>Mojeek</item>
+        <item>Qwant</item>
+        <item>Seznam</item>
+        <item>StartPage</item>
+        <item>SwissCow</item>
+        <item>Yahoo</item>
+        <item>Yandex</item>
+    </string-array>
+
+    <!-- Temperature Unit -->
+    <string-array name="temp_unit_entries">
+        <item>@string/celsius</item>
+        <item>@string/fahrenheit</item>
+    </string-array>
+    <string-array name="temp_unit_values">
+        <item>Celsius</item>
+        <item>Fahrenheit</item>
+    </string-array>
+</resources>

@@ -1314,7 +1314,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     private fun sendToSettingFragment() {
         try {
-            findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
+            val intent = Intent(requireContext(), SettingsActivity::class.java)
+            startActivity(intent)
             viewModel.firstOpen(false)
         } catch (e: java.lang.Exception) {
             AppLogger.d("onLongClick", e.toString())

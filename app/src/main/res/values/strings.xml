@@ -88,6 +88,7 @@
     <string name="home_management">Home &amp; App Management</string>
 
     <string name="auto_open_apps">Auto Open Apps</string>
+    <string name="number_of_home_apps">Number of Home Apps</string>
     <string name="open_apps_on_enter">Open App on Enter</string>
     <string name="lock_home_apps">Lock Home Apps</string>
     <string name="lock_settings">Lock Settings</string>

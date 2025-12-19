@@ -40,6 +40,19 @@
 
         <item name="backgroundLight">@color/background_light</item>
         <item name="backgroundDark">@color/background_dark</item>
+
+        <item name="preferenceTheme">@style/AppPreferenceTheme</item>
+    </style>
+
+    <style name="Theme.mLauncher.Settings" parent="Theme.mLauncher">
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
     </style>
 
     <style name="WindowAnimationTransition">
@@ -113,5 +126,26 @@
         <item name="android:shadowDx">1</item>
         <item name="android:shadowDy">1</item>
         <item name="android:shadowRadius">2</item>
+    </style>
+
+    <style name="AppPreferenceTheme" parent="@style/PreferenceThemeOverlay">
+        <item name="colorAccent">@color/preference_accent</item>
+        <item name="colorControlActivated">@color/preference_accent</item>
+        <item name="android:colorAccent">@color/preference_accent</item>
+        <item name="android:colorControlActivated">@color/preference_accent</item>
+        <item name="colorPrimary">@color/preference_accent</item>
+        <item name="android:colorPrimary">@color/preference_accent</item>
+        <item name="colorSecondary">@color/preference_accent</item>
+        <item name="switchPreferenceCompatStyle">@style/AppSwitchPreferenceStyle</item>
+        <item name="preferenceCategoryStyle">@style/AppPreferenceCategoryStyle</item>
+    </style>
+
+    <style name="AppPreferenceCategoryStyle" parent="Preference.Category.Material">
+        <item name="android:textColor">@color/preference_accent</item>
+        <item name="android:layout_marginTop">16dp</item>
+    </style>
+
+    <style name="AppSwitchPreferenceStyle" parent="Preference.SwitchPreferenceCompat.Material">
+        <item name="android:widgetLayout">@layout/preference_widget_switch_compat</item>
     </style>
 </resources>

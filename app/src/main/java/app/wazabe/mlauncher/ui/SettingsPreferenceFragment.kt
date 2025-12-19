@@ -19,7 +19,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val typedValue = android.util.TypedValue()
-        requireContext().theme.resolveAttribute(android.R.attr.colorBackground, typedValue, true)
+        requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorSurface, typedValue, true)
         view.setBackgroundColor(typedValue.data)
 
         val prefs = app.wazabe.mlauncher.data.Prefs(requireContext())
@@ -45,7 +45,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
         return when (preference.key) {
             "pref_key_features" -> {
-                navigateToDetail("features")
+                findNavController().navigate(R.id.action_settingsFragment_to_featuresSettingsFragment)
                 true
             }
             "pref_key_look_feel" -> {

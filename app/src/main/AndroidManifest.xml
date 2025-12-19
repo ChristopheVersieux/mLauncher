@@ -76,6 +76,12 @@
             android:excludeFromRecents="true"
             android:exported="false"
             android:launchMode="singleTask" />
+        <!-- SETTINGS ACTIVITY -->
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:theme="@style/Theme.mLauncher.Settings" />
         <!-- CRASH REPORT ACTIVITY -->
         <activity
             android:name=".CrashReportActivity"

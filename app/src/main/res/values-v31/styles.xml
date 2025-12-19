@@ -25,11 +25,6 @@
         <!-- <item name="android:windowTranslucentStatus">false</item> -->
         <!-- <item name="android:windowTranslucentNavigation">true</item> -->
         <item name="windowActionBar">false</item>
-        <item name="colorPrimary">@color/black</item>
-        <item name="colorPrimaryDark">@android:color/darker_gray</item>
-        <item name="colorAccent">@color/black</item>
-        <item name="colorSurface">@color/background_light</item>
-        <item name="colorOnSurface">@color/background_dark</item>
         <item name="primaryColor">@color/black</item>
         <item name="primaryInverseColor">@color/blackInverse</item>
         <item name="primaryTextShadowColor">@color/blackInverseTrans50</item>
@@ -42,7 +37,26 @@
         <item name="primaryShadeDarkColor">@color/blackInverseTrans25</item>
         <item name="primaryColorBackground">@color/background_bubble</item>
 
-        <item name="backgroundLight">@color/background_light</item>
-        <item name="backgroundDark">@color/background_dark</item>
+        <item name="backgroundLight">@android:color/system_neutral1_10</item>
+        <item name="backgroundDark">@android:color/system_neutral1_900</item>
+        
+        <item name="preferenceTheme">@style/AppPreferenceTheme</item>
+
+        <item name="colorSurface">@android:color/system_neutral1_10</item>
+        <item name="colorOnSurface">@android:color/system_neutral1_900</item>
+        <item name="colorPrimary">@android:color/system_accent1_600</item>
+        <item name="colorPrimaryDark">@android:color/system_accent1_800</item>
+        <item name="colorAccent">@android:color/system_accent1_600</item>
+    </style>
+
+    <style name="Theme.mLauncher.Settings" parent="Theme.mLauncher">
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
     </style>
 </resources>

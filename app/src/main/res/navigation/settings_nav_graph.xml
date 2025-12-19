@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/settings_nav_graph"
+    app:startDestination="@id/settingsFragment">
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="app.wazabe.mlauncher.ui.SettingsPreferenceFragment"
+        android:label="SettingsFragment">
+        <action
+            android:id="@+id/action_settingsFragment_to_appListFragment"
+            app:destination="@id/appListFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+
+        <action
+            android:id="@+id/action_settingsFragment_to_appFavoriteFragment"
+            app:destination="@id/appFavoriteFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+
+        <action
+            android:id="@+id/action_settingsFragment_to_locationSearchFragment"
+            app:destination="@id/locationSearchFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingsDetailFragment"
+            app:destination="@id/settingsDetailFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+            
+        <action
+            android:id="@+id/action_settingsFragment_to_featuresSettingsFragment"
+            app:destination="@id/featuresSettingsFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/appListFragment"
+        android:name="app.wazabe.mlauncher.ui.AppDrawerFragment"
+        android:label="appListFragment"
+        tools:layout="@layout/fragment_app_drawer" />
+
+    <fragment
+        android:id="@+id/appFavoriteFragment"
+        android:name="app.wazabe.mlauncher.ui.FavoriteFragment"
+        android:label="appFavoriteFragment"
+        tools:layout="@layout/fragment_favorite" />
+
+    <fragment
+        android:id="@+id/locationSearchFragment"
+        android:name="app.wazabe.mlauncher.ui.LocationSearchFragment"
+        android:label="appLocationSearchFragment"
+        tools:layout="@layout/fragment_location_search" />
+
+    <fragment
+        android:id="@+id/featuresSettingsFragment"
+        android:name="app.wazabe.mlauncher.ui.FeaturesSettingsFragment"
+        android:label="FeaturesSettingsFragment"
+        tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/settingsDetailFragment"
+        android:name="app.wazabe.mlauncher.ui.SettingsFragment"
+        android:label="SettingsDetailFragment" />
+
+</navigation>
