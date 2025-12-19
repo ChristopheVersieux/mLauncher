@@ -1,0 +1,44 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "installDebug",
+            "type": "shell",
+            "command": "./gradlew installDebug",
+            "windows": {
+                "command": ".\\gradlew.bat installDebug"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "installRelease",
+            "type": "shell",
+            "command": "./gradlew installRelease; adb shell am start -n app.wazabe.mlauncher/.MainActivity",
+            "windows": {
+                "command": ".\\gradlew.bat installRelease; & 'adb' shell am start -n app.wazabe.mlauncher/.MainActivity"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "assembleDebug",
+            "type": "shell",
+            "command": "./gradlew assembleDebug",
+            "windows": {
+                "command": ".\\gradlew.bat assembleDebug"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        }
+    ]
+}

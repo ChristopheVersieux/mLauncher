@@ -1,8 +1,8 @@
-package com.github.droidworksstudio.fuzzywuzzy
+﻿package com.github.droidworksstudio.fuzzywuzzy
 
-import com.github.droidworksstudio.mlauncher.data.AppListItem
-import com.github.droidworksstudio.mlauncher.data.ContactListItem
-import com.github.droidworksstudio.mlauncher.helper.emptyString
+import app.wazabe.mlauncher.data.AppListItem
+import app.wazabe.mlauncher.data.ContactListItem
+import app.wazabe.mlauncher.helper.emptyString
 import java.text.Normalizer
 import java.util.Locale
 

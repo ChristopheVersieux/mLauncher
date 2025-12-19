@@ -1,4 +1,4 @@
-package com.github.droidworksstudio.common.share
+﻿package com.github.droidworksstudio.common.share
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.github.droidworksstudio.mlauncher.R
+import app.wazabe.mlauncher.R
 
 class ShareAppAdapter(
     private val apps: List<ShareAppInfo>,

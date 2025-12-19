@@ -1,4 +1,4 @@
-package com.github.creativecodecat.components.views
+﻿package com.github.creativecodecat.components.views
 
 import android.content.Context
 import android.graphics.Typeface
@@ -13,9 +13,9 @@ import androidx.appcompat.app.AppCompatDialog
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import com.github.droidworksstudio.common.isGestureNavigationEnabled
-import com.github.droidworksstudio.mlauncher.R
-import com.github.droidworksstudio.mlauncher.helper.CustomFontView
-import com.github.droidworksstudio.mlauncher.helper.FontManager
+import app.wazabe.mlauncher.R
+import app.wazabe.mlauncher.helper.CustomFontView
+import app.wazabe.mlauncher.helper.FontManager
 import com.google.android.material.card.MaterialCardView
 
 /**

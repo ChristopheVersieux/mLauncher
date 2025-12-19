@@ -1,4 +1,4 @@
-package com.github.droidworksstudio.common
+﻿package com.github.droidworksstudio.common
 
 import android.content.ContentUris
 import android.content.ContentValues
@@ -9,8 +9,8 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
-import com.github.droidworksstudio.mlauncher.CrashReportActivity
-import com.github.droidworksstudio.mlauncher.helper.getDeviceInfo
+import app.wazabe.mlauncher.CrashReportActivity
+import app.wazabe.mlauncher.helper.getDeviceInfo
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader

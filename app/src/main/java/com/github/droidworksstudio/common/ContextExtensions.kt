@@ -1,4 +1,4 @@
-package com.github.droidworksstudio.common
+﻿package com.github.droidworksstudio.common
 
 import android.app.Activity
 import android.app.ActivityManager
@@ -34,10 +34,10 @@ import androidx.biometric.BiometricManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import com.github.droidworksstudio.mlauncher.Mlauncher
-import com.github.droidworksstudio.mlauncher.data.Constants
-import com.github.droidworksstudio.mlauncher.data.Prefs
-import com.github.droidworksstudio.mlauncher.services.ActionService
+import app.wazabe.mlauncher.Mlauncher
+import app.wazabe.mlauncher.data.Constants
+import app.wazabe.mlauncher.data.Prefs
+import app.wazabe.mlauncher.services.ActionService
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar

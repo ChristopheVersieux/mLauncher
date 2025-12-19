@@ -1,4 +1,4 @@
-package com.github.creativecodecat.components.views
+﻿package com.github.creativecodecat.components.views
 
 import android.content.Context
 import android.graphics.Typeface
@@ -7,8 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.github.droidworksstudio.common.AppLogger
-import com.github.droidworksstudio.mlauncher.helper.CustomFontView
-import com.github.droidworksstudio.mlauncher.helper.FontManager
+import app.wazabe.mlauncher.helper.CustomFontView
+import app.wazabe.mlauncher.helper.FontManager
 
 class FontRecyclerView @JvmOverloads constructor(
     context: Context,

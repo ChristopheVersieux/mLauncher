@@ -1,4 +1,4 @@
-package com.github.droidworksstudio.common.share
+﻿package com.github.droidworksstudio.common.share
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -13,7 +13,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.creativecodecat.components.views.FontBottomSheetDialogLocked
-import com.github.droidworksstudio.mlauncher.R
+import app.wazabe.mlauncher.R
 
 class ShareUtils(val context: Context, val activity: Activity) {
 

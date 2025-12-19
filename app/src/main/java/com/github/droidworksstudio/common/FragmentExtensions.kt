@@ -1,4 +1,4 @@
-package com.github.droidworksstudio.common
+﻿package com.github.droidworksstudio.common
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -15,7 +15,7 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.fragment.app.Fragment
-import com.github.droidworksstudio.mlauncher.R
+import app.wazabe.mlauncher.R
 
 fun Fragment.showLongToast(message: String) {
     showCustomToast(this, message, iconRes = R.drawable.ic_toast, delayMillis = 3000L)

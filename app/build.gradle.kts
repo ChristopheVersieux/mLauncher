@@ -29,13 +29,13 @@ val versionNameStr = when (type) {
 }
 
 val applicationName = when (type) {
-    1 -> "app.mlauncher.beta"
-    2 -> "app.mlauncher.alpha"
-    else -> "app.mlauncher"
+    1 -> "app.wazabe.mlauncher.beta"
+    2 -> "app.wazabe.mlauncher.alpha"
+    else -> "app.wazabe.mlauncher"
 }
 
 android {
-    namespace = "com.github.droidworksstudio.mlauncher"
+    namespace = "app.wazabe.mlauncher"
     compileSdk = 36
 
     defaultConfig {
@@ -56,7 +56,7 @@ android {
             isMinifyEnabled = false
             isShrinkResources = false
             isDebuggable = true
-            applicationIdSuffix = ".dev"
+            // applicationIdSuffix = ".dev"
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -67,6 +67,7 @@ android {
         }
 
         getByName("release") {
+            signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -157,6 +158,9 @@ dependencies {
     // Navigation
     implementation(libs.navigation.fragment.ktx)
     implementation(libs.navigation.ui.ktx)
+
+    // Preferences
+    implementation("androidx.preference:preference-ktx:1.2.1")
 
     // Work Manager
     implementation(libs.work.runtime.ktx)

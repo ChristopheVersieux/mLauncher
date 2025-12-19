@@ -1,11 +1,11 @@
-package com.github.creativecodecat.components.views
+﻿package com.github.creativecodecat.components.views
 
 import android.content.Context
 import android.graphics.Typeface
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
-import com.github.droidworksstudio.mlauncher.helper.CustomFontView
-import com.github.droidworksstudio.mlauncher.helper.FontManager
+import app.wazabe.mlauncher.helper.CustomFontView
+import app.wazabe.mlauncher.helper.FontManager
 
 
 class FontAppCompatTextView @JvmOverloads constructor(

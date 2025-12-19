@@ -1,0 +1,37 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Android Launch",
+            "type": "android",
+            "request": "launch",
+            "mainActivity": "app.wazabe.mlauncher.MainActivity",
+            "applicationId": "app.wazabe.mlauncher",
+            "appSrcRoot": "${workspaceFolder}/app/src/main",
+            "apkFile": "${workspaceFolder}/app/build/outputs/apk/debug/app.wazabe.mlauncher_v1.11.2 build 8-Debug.apk",
+            "adbPort": 5037,
+            "preLaunchTask": "installDebug"
+        },
+        {
+            "name": "Android Attach",
+            "type": "android",
+            "request": "attach",
+            "mainActivity": "app.wazabe.mlauncher.MainActivity",
+            "applicationId": "app.wazabe.mlauncher",
+            "processId": "${command:PickProcess}",
+            "appSrcRoot": "${workspaceFolder}/app/src/main",
+            "adbPort": 5037
+        },
+        {
+            "name": "Android Release",
+            "type": "android",
+            "request": "launch",
+            "mainActivity": "app.wazabe.mlauncher.MainActivity",
+            "applicationId": "app.wazabe.mlauncher",
+            "appSrcRoot": "${workspaceFolder}/app/src/main",
+            "apkFile": "${workspaceFolder}/app/build/outputs/apk/release/app.wazabe.mlauncher_v1.11.2 build 8-Signed.apk",
+            "adbPort": 5037,
+            "preLaunchTask": "installRelease"
+        }
+    ]
+}

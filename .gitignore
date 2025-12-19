@@ -3,7 +3,6 @@
 .idea
 git-cliff*
 bin/*
-local.properties
 build
 pages
 wiki

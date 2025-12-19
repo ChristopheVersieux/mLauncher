@@ -43,9 +43,7 @@
             android:paddingVertical="8dp"
             android:scaleType="fitCenter"
             android:visibility="gone"
-            app:srcCompat="@drawable/work_profile"
-            tools:layout_conversion_absoluteHeight="0dp"
-            tools:layout_conversion_absoluteWidth="0dp" />
+            app:srcCompat="@drawable/work_profile" />
 
         <ImageView
             android:id="@+id/privateApps"
@@ -57,9 +55,7 @@
             android:paddingVertical="8dp"
             android:scaleType="fitCenter"
             android:visibility="gone"
-            app:srcCompat="@drawable/private_profile_off"
-            tools:layout_conversion_absoluteHeight="0dp"
-            tools:layout_conversion_absoluteWidth="0dp" />
+            app:srcCompat="@drawable/private_profile_off" />
 
         <ImageView
             android:id="@+id/systemApps"
@@ -71,9 +67,7 @@
             android:paddingVertical="8dp"
             android:scaleType="fitCenter"
             android:visibility="gone"
-            app:srcCompat="@drawable/system_profile"
-            tools:layout_conversion_absoluteHeight="0dp"
-            tools:layout_conversion_absoluteWidth="0dp" />
+            app:srcCompat="@drawable/system_profile" />
 
         <ImageView
             android:id="@+id/internetSearch"
@@ -85,9 +79,7 @@
             android:paddingVertical="8dp"
             android:scaleType="fitCenter"
             android:visibility="gone"
-            app:srcCompat="@drawable/ic_browser"
-            tools:layout_conversion_absoluteHeight="0dp"
-            tools:layout_conversion_absoluteWidth="0dp" />
+            app:srcCompat="@drawable/ic_browser" />
 
         <ImageView
             android:id="@+id/searchSwitcher"
@@ -99,9 +91,7 @@
             android:paddingVertical="8dp"
             android:scaleType="fitCenter"
             android:visibility="gone"
-            app:srcCompat="@drawable/ic_contacts"
-            tools:layout_conversion_absoluteHeight="0dp"
-            tools:layout_conversion_absoluteWidth="0dp" />
+            app:srcCompat="@drawable/ic_contacts" />
 
         <Space
             android:layout_width="12dp"
@@ -183,7 +173,7 @@
         android:layout_margin="8dp"
         android:visibility="gone">
 
-        <com.github.droidworksstudio.mlauncher.ui.components.AZSidebarView
+        <app.wazabe.mlauncher.ui.components.AZSidebarView
             android:id="@+id/azSidebar"
             android:layout_width="32dp"
             android:layout_height="match_parent" />

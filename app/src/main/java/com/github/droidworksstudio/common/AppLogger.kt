@@ -1,7 +1,7 @@
-package com.github.droidworksstudio.common
+﻿package com.github.droidworksstudio.common
 
 import android.util.Log
-import com.github.droidworksstudio.mlauncher.BuildConfig
+import app.wazabe.mlauncher.BuildConfig
 
 object AppLogger {
     private const val DEFAULT_TAG = "AppLogger"

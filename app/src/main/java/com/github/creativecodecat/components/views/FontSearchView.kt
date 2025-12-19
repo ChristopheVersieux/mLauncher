@@ -1,4 +1,4 @@
-package com.github.creativecodecat.components.views
+﻿package com.github.creativecodecat.components.views
 
 import android.content.Context
 import android.graphics.Typeface
@@ -6,8 +6,8 @@ import android.util.AttributeSet
 import android.widget.EditText
 import androidx.appcompat.widget.SearchView
 import com.github.droidworksstudio.common.AppLogger
-import com.github.droidworksstudio.mlauncher.helper.CustomFontView
-import com.github.droidworksstudio.mlauncher.helper.FontManager
+import app.wazabe.mlauncher.helper.CustomFontView
+import app.wazabe.mlauncher.helper.FontManager
 
 class FontSearchView @JvmOverloads constructor(
     context: Context,

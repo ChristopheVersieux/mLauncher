@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        android:layout="@layout/settings_header"
+        android:selectable="false" />
+
+    <Preference
+        android:key="pref_key_features"
+        android:title="@string/settings_features_title"
+        android:summary="@string/settings_features_description"
+        app:iconSpaceReserved="false"
+        app:icon="@drawable/ic_feature" />
+    
+    <Preference
+        android:key="pref_key_look_feel"
+        android:title="@string/settings_look_feel_title"
+        android:summary="@string/settings_look_feel_description"
+        app:iconSpaceReserved="false"
+        app:icon="@drawable/ic_look_feel" />
+        
+    <Preference
+        android:key="pref_key_gestures"
+        android:title="@string/settings_gestures_title"
+        android:summary="@string/settings_gestures_description"
+        app:iconSpaceReserved="false"
+        app:icon="@drawable/ic_gestures" />
+        
+    <Preference
+        android:key="pref_key_notes"
+        android:title="@string/settings_notes_title"
+        android:summary="@string/settings_notes_description"
+        app:iconSpaceReserved="false"
+        app:icon="@drawable/ic_notes" />
+
+    <Preference
+        android:key="pref_key_private_spaces"
+        android:title="@string/private_space"
+        app:iconSpaceReserved="false"
+        app:icon="@drawable/private_profile_off" />
+
+    <Preference
+        android:key="pref_key_favorite_apps"
+        android:title="@string/settings_favorite_apps_title"
+        android:summary="@string/settings_favorite_apps_description"
+        app:iconSpaceReserved="false"
+        app:icon="@drawable/ic_favorite" />
+
+    <Preference
+        android:key="pref_key_hidden_apps"
+        android:title="@string/settings_hidden_apps_title"
+        android:summary="@string/settings_hidden_apps_description"
+        app:iconSpaceReserved="false"
+        app:icon="@drawable/ic_hidden" />
+        
+    <Preference
+        android:key="pref_key_advanced"
+        android:title="@string/settings_advanced_title"
+        android:summary="@string/settings_advanced_description"
+        app:iconSpaceReserved="false"
+        app:icon="@drawable/ic_advanced" />
+
+    <Preference
+        android:key="pref_key_expert"
+        android:title="@string/settings_expert_title"
+        android:summary="@string/settings_expert_description"
+        app:iconSpaceReserved="false"
+        app:icon="@drawable/ic_experimental" />
+
+    <Preference
+        android:key="pref_key_about"
+        android:title="@string/about_settings_title"
+        app:iconSpaceReserved="false"
+        app:icon="@drawable/ic_toast" />
+
+</PreferenceScreen>

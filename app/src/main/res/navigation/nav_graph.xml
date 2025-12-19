@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.github.droidworksstudio.mlauncher.ui.HomeFragment"
+        android:name="app.wazabe.mlauncher.ui.HomeFragment"
         android:label="mainFragment"
         tools:layout="@layout/fragment_home">
         <action
@@ -35,7 +35,7 @@
 
     <fragment
         android:id="@+id/appListFragment"
-        android:name="com.github.droidworksstudio.mlauncher.ui.AppDrawerFragment"
+        android:name="app.wazabe.mlauncher.ui.AppDrawerFragment"
         android:label="appListFragment"
         tools:layout="@layout/fragment_app_drawer">
         <action
@@ -61,28 +61,67 @@
 
     <fragment
         android:id="@+id/notesManagerFragment"
-        android:name="com.github.droidworksstudio.mlauncher.ui.notes.NotesManagerFragment"
+        android:name="app.wazabe.mlauncher.ui.notes.NotesManagerFragment"
         android:label="notesManagerFragment"
         tools:layout="@layout/fragment_notes_manager" />
 
     <fragment
         android:id="@+id/appFavoriteFragment"
-        android:name="com.github.droidworksstudio.mlauncher.ui.FavoriteFragment"
+        android:name="app.wazabe.mlauncher.ui.FavoriteFragment"
         android:label="appFavoriteFragment"
         tools:layout="@layout/fragment_favorite" />
 
     <fragment
         android:id="@+id/locationSearchFragment"
-        android:name="com.github.droidworksstudio.mlauncher.ui.LocationSearchFragment"
+        android:name="app.wazabe.mlauncher.ui.LocationSearchFragment"
         android:label="appLocationSearchFragment"
         tools:layout="@layout/fragment_location_search" />
 
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.github.droidworksstudio.mlauncher.ui.SettingsFragment"
-        android:label="SettingsFragment"
-        android:layout="@layout/fragment_settings">
+        android:name="app.wazabe.mlauncher.ui.SettingsPreferenceFragment"
+        android:label="SettingsFragment">
         <action
+            android:id="@+id/action_settingsFragment_to_appListFragment"
+            app:destination="@id/appListFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+
+        <action
+            android:id="@+id/action_settingsFragment_to_appFavoriteFragment"
+            app:destination="@id/appFavoriteFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+
+        <action
+            android:id="@+id/action_settingsFragment_to_locationSearchFragment"
+            app:destination="@id/locationSearchFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingsDetailFragment"
+            app:destination="@id/settingsDetailFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsDetailFragment"
+        android:name="app.wazabe.mlauncher.ui.SettingsFragment"
+        android:label="SettingsDetailFragment"
+        android:layout="@layout/fragment_settings">
+        <argument
+            android:name="start_screen"
+            app:argType="string"
+            android:defaultValue="main" />
+             <action
             android:id="@+id/action_settingsFragment_to_appListFragment"
             app:destination="@id/appListFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
