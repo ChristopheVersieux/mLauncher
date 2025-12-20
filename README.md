@@ -1,5 +1,7 @@
 <div align='center'>
-	<h2>mLauncher - Minimal and Clutter Free Android launcher</h2>
+	<h2>Cascade Launcher</h2>
+    <p>Fork of <a href="https://github.com/CodeWorksCreativeHub/mLauncher">mLauncher - Minimal and Clutter Free Android launcher</a></p>
+    <p><i>Focusing on refined user experience, Android native components, and blazing speed.</i></p>
     <table align='center'>
         Click on any image to enlarge it. To know more, explore and see for yourself.
         <tr>
@@ -44,8 +46,8 @@
 
 - Chat with us at [ModMyDevice](https://discord.com/invite/modmydevice) on discord.
 - This application can be found
-  on [Play Store](https://play.google.com/store/apps/details?id=app.mlauncher), [GitHub](https://github.com/CodeWorksCreativeHub/mLauncher/releases/), [IzzyOnDroid](https://apt.izzysoft.de/fdroid/index/apk/app.mlauncher) & [F-Droid](https://f-droid.org/packages/app.mlauncher/).
-- The latest stable version is available on the [main](https://github.com/CodeWorksCreativeHub/mLauncher/tree/main) branch, which can be cloned to build
+  on [Play Store](https://play.google.com/store/apps/details?id=app.mlauncher), [GitHub](https://github.com/CodeWorksCreativeHub/Cascade Launcher/releases/), [IzzyOnDroid](https://apt.izzysoft.de/fdroid/index/apk/app.mlauncher) & [F-Droid](https://f-droid.org/packages/app.mlauncher/).
+- The latest stable version is available on the [main](https://github.com/CodeWorksCreativeHub/Cascade Launcher/tree/main) branch, which can be cloned to build
   the application independently.
 - The **original** version of the application is also accessible on
   the [Play Store](https://play.google.com/store/apps/details?id=app.olauncher), [F-Droid](https://f-droid.org/fr/packages/app.olauncher/) & [GitHub](https://github.com/tanujnotes/Olauncher).
@@ -114,25 +116,25 @@ your hard work and dedication. Thank you all for your invaluable contributions!
 
 ## Contribute
 
-- If you are unhappy with any part of the app or feel like missing something, you can open a pull request or an [**issue**](https://github.com/CodeWorksCreativeHub/mLauncher/issues/new/choose) as you like.
+- If you are unhappy with any part of the app or feel like missing something, you can open a pull request or an [**issue**](https://github.com/CodeWorksCreativeHub/Cascade Launcher/issues/new/choose) as you like.
     - Please go through the issues marked as `Bug report`, `Crash report` or `Feature request`.
     - Please can we discuss before sending pull requests.
     - Make pull requests to `main` branch.
-- Any help in translating mLauncher into other languages is greatly appreciated. If you don't know how to perform a pull request, feel free to check
-  out our dedicated [**Wiki**](https://github.com/CodeWorksCreativeHub/mLauncher/wiki).
+- Any help in translating Cascade Launcher into other languages is greatly appreciated. If you don't know how to perform a pull request, feel free to check
+  out our dedicated [**Wiki**](https://github.com/CodeWorksCreativeHub/Cascade Launcher/wiki).
 
 ## License
 
-**mLauncher is proudly licensed under the open source GPL3 license, granting users the freedom to use, study, modify and distribute it at will.**
+**Cascade Launcher is proudly licensed under the open source GPL3 license, granting users the freedom to use, study, modify and distribute it at will.**
 
-The Copyleft provision guarantees that these freedoms remain intact, ensuring that Multi Launcher will remain a fully open-source project. With access to
+The Copyleft provision guarantees that these freedoms remain intact, ensuring that Cascade Launcher will remain a fully open-source project. With access to
 the full source code, anyone can build, fork, and customize the application to their heart's content, unleashing its full potential.
 
-- Multi Launcher does not collect or transmit any data in any way whatsoever.
+- Cascade Launcher does not collect or transmit any data in any way whatsoever.
 
 ## Permissions
 
-mLauncher uses the following permissions:
+Cascade Launcher uses the following permissions:
 
 - `android.permission.EXPAND_STATUS_BAR`
     - Allows an application to expand or collapse the status bar.
@@ -145,7 +147,7 @@ mLauncher uses the following permissions:
     - Required for issuing the request to remove packages. This does not allow the app to remove apps directly; this only gives the permission to
       issue the request.
 - `android.permission.PACKAGE_USAGE_STATS`
-    - Allows mLauncher to see usage of other apps to list last used apps first in the app list.
+    - Allows Cascade Launcher to see usage of other apps to list last used apps first in the app list.
 
 ## Credits
 
@@ -154,10 +156,10 @@ mLauncher uses the following permissions:
 
 ## Donation
 
-We kindly request that you consider supporting the ongoing development of mLauncher by making a donation if you find it to be a useful application.
-As a free and open-source product, mLauncher depends entirely on the support and generosity of its users to maintain its continued growth and
+We kindly request that you consider supporting the ongoing development of Cascade Launcher by making a donation if you find it to be a useful application.
+As a free and open-source product, Cascade Launcher depends entirely on the support and generosity of its users to maintain its continued growth and
 accessibility to all.
-Please note that while purchasing is not obligatory, even a small donation would go a long way in helping us to keep mLauncher alive and thriving.
+Please note that while purchasing is not obligatory, even a small donation would go a long way in helping us to keep Cascade Launcher alive and thriving.
 We appreciate your continued support, and thank you for your contribution towards the betterment of our product. 😊
 
 <div align='center'>

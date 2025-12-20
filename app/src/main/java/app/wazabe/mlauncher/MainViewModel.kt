@@ -589,8 +589,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                             val pkg = info.applicationInfo.packageName
                             val cls = info.componentName.className
 
-                            // Skip your own app
-                            if (pkg == BuildConfig.APPLICATION_ID) return@mapNotNull null
 
                             val key = appKey(pkg, cls, profile.hashCode())
                             if (!seenAppKeys.add(key)) return@mapNotNull null

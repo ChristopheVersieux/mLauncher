@@ -22,6 +22,7 @@ import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
 import android.text.style.SuperscriptSpan
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -29,6 +30,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Space
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.biometric.BiometricPrompt
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -156,6 +158,21 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         } ?: throw Exception("Invalid Activity")
 
         setupAppDrawer()
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (drawerBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                        drawerBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    } else {
+                        isEnabled = false
+                        requireActivity().onBackPressedDispatcher.onBackPressed()
+                        isEnabled = true
+                    }
+                }
+            }
+        )
 
         viewModel.ismlauncherDefault()
 
@@ -1549,13 +1566,30 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
         // Handle window insets manually since Edge-to-Edge is enabled
         ViewCompat.setOnApplyWindowInsetsListener(drawerBinding.root) { view, insets ->
-            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            
+            // Apply status bar height to top padding of header
             drawerBinding.drawerHeader.setPadding(
                 drawerBinding.drawerHeader.paddingLeft,
-                statusBarHeight,
+                systemBars.top,
                 drawerBinding.drawerHeader.paddingRight,
                 drawerBinding.drawerHeader.paddingBottom
             )
+            
+            // Apply navigation bar height to bottom padding of the entire drawer root
+            view.setPadding(
+                view.paddingLeft,
+                view.paddingTop,
+                view.paddingRight,
+                systemBars.bottom
+            )
+            
+            // Update peek height to include navigation bar so 60dp handle remains fully visible
+            val basePeekHeight = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 60f, resources.displayMetrics
+            ).toInt()
+            drawerBehavior.peekHeight = basePeekHeight + systemBars.bottom
+            
             insets
         }
 

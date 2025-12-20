@@ -21,13 +21,13 @@
     <string name="grant_location_permission">To continue, please grant Location permission.</string>
     <string name="reason_location_permission">This app needs Location Access to provide accurate weather updates based on your current location. We do not collect or share any personal data.</string>
     <string name="grant_accessibility_permission">To continue, please grant Accessibility permission.</string>
-    <string name="reason_accessibility_permission">MultiLauncher needs Accessibility permission to provide enhanced features, such as locking the screen and opening quick settings. These functions help improve usability. We do not collect or share any data.</string>
+    <string name="reason_accessibility_permission">Cascade Launcher needs Accessibility permission to provide enhanced features, such as locking the screen and opening quick settings. These functions help improve usability. We do not collect or share any data.</string>
     <string name="permission_granted">Permission Granted! You can continue.</string>
 
     <string name="this_can_be_disabled_later">* This permission may be disabled later.</string>
 
     <!-- Strings used for settings menus -->
-    <string name="settings_name">MultiLauncher Settings</string>
+    <string name="settings_name">Cascade Launcher Settings</string>
 
     <string name="settings_features_title">Features</string>
     <string name="settings_features_description">Improve your productivity.</string>
@@ -58,7 +58,7 @@
     <string name="settings_expert_description">Unlock hidden options, and advanced tweaks.</string>
 
 
-    <string name="settings_exit_mlauncher_title">Exit MultiLauncher</string>
+    <string name="settings_exit_mlauncher_title">Exit Cascade Launcher</string>
     <string name="settings_exit_mlauncher_description">Switch to your default launcher temporarily.</string>
     <string name="settings_exit_mlauncher_dialog">Choose a launcher</string>
 
@@ -302,14 +302,14 @@
     <string name="clear_home_app">Clear Home App</string>
 
     <!-- Accessibility/Help Strings -->
-    <string name="accessibility_service_name">MultiLauncher Action Services</string>
+    <string name="accessibility_service_name">Cascade Launcher Action Services</string>
     <string name="accessibility_service_why_we_need">Why We Need Accessibility Permission</string>
-    <string name="accessibility_service_description">This accessibility service allows MultiLauncher to do certain actions such as locking the screen or opening the quick settings. Our accessibility service does not collect or share any data.</string>
+    <string name="accessibility_service_description">This accessibility service allows Cascade Launcher to do certain actions such as locking the screen or opening the quick settings. Our accessibility service does not collect or share any data.</string>
     <string name="accessibility_service_more_info">
-    MultiLauncher requires access to the Accessibility Service to enable features such as:\n\n
+    Cascade Launcher requires access to the Accessibility Service to enable features such as:\n\n
     • Locking the screen with a gesture or shortcut\n
     • Opening the Quick Settings panel quickly\n\n
-    This permission allows MultiLauncher to perform these actions on your behalf, but we do not collect, store, or share any personal or sensitive data through this service.\n\n
+    This permission allows Cascade Launcher to perform these actions on your behalf, but we do not collect, store, or share any personal or sensitive data through this service.\n\n
     You can disable this access anytime from your device settings.
     </string>
     <string name="can_not_delete_system_apps">Can\'t Delete System Apps</string>
@@ -326,7 +326,7 @@
     <string name="text_authentication_cancel">Authentication Cancel.</string>
     <string name="text_authentication_error">Authentication error: %1$s (code %2$d)</string>
     <string name="text_authentication_failed">Authentication failed.</string>
-    <string name="text_biometric_login">Biometric login MultiLauncher Settings</string>
+    <string name="text_biometric_login">Biometric login Cascade Launcher Settings</string>
     <string name="text_biometric_login_app">Biometric login for %1$s</string>
     <string name="text_biometric_login_sub">Log in using your biometric credentials.</string>
 
@@ -425,7 +425,7 @@
 
     <!-- Private Spaces Strings -->
     <string name="alert_requires_android_v">This functionality requires Android 15 or later.</string>
-    <string name="toast_private_space_default_home_screen">MultiLauncher needs to be the default home screen to access private space.</string>
+    <string name="toast_private_space_default_home_screen">Cascade Launcher needs to be the default home screen to access private space.</string>
     <string name="toast_private_space_locked">Private space locked</string>
     <string name="toast_private_space_unlocked">Private space unlocked</string>
     <string name="toast_private_space_not_available">Private space is not available</string>
