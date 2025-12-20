@@ -67,6 +67,7 @@ class AppDrawerAdapter(
 
     private lateinit var prefs: Prefs
     private var appFilter = createAppFilter()
+    var location: Int = 0
     var appsList: MutableList<AppListItem> = mutableListOf()
     var appFilteredList: MutableList<AppListItem> = mutableListOf()
     private lateinit var binding: AdapterAppDrawerBinding

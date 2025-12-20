@@ -332,7 +332,7 @@ class Prefs(val context: Context) {
         set(value) = prefsNormal.edit { putString(HOME_ALIGNMENT, value.toString()) }
 
     var homeAlignmentBottom: Boolean
-        get() = getSetting(HOME_ALIGNMENT_BOTTOM, true)
+        get() = getSetting(HOME_ALIGNMENT_BOTTOM, false)
         set(value) = prefsNormal.edit { putBoolean(HOME_ALIGNMENT_BOTTOM, value) }
 
     var extendHomeAppsArea: Boolean
@@ -439,7 +439,7 @@ class Prefs(val context: Context) {
 
     var iconPackHome: Constants.IconPacks
         get() {
-            return getEnumSetting(ICON_PACK_HOME, Constants.IconPacks.Disabled)
+            return getEnumSetting(ICON_PACK_HOME, Constants.IconPacks.System)
         }
         set(value) = prefsNormal.edit { putString(ICON_PACK_HOME, value.name) }
 
@@ -449,7 +449,7 @@ class Prefs(val context: Context) {
 
     var iconPackAppList: Constants.IconPacks
         get() {
-            return getEnumSetting(ICON_PACK_APP_LIST, Constants.IconPacks.Disabled)
+            return getEnumSetting(ICON_PACK_APP_LIST, Constants.IconPacks.System)
         }
         set(value) = prefsNormal.edit { putString(ICON_PACK_APP_LIST, value.name) }
 
@@ -767,7 +767,7 @@ class Prefs(val context: Context) {
 
     var textPaddingSize: Int
         get() {
-            return getSetting(TEXT_PADDING_SIZE, 10)
+            return getSetting(TEXT_PADDING_SIZE, 50)
         }
         set(value) = prefsNormal.edit { putInt(TEXT_PADDING_SIZE, value) }
 

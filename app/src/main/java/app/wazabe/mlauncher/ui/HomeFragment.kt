@@ -595,6 +595,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     private fun showAppList(flag: AppDrawerFlag, includeHiddenApps: Boolean = false, includeRecentApps: Boolean = true, n: Int = 0) {
         viewModel.getAppList(includeHiddenApps, includeRecentApps)
+        appsAdapter.flag = flag
+        appsAdapter.location = n
         CrashHandler.logUserAction("Display App List")
         drawerBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
@@ -1523,7 +1525,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             AppDrawerFlag.LaunchApp,
             gravity,
             { appModel ->
-                viewModel.selectedApp(this, appModel, AppDrawerFlag.LaunchApp, 0)
+                viewModel.selectedApp(this, appModel, appsAdapter.flag, appsAdapter.location)
                 drawerBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             },
             { appModel ->

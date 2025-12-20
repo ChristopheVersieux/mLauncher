@@ -2,7 +2,7 @@
     <string name="pass_a_string" translatable="false">%1$s</string>
 
     <!-- Base Settings -->
-    <string name="select_app">Select App</string>
+    <string name="select_app">Add App</string>
     <string name="show_apps">Search Apps</string>
     <string name="show_private_apps">Search Private Apps</string>
     <string name="show_work_apps">Search Work Apps</string>
@@ -231,7 +231,7 @@
     <!-- Strings used for advanced settings -->
     <string name="advanced_settings_title">Advanced</string>
 
-    <string name="advanced_settings_app_info_title">App Info</string>
+    <string name="advanced_settings_app_info_title">App Details</string>
     <string name="advanced_settings_app_info_description">%1$s</string>
 
     <string name="advanced_settings_set_as_default_launcher">Set as Default Launcher</string>
@@ -370,7 +370,7 @@
     <string name="unpin">Unpin</string>
     <string name="rename">Rename</string>
     <string name="tag">Tag</string>
-    <string name="info">Info</string>
+    <string name="info">App Details</string>
     <string name="okay">Okay</string>
     <string name="apply">Apply</string>
     <string name="reset">Reset</string>

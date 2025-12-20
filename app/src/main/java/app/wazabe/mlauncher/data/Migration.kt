@@ -45,6 +45,14 @@ class Migration(val context: Context) {
                 "SHORT_SWIPE_THRESHOLD",
                 "LONG_SWIPE_THRESHOLD",
             ),
+            1110209 to listOf(
+                "HOME_ALIGNMENT_BOTTOM",
+                "TEXT_PADDING_SIZE"
+            ),
+            1110210 to listOf(
+                "ICON_PACK_HOME",
+                "ICON_PACK_APP_LIST"
+            ),
             // Add more versions and preferences to remove here
         )
 
