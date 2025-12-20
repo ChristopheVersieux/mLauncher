@@ -37,6 +37,8 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.fragment.findNavController
 import com.github.droidworksstudio.common.AppLogger
 import com.github.droidworksstudio.common.ColorIconsExtensions
@@ -44,7 +46,10 @@ import com.github.droidworksstudio.common.ColorManager
 import com.github.droidworksstudio.common.CrashHandler
 import com.github.droidworksstudio.common.attachGestureManager
 import com.github.droidworksstudio.common.getLocalizedString
+import com.github.droidworksstudio.common.isSystemApp
 import com.github.droidworksstudio.common.isGestureNavigationEnabled
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import com.github.droidworksstudio.common.launchCalendar
 import com.github.droidworksstudio.common.openAlarmApp
 import com.github.droidworksstudio.common.openBatteryManager
@@ -81,6 +86,7 @@ import app.wazabe.mlauncher.helper.receivers.DeviceAdmin
 import app.wazabe.mlauncher.helper.receivers.PrivateSpaceReceiver
 import app.wazabe.mlauncher.helper.setTopPadding
 import app.wazabe.mlauncher.helper.showPermissionDialog
+import app.wazabe.mlauncher.helper.openAppInfo
 import app.wazabe.mlauncher.helper.utils.AppReloader
 import app.wazabe.mlauncher.helper.utils.BiometricHelper
 import app.wazabe.mlauncher.helper.utils.PrivateSpaceManager
@@ -90,13 +96,21 @@ import app.wazabe.mlauncher.listener.NotificationDotManager
 import app.wazabe.mlauncher.services.ActionService
 import app.wazabe.mlauncher.ui.components.DialogManager
 import app.wazabe.mlauncher.ui.widgets.WidgetActivity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import androidx.appcompat.widget.SearchView
+import androidx.core.net.toUri
+import androidx.recyclerview.widget.LinearLayoutManager
+import app.wazabe.mlauncher.databinding.FragmentAppDrawerBottomSheetBinding
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import app.wazabe.mlauncher.ui.adapter.AppDrawerAdapter
+import app.wazabe.mlauncher.ui.adapter.ContactDrawerAdapter
 
 class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListener {
 
     private lateinit var prefs: Prefs
     private lateinit var viewModel: MainViewModel
+    private lateinit var drawerBehavior: BottomSheetBehavior<View>
+    private lateinit var appsAdapter: AppDrawerAdapter
+    private lateinit var contactsAdapter: ContactDrawerAdapter
     private lateinit var dialogBuilder: DialogManager
     private lateinit var deviceManager: DevicePolicyManager
     private lateinit var batteryReceiver: BatteryReceiver
@@ -140,6 +154,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         viewModel = activity?.run {
             ViewModelProvider(this)[MainViewModel::class.java]
         } ?: throw Exception("Invalid Activity")
+
+        setupAppDrawer()
 
         viewModel.ismlauncherDefault()
 
@@ -261,7 +277,10 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             totalScreenTime.setTextColor(prefs.appColor)
             setDefaultLauncher.setTextColor(prefs.appColor)
 
-            val fabList = listOf(fabPhone, fabMessages, fabCamera, fabPhotos, fabBrowser, fabSettings, fabAction)
+            val fabList = listOf(fabPhone, fabMessages, fabCamera, fabPhotos, fabBrowser)
+            // fabSettings and fabAction are now in the drawer header
+            fabSettings.isVisible = false
+            fabAction.isVisible = false
             val fabFlags = prefs.getMenuFlags("HOME_BUTTON_FLAGS", "0000011") // Might return list of wrong size
             val colors = ColorManager.getRandomHueColors(prefs.shortcutIconsColor, fabList.size)
 
@@ -380,17 +399,17 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 CrashHandler.logUserAction("fabBrowser Clicked")
             }
 
-            R.id.fabSettings -> {
+            R.id.fabSettings, R.id.drawerFabSettings -> {
                 trySettings()
-                CrashHandler.logUserAction("fabSettings Clicked")
+                CrashHandler.logUserAction("Settings Clicked")
             }
 
-            R.id.fabAction -> {
+            R.id.fabAction, R.id.drawerFabAction -> {
                 when (val action = prefs.clickFloatingAction) {
                     Action.OpenApp -> openFabActionApp()
                     else -> handleOtherAction(action)
                 }
-                CrashHandler.logUserAction("fabAction Clicked")
+                CrashHandler.logUserAction("Action Clicked")
             }
 
             else -> {
@@ -441,13 +460,13 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             battery.setOnClickListener(this@HomeFragment)
             weather.setOnClickListener(this@HomeFragment)
 
+            // fabPhone, fabMessages, etc. remain for now
             fabPhone.setOnClickListener(this@HomeFragment)
             fabMessages.setOnClickListener(this@HomeFragment)
             fabCamera.setOnClickListener(this@HomeFragment)
             fabPhotos.setOnClickListener(this@HomeFragment)
             fabBrowser.setOnClickListener(this@HomeFragment)
-            fabAction.setOnClickListener(this@HomeFragment)
-            fabSettings.setOnClickListener(this@HomeFragment)
+            // fabAction and fabSettings removed from here
         }
     }
 
@@ -560,16 +579,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     private fun showAppList(flag: AppDrawerFlag, includeHiddenApps: Boolean = false, includeRecentApps: Boolean = true, n: Int = 0) {
         viewModel.getAppList(includeHiddenApps, includeRecentApps)
         CrashHandler.logUserAction("Display App List")
-        try {
-            if (findNavController().currentDestination?.id == R.id.mainFragment) {
-                findNavController().navigate(
-                    R.id.action_mainFragment_to_appListFragment,
-                    bundleOf("flag" to flag.toString(), "n" to n, "profileType" to "SYSTEM")
-                )
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        drawerBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     private fun showNotesManager() {
@@ -1476,6 +1486,133 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                     else -> handleOtherAction(action)
                 }
                 CrashHandler.logUserAction("SwipeDown Long Gesture")
+            }
+        })
+    }
+
+    private fun setupAppDrawer() {
+        val drawerContainer = binding.coordinatorLayout.findViewById<View>(R.id.appDrawerContainer)
+        drawerBehavior = BottomSheetBehavior.from(drawerContainer)
+
+        val gravity = when (prefs.drawerAlignment) {
+            Constants.Gravity.Left -> Gravity.LEFT
+            Constants.Gravity.Center -> Gravity.CENTER
+            Constants.Gravity.Right -> Gravity.RIGHT
+        }
+
+        appsAdapter = AppDrawerAdapter(
+            requireContext(),
+            this,
+            AppDrawerFlag.LaunchApp,
+            gravity,
+            { appModel ->
+                viewModel.selectedApp(this, appModel, AppDrawerFlag.LaunchApp, 0)
+                drawerBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            },
+            { appModel ->
+                if (requireContext().isSystemApp(appModel.activityPackage))
+                    showShortToast(getLocalizedString(R.string.can_not_delete_system_apps))
+                else {
+                    val intent = Intent(Intent.ACTION_DELETE, "package:${appModel.activityPackage}".toUri())
+                    requireContext().startActivity(intent)
+                }
+            },
+            { p, a -> prefs.setAppAlias(p, a) },
+            { p, t, u -> prefs.setAppTag(p, t, u); appsAdapter.notifyDataSetChanged() },
+            { flag, appModel ->
+                val newSet = mutableSetOf<String>()
+                newSet.addAll(prefs.hiddenApps)
+                if (flag == AppDrawerFlag.HiddenApps) {
+                    newSet.remove(appModel.activityPackage + "|" + appModel.activityClass + "|" + appModel.user.hashCode())
+                } else {
+                    newSet.add(appModel.activityPackage + "|" + appModel.activityClass + "|" + appModel.user.hashCode())
+                }
+                prefs.hiddenApps = newSet
+                viewModel.getAppList()
+            },
+            { appModel ->
+                openAppInfo(requireContext(), appModel.user, appModel.activityPackage)
+                drawerBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        )
+
+        contactsAdapter = ContactDrawerAdapter(
+            requireContext(),
+            gravity,
+            { contactModel ->
+                viewModel.selectedContact(this, contactModel, 0)
+                drawerBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        )
+
+        val drawerBinding = binding.appDrawerLayout
+
+        // Handle window insets manually since Edge-to-Edge is enabled
+        ViewCompat.setOnApplyWindowInsetsListener(drawerBinding.root) { view, insets ->
+            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            drawerBinding.drawerHeader.setPadding(
+                drawerBinding.drawerHeader.paddingLeft,
+                statusBarHeight,
+                drawerBinding.drawerHeader.paddingRight,
+                drawerBinding.drawerHeader.paddingBottom
+            )
+            insets
+        }
+
+        drawerBinding.drawerFabAction.setOnClickListener(this)
+        drawerBinding.drawerFabSettings.setOnClickListener(this)
+
+        drawerBinding.appsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        drawerBinding.contactsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        drawerBinding.appsRecyclerView.adapter = appsAdapter
+        drawerBinding.contactsRecyclerView.adapter = contactsAdapter
+
+        initAppDrawerViewModel(drawerBinding)
+        setupAppDrawerSearch(drawerBinding)
+    }
+
+    private fun initAppDrawerViewModel(drawerBinding: FragmentAppDrawerBottomSheetBinding) {
+        viewModel.appList.observe(viewLifecycleOwner) { rawAppList ->
+            rawAppList?.let { list ->
+                val appsByProfile = list.groupBy { it.profileType }
+                val mergedList = listOf("SYSTEM", "PRIVATE", "WORK", "USER").flatMap { profile ->
+                    appsByProfile[profile].orEmpty()
+                }
+                drawerBinding.listEmptyHint.isVisible = mergedList.isEmpty()
+                drawerBinding.sidebarContainer.isVisible = prefs.showAZSidebar
+                appsAdapter.setAppList(mergedList.toMutableList())
+            }
+        }
+
+        viewModel.contactList.observe(viewLifecycleOwner) { newList ->
+            newList?.let {
+                drawerBinding.listEmptyHint.isVisible = it.isEmpty()
+                contactsAdapter.setContactList(it.toMutableList())
+            }
+        }
+    }
+
+    private fun setupAppDrawerSearch(drawerBinding: FragmentAppDrawerBottomSheetBinding) {
+        drawerBinding.search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                val searchQuery = query?.trim() ?: ""
+                if (searchQuery.isNotEmpty()) {
+                    if (drawerBinding.menuView.displayedChild == 0) {
+                        appsAdapter.launchFirstInList()
+                    } else {
+                        contactsAdapter.launchFirstInList()
+                    }
+                    drawerBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                }
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                newText?.let {
+                    if (drawerBinding.menuView.displayedChild == 0) appsAdapter.filter.filter(it.trim())
+                    else contactsAdapter.filter.filter(it.trim())
+                }
+                return false
             }
         })
     }

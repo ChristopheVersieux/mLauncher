@@ -1,275 +1,298 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/mainLayout"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    android:orientation="vertical"
+    android:fitsSystemWindows="true"
     tools:context=".ui.HomeFragment">
 
     <FrameLayout
-        android:id="@+id/touchArea"
+        android:id="@+id/mainLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="50dp" />
+        android:animateLayoutChanges="true">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/mainView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginVertical="20dp"
-        android:orientation="vertical">
+        <FrameLayout
+            android:id="@+id/touchArea"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="50dp" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/mainView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginVertical="20dp"
             android:orientation="vertical">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_marginTop="6dp"
+                android:orientation="vertical">
 
-                <com.github.creativecodecat.components.views.FontAppCompatTextView
-                    android:id="@+id/weather"
-                    style="@style/TextDefaultStyle"
-                    android:layout_width="wrap_content"
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:visibility="gone" />
+                    android:orientation="horizontal">
 
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
+                    <com.github.creativecodecat.components.views.FontAppCompatTextView
+                        android:id="@+id/weather"
+                        style="@style/TextDefaultStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
 
-                <com.github.creativecodecat.components.views.FontAppCompatTextView
-                    android:id="@+id/battery"
-                    style="@style/TextDefaultStyle"
-                    android:layout_width="wrap_content"
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <com.github.creativecodecat.components.views.FontAppCompatTextView
+                        android:id="@+id/battery"
+                        style="@style/TextDefaultStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <LinearLayout
+                    android:id="@+id/timeDateLayout"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp" />
+                    android:layout_marginVertical="1dp"
+                    android:orientation="vertical"
+                    tools:visibility="visible">
+
+                    <com.github.creativecodecat.components.views.FontTextClock
+                        android:id="@+id/clock"
+                        style="@style/TextDefaultStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/time_size"
+                        tools:text="02:34" />
+
+
+                    <com.github.creativecodecat.components.views.FontTextClock
+                        android:id="@+id/date"
+                        style="@style/TextDefaultStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="2dp"
+                        android:textSize="@dimen/date_size"
+                        tools:text="Thu, 30 Dec" />
+
+                    <com.github.creativecodecat.components.views.FontAppCompatTextView
+                        android:id="@+id/alarm"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/alarm_size"
+                        android:visibility="gone" />
+
+                    <com.github.creativecodecat.components.views.FontAppCompatTextView
+                        android:id="@+id/daily_word"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/alarm_size"
+                        android:visibility="gone" />
+                </LinearLayout>
             </androidx.appcompat.widget.LinearLayoutCompat>
 
+            <!-- First run tips -->
             <LinearLayout
-                android:id="@+id/timeDateLayout"
+                android:id="@+id/firstRunTips"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="1dp"
+                android:layout_gravity="bottom"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="106dp"
+                android:layout_marginEnd="4dp"
+                android:gravity="center_horizontal"
                 android:orientation="vertical"
+                android:visibility="gone"
                 tools:visibility="visible">
 
-                <com.github.creativecodecat.components.views.FontTextClock
-                    android:id="@+id/clock"
-                    style="@style/TextDefaultStyle"
+                <com.github.creativecodecat.components.views.FontAppCompatTextView
+                    style="@style/TextSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/time_size"
-                    tools:text="02:34" />
-
-
-                <com.github.creativecodecat.components.views.FontTextClock
-                    android:id="@+id/date"
-                    style="@style/TextDefaultStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="2dp"
-                    android:textSize="@dimen/date_size"
-                    tools:text="Thu, 30 Dec" />
+                    android:text="@string/tap_button_for_notes" />
 
                 <com.github.creativecodecat.components.views.FontAppCompatTextView
-                    android:id="@+id/alarm"
+                    style="@style/TextSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/alarm_size"
-                    android:visibility="gone" />
+                    android:text="@string/swipe_up_for_apps" />
 
                 <com.github.creativecodecat.components.views.FontAppCompatTextView
-                    android:id="@+id/daily_word"
+                    style="@style/TextSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/alarm_size"
-                    android:visibility="gone" />
+                    android:text="@string/long_press_for_settings" />
+
             </LinearLayout>
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <!-- First run tips -->
+
+        <!-- Home apps-->
         <LinearLayout
-            android:id="@+id/firstRunTips"
+            android:id="@+id/homeAppsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="100dp"
+            android:paddingBottom="30dp" />
+
+        <com.github.creativecodecat.components.views.FontAppCompatTextView
+            android:id="@+id/homeScreenPager"
+            style="@style/TextSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:visibility="gone" />
+
+        <com.github.creativecodecat.components.views.FontAppCompatTextView
+            android:id="@+id/totalScreenTime"
+            style="@style/TextSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:text="@string/total_screen_time"
+            android:visibility="gone" />
+
+        <!-- Set default launcher -->
+        <com.github.creativecodecat.components.views.FontAppCompatTextView
+            android:id="@+id/setDefaultLauncher"
+            style="@style/TextSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:text="@string/advanced_settings_set_as_default_launcher"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/privateLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="106dp"
-            android:layout_marginEnd="4dp"
+            android:layout_gravity="bottom|center_horizontal"
             android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:visibility="gone"
-            tools:visibility="visible">
+            android:orientation="horizontal"
+            android:padding="32dp"
+            android:visibility="gone">
 
-            <com.github.creativecodecat.components.views.FontAppCompatTextView
-                style="@style/TextSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tap_button_for_notes" />
+            <ImageView
+                android:id="@+id/privateFab"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_margin="8dp"
+                android:contentDescription="@string/show"
+                android:elevation="6dp"
+                android:src="@drawable/private_profile_on" />
+        </LinearLayout>
 
-            <com.github.creativecodecat.components.views.FontAppCompatTextView
-                style="@style/TextSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/swipe_up_for_apps" />
+        <LinearLayout
+            android:id="@+id/fabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:visibility="gone">
 
-            <com.github.creativecodecat.components.views.FontAppCompatTextView
-                style="@style/TextSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/long_press_for_settings" />
+            <ImageView
+                android:id="@+id/fabPhone"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_margin="8dp"
+                android:contentDescription="@string/show"
+                android:elevation="6dp"
+                android:src="@drawable/ic_phone" />
+
+            <ImageView
+                android:id="@+id/fabMessages"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_margin="8dp"
+                android:contentDescription="@string/show"
+                android:elevation="6dp"
+                android:src="@drawable/ic_messages" />
+
+            <ImageView
+                android:id="@+id/fabCamera"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_margin="8dp"
+                android:contentDescription="@string/show"
+                android:elevation="6dp"
+                android:src="@drawable/ic_camera" />
+
+            <ImageView
+                android:id="@+id/fabPhotos"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_margin="8dp"
+                android:contentDescription="@string/show"
+                android:elevation="6dp"
+                android:src="@drawable/ic_photos" />
+
+            <ImageView
+                android:id="@+id/fabBrowser"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_margin="8dp"
+                android:contentDescription="@string/show"
+                android:elevation="6dp"
+                android:src="@drawable/ic_browser" />
+
+            <ImageView
+                android:id="@+id/fabSettings"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_margin="8dp"
+                android:contentDescription="@string/show"
+                android:elevation="6dp"
+                android:src="@drawable/ic_settings"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/fabAction"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_margin="8dp"
+                android:contentDescription="@string/show"
+                android:elevation="6dp"
+                android:src="@drawable/app_launcher"
+                android:visibility="gone" />
 
         </LinearLayout>
-    </androidx.appcompat.widget.LinearLayoutCompat>
+    </FrameLayout>
 
-
-    <!-- Home apps-->
-    <LinearLayout
-        android:id="@+id/homeAppsLayout"
+    <!-- Persistent App Drawer Bottom Sheet -->
+    <FrameLayout
+        android:id="@+id/appDrawerContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        android:orientation="vertical"
-        android:paddingHorizontal="20dp"
-        android:paddingTop="100dp"
-        android:paddingBottom="30dp" />
+        android:background="@android:color/transparent"
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="60dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-    <com.github.creativecodecat.components.views.FontAppCompatTextView
-        android:id="@+id/homeScreenPager"
-        style="@style/TextSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:visibility="gone" />
+        <include
+            android:id="@+id/appDrawerLayout"
+            layout="@layout/fragment_app_drawer_bottom_sheet" />
+    </FrameLayout>
 
-    <com.github.creativecodecat.components.views.FontAppCompatTextView
-        android:id="@+id/totalScreenTime"
-        style="@style/TextSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:text="@string/total_screen_time"
-        android:visibility="gone" />
-
-    <!-- Set default launcher -->
-    <com.github.creativecodecat.components.views.FontAppCompatTextView
-        android:id="@+id/setDefaultLauncher"
-        style="@style/TextSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:text="@string/advanced_settings_set_as_default_launcher"
-        android:visibility="gone" />
-
-    <LinearLayout
-        android:id="@+id/privateLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        android:padding="32dp"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/privateFab"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_margin="8dp"
-            android:contentDescription="@string/show"
-            android:elevation="6dp"
-            android:src="@drawable/private_profile_on" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/fabLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/fabPhone"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_margin="8dp"
-            android:contentDescription="@string/show"
-            android:elevation="6dp"
-            android:src="@drawable/ic_phone" />
-
-        <ImageView
-            android:id="@+id/fabMessages"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_margin="8dp"
-            android:contentDescription="@string/show"
-            android:elevation="6dp"
-            android:src="@drawable/ic_messages" />
-
-        <ImageView
-            android:id="@+id/fabCamera"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_margin="8dp"
-            android:contentDescription="@string/show"
-            android:elevation="6dp"
-            android:src="@drawable/ic_camera" />
-
-        <ImageView
-            android:id="@+id/fabPhotos"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_margin="8dp"
-            android:contentDescription="@string/show"
-            android:elevation="6dp"
-            android:src="@drawable/ic_photos" />
-
-        <ImageView
-            android:id="@+id/fabBrowser"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_margin="8dp"
-            android:contentDescription="@string/show"
-            android:elevation="6dp"
-            android:src="@drawable/ic_browser" />
-
-        <ImageView
-            android:id="@+id/fabSettings"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_margin="8dp"
-            android:contentDescription="@string/show"
-            android:elevation="6dp"
-            android:src="@drawable/ic_settings" />
-
-        <ImageView
-            android:id="@+id/fabAction"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_margin="8dp"
-            android:contentDescription="@string/show"
-            android:elevation="6dp"
-            android:src="@drawable/app_launcher" />
-
-    </LinearLayout>
-
-</FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
