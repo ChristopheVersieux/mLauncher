@@ -1570,22 +1570,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         ViewCompat.setOnApplyWindowInsetsListener(drawerBinding.root) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             
-            // Apply status bar height to top padding of header
-            drawerBinding.drawerHeader.setPadding(
-                drawerBinding.drawerHeader.paddingLeft,
-                systemBars.top,
-                drawerBinding.drawerHeader.paddingRight,
-                drawerBinding.drawerHeader.paddingBottom
-            )
-            
-            // Apply navigation bar height to bottom padding of the entire drawer root
-            view.setPadding(
-                view.paddingLeft,
-                view.paddingTop,
-                view.paddingRight,
-                systemBars.bottom
-            )
-            
+
+
             // Update peek height to include navigation bar so 60dp handle remains fully visible
             val basePeekHeight = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, 60f, resources.displayMetrics

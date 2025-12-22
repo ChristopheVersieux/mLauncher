@@ -14,18 +14,20 @@
     <LinearLayout
         android:id="@+id/drawerHeader"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:gravity="center">
+        android:paddingVertical="16dp">
 
         <ImageView
             android:id="@+id/drawerFabAction"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:contentDescription="@string/show"
-            android:src="@drawable/ic_cascade_launcher" />
+            android:src="@drawable/ic_cascade_launcher"
+            app:tint="?attr/primaryColor" />
 
         <View
             android:layout_width="0dp"
@@ -36,9 +38,9 @@
         <com.github.creativecodecat.components.views.FontAppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:alpha="0.3"
             android:text="•••"
             android:textColor="?attr/primaryColor"
-            android:alpha="0.3"
             android:textSize="18sp" />
 
         <View
@@ -55,101 +57,21 @@
             app:tint="?attr/primaryColor" />
     </LinearLayout>
 
-    <!-- Search Bar positioned below header -->
-    <LinearLayout
-        android:id="@+id/searchContainer"
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/drawerHeader"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp"
-        android:orientation="horizontal"
-        android:paddingHorizontal="8dp">
-
-        <com.github.creativecodecat.components.views.FontSearchView
-            android:id="@+id/search"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="end"
-            android:imeOptions="actionSearch"
-            android:paddingHorizontal="0dp"
-            android:paddingVertical="0dp"
-            app:iconifiedByDefault="false"
-            app:queryBackground="@null"
-            app:queryHint="___"
-            app:searchIcon="@drawable/ic_search"
-            app:theme="@style/AppSearchText" />
-
-        <ImageView
-            android:id="@+id/workApps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/advanced_settings_app_info_title"
-            android:paddingHorizontal="5dp"
-            android:paddingVertical="8dp"
-            android:scaleType="fitCenter"
-            android:visibility="gone"
-            app:srcCompat="@drawable/work_profile" />
-
-        <ImageView
-            android:id="@+id/privateApps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/advanced_settings_app_info_title"
-            android:paddingHorizontal="5dp"
-            android:paddingVertical="8dp"
-            android:scaleType="fitCenter"
-            android:visibility="gone"
-            app:srcCompat="@drawable/private_profile_off" />
-
-        <ImageView
-            android:id="@+id/systemApps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/advanced_settings_app_info_title"
-            android:paddingHorizontal="5dp"
-            android:paddingVertical="8dp"
-            android:scaleType="fitCenter"
-            android:visibility="gone"
-            app:srcCompat="@drawable/system_profile" />
-
-        <ImageView
-            android:id="@+id/internetSearch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/advanced_settings_app_info_title"
-            android:paddingHorizontal="5dp"
-            android:paddingVertical="8dp"
-            android:scaleType="fitCenter"
-            android:visibility="gone"
-            app:srcCompat="@drawable/ic_browser" />
-
-        <ImageView
-            android:id="@+id/searchSwitcher"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/advanced_settings_app_info_title"
-            android:paddingHorizontal="5dp"
-            android:paddingVertical="8dp"
-            android:scaleType="fitCenter"
-            android:visibility="gone"
-            app:srcCompat="@drawable/ic_contacts" />
-
-        <Space
-            android:layout_width="12dp"
-            android:layout_height="0dp" />
-    </LinearLayout>
+        app:iconifiedByDefault="false"
+        app:queryHint="Search apps..." />
 
     <com.github.creativecodecat.components.views.FontAppCompatTextView
         android:id="@+id/appDrawerTip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/searchContainer"
+        android:layout_below="@id/search"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="4dp"
         android:ellipsize="end"

@@ -140,7 +140,7 @@ class OnboardingPageFragment : Fragment() {
                 binding.permissionButton.setOnClickListener { setDefaultHomeScreen() }
 
                 binding.nextButton.text = getLocalizedString(R.string.next)
-                binding.nextButton.setOnClickListener { viewPager?.currentItem = viewPager.currentItem + 1 }
+                binding.nextButton.setOnClickListener { finishOnboarding()  }
             }
 
             is FragmentOnboardingPageTwoBinding -> {
