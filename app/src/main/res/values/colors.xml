@@ -5,8 +5,13 @@
     <color name="colorPrimaryBackground">@color/background_bubble</color>
     <color name="transparent">#00000000</color>
     <color name="colorAccent">#222222</color>
-    <color name="preference_accent">@color/colorAccent</color>
+    <color name="preference_accent">@android:color/system_accent1_600</color>
+    <color name="preference_accent_light">@android:color/system_accent1_300</color>
+    <color name="preference_accent_dark">@android:color/system_accent1_800</color>
+    <color name="system_surface">@android:color/system_neutral1_10</color>
+    <color name="system_on_surface">@android:color/system_neutral1_900</color>
     <color name="colorSelected">#651FFF</color>
+
 
     <color name="buttonTextPrimary">#222222</color>
     <color name="buttonBackgroundPrimary">#a6da95</color>

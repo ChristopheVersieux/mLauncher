@@ -40,7 +40,7 @@ android {
 
     defaultConfig {
         applicationId = applicationName
-        minSdk = 28
+        minSdk = 31
         targetSdk = 36
         versionCode = versionCodeInt
         versionName = versionNameStr

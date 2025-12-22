@@ -2,7 +2,9 @@
 
     <style name="Theme.mLauncher" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:fontFamily">@android:fontFamily/system_font</item>
+        <item name="android:windowSplashScreenBrandingImage">@drawable/branding_image</item>
 
+        <item name="android:forceDarkAllowed">false</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
@@ -18,14 +20,10 @@
         <item name="android:statusBarColor">@color/whiteInverseTrans50</item>
         <item name="android:navigationBarColor">@color/whiteInverseTrans50</item>
         <!-- <item name="android:enforceStatusBarContrast">false</item> -->
+        <item name="android:enforceNavigationBarContrast">false</item>
         <!-- <item name="android:windowTranslucentStatus">false</item> -->
         <!-- <item name="android:windowTranslucentNavigation">true</item> -->
         <item name="windowActionBar">false</item>
-        <item name="colorPrimary">@color/white</item>
-        <item name="colorPrimaryDark">@android:color/darker_gray</item>
-        <item name="colorAccent">@color/white</item>
-        <item name="colorSurface">@color/background_dark</item>
-        <item name="colorOnSurface">@color/background_light</item>
         <item name="primaryColor">@color/white</item>
         <item name="primaryInverseColor">@color/whiteInverse</item>
         <item name="primaryTextShadowColor">@color/whiteInverseTrans50</item>
@@ -40,6 +38,14 @@
 
         <item name="backgroundLight">@color/background_light</item>
         <item name="backgroundDark">@color/background_dark</item>
+
+        <item name="preferenceTheme">@style/AppPreferenceTheme</item>
+
+        <item name="colorSurface">@android:color/system_neutral1_900</item>
+        <item name="colorOnSurface">@android:color/system_neutral1_10</item>
+        <item name="colorPrimary">@android:color/system_accent1_200</item>
+        <item name="colorPrimaryDark">@android:color/system_accent1_600</item>
+        <item name="colorAccent">@android:color/system_accent1_200</item>
     </style>
 
     <style name="WindowAnimationTransition">
