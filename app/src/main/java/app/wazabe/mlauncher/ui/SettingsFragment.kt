@@ -502,7 +502,7 @@ class SettingsFragment : BaseFragment() {
                 "features" -> {
                     BackHandler { currentScreen = "main" }
                     PageHeader(
-                        iconRes = R.drawable.ic_back,
+                        iconRes = R.drawable.ic_cascade_launcher,
                         title = getLocalizedString(R.string.features_settings_title),
                         onClick = { currentScreen = "main" }
                     )
@@ -1077,7 +1077,7 @@ class SettingsFragment : BaseFragment() {
                     }
 
                     PageHeader(
-                        iconRes = R.drawable.ic_back,
+                        iconRes = R.drawable.ic_cascade_launcher,
                         title = getLocalizedString(R.string.look_feel_settings_title),
                         onClick = {
                             currentScreen = "main"
@@ -1766,7 +1766,7 @@ class SettingsFragment : BaseFragment() {
                 "gestures" -> {
                     BackHandler { currentScreen = "main" }
                     PageHeader(
-                        iconRes = R.drawable.ic_back,
+                        iconRes = R.drawable.ic_cascade_launcher,
                         title = getLocalizedString(R.string.gestures_settings_title),
                         onClick = { currentScreen = "main" }
                     )
@@ -2237,7 +2237,7 @@ class SettingsFragment : BaseFragment() {
                 "notes" -> {
                     BackHandler { currentScreen = "main" }
                     PageHeader(
-                        iconRes = R.drawable.ic_back,
+                        iconRes = R.drawable.ic_cascade_launcher,
                         title = getLocalizedString(R.string.notes_settings_title),
                         onClick = { currentScreen = "main" }
                     )
@@ -2428,7 +2428,7 @@ class SettingsFragment : BaseFragment() {
                 "advanced" -> {
                     BackHandler { currentScreen = "main" }
                     PageHeader(
-                        iconRes = R.drawable.ic_back,
+                        iconRes = R.drawable.ic_cascade_launcher,
                         title = getLocalizedString(R.string.advanced_settings_title),
                         onClick = {
                             currentScreen = "main"
@@ -2595,7 +2595,7 @@ class SettingsFragment : BaseFragment() {
                     }
 
                     PageHeader(
-                        iconRes = R.drawable.ic_back,
+                        iconRes = R.drawable.ic_cascade_launcher,
                         title = getLocalizedString(R.string.about_settings_title, getLocalizedString(R.string.app_name)),
 
                         onClick = {
@@ -2662,7 +2662,7 @@ class SettingsFragment : BaseFragment() {
                     }
 
                     PageHeader(
-                        iconRes = R.drawable.ic_back,
+                        iconRes = R.drawable.ic_cascade_launcher,
                         title = getLocalizedString(R.string.expert_settings_title),
                         onClick = {
                             currentScreen = "main"

@@ -2,16 +2,23 @@
 
 import android.app.Application
 import android.content.Context
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
-import com.github.droidworksstudio.common.CrashHandler
 import app.wazabe.mlauncher.data.Constants
 import app.wazabe.mlauncher.data.Prefs
 import app.wazabe.mlauncher.helper.FontManager
 import app.wazabe.mlauncher.helper.IconCacheTarget
 import app.wazabe.mlauncher.helper.IconPackHelper
+import com.github.droidworksstudio.common.AppLogger
+import com.github.droidworksstudio.common.CrashHandler
 import java.util.concurrent.Executors
 
 class Mlauncher : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        initialize(this)
+    }
+
     companion object {
         private var appContext: Context? = null
 
@@ -23,12 +30,19 @@ class Mlauncher : Application() {
 
         fun initialize(context: Context) {
             if (appContext != null) return // already initialized
-            appContext = context
+            appContext = context.applicationContext
 
             val prefs = Prefs(context)
 
+            // 🔹 Log the theme preference to understand what's being loaded
+            val loadedTheme = prefs.appTheme
+            val toastMessage = "Theme loaded: ${loadedTheme.name}"
+            AppLogger.d("MlauncherTheme", toastMessage)
+            Toast.makeText(context.applicationContext, toastMessage, Toast.LENGTH_LONG).show()
+
+
             // 🌓 Set theme mode once at app startup
-            val themeMode = when (prefs.appTheme) {
+            val themeMode = when (loadedTheme) {
                 Constants.Theme.Light -> AppCompatDelegate.MODE_NIGHT_NO
                 Constants.Theme.Dark -> AppCompatDelegate.MODE_NIGHT_YES
                 Constants.Theme.System -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM

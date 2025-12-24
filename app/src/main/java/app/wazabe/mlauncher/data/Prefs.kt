@@ -3,6 +3,7 @@
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.UserHandle
+import android.preference.PreferenceManager
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.content.edit
 import androidx.core.graphics.toColorInt
@@ -29,7 +30,7 @@ class Prefs(val context: Context) {
     val messageWrongListType: ParameterizedType = Types.newParameterizedType(List::class.java, MessageWrong::class.java)
     val messageWrongAdapter: JsonAdapter<List<MessageWrong>> = moshi.adapter(messageWrongListType)
 
-    internal val prefsNormal: SharedPreferences = context.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE)
+    internal val prefsNormal: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     internal val prefsOnboarding: SharedPreferences = context.getSharedPreferences(PREFS_ONBOARDING_FILENAME, Context.MODE_PRIVATE)
     internal val pinnedAppsKey = PINNED_APPS
 
@@ -563,7 +564,7 @@ class Prefs(val context: Context) {
         get() {
             return getEnumSetting(APP_THEME, Constants.Theme.System)
         }
-        set(value) = prefsNormal.edit { putString(APP_THEME, value.name) }
+        set(value) = prefsNormal.edit(commit = true) { putString(APP_THEME, value.name) }
 
     var tempUnit: Constants.TempUnits
         get() {
