@@ -7,7 +7,7 @@
     <string name="privacy_policy" translatable="false">Privacy Policy</string>
     <string name="privacy_policy_url" translatable="false">https://mlauncher.5646316.xyz/privacy.html</string>
 
-    <string name="created_by" translatable="false"><![CDATA[by <a href="https://5646316.xyz/">CodeWorks Creative Hub</a>]]></string>
+    <string name="created_by" translatable="false"><![CDATA[by CVE Based on CodeWorks Creative Hub work]]></string>
     <string name="github_link" translatable="false"><![CDATA[<a href="https://github.com/CodeWorksCreativeHub/mLauncher">GitHub</a>]]></string>
     <string name="sponsor_link" translatable="false"><![CDATA[<a href="https://github.com/sponsors/CreativeCodeCat">GitHub Sponsors</a><br>(Recurring)]]></string>
     <string name="libera_link" translatable="false"><![CDATA[<a href="https://liberapay.com/CreativeCodeCat/donate">Liberapay</a><br>(One Time)]]></string>

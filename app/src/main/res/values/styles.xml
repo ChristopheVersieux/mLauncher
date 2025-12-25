@@ -18,7 +18,7 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
-        <item name="android:statusBarColor">@color/blackInverseTrans50</item>
+        <item name="android:statusBarColor">@color/colorAccent</item>
         <item name="android:navigationBarColor">@color/blackInverseTrans50</item>
         <!-- <item name="android:enforceStatusBarContrast">false</item> -->
         <item name="android:enforceNavigationBarContrast">false</item>
@@ -44,9 +44,10 @@
 
         <item name="colorSurface">@android:color/system_neutral1_10</item>
         <item name="colorOnSurface">@android:color/system_neutral1_900</item>
-        <item name="colorPrimary">@android:color/system_accent1_600</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@android:color/system_accent1_800</item>
         <item name="colorAccent">@android:color/system_accent1_600</item>
+        <item name="colorOnPrimary">@android:color/white</item>
     </style>
 
     <style name="Theme.mLauncher.Settings" parent="Theme.mLauncher">
@@ -58,9 +59,9 @@
         <item name="android:windowTranslucentNavigation">false</item>
         <item name="android:fitsSystemWindows">true</item>
 
-        <item name="android:statusBarColor">?attr/colorSurface</item>
-        <item name="android:navigationBarColor">?attr/colorSurface</item>
-
+        <!-- Make status bar match app bar color -->
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
     <style name="BottomSheetDialogStyle" parent="Theme.Design.BottomSheetDialog">

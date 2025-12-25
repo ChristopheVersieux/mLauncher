@@ -18,9 +18,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val typedValue = android.util.TypedValue()
-        requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorSurface, typedValue, true)
-        view.setBackgroundColor(typedValue.data)
 
         val prefs = app.wazabe.mlauncher.data.Prefs(requireContext())
         val privateSpaceManager = PrivateSpaceManager(requireContext())
@@ -49,15 +46,15 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 true
             }
             "pref_key_look_feel" -> {
-                navigateToDetail("look_feel")
+                findNavController().navigate(R.id.action_settingsFragment_to_lookFeelSettingsFragment)
                 true
             }
             "pref_key_gestures" -> {
-                navigateToDetail("gestures")
+                findNavController().navigate(R.id.action_settingsFragment_to_gesturesSettingsFragment)
                 true
             }
             "pref_key_notes" -> {
-                navigateToDetail("notes")
+                findNavController().navigate(R.id.action_settingsFragment_to_notesSettingsFragment)
                 true
             }
             "pref_key_private_spaces" -> {
@@ -66,10 +63,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                         showToast = false,
                         launchSettings = false
                     )
-                     // Refresh to show updated icon/status if needed, though this might need a full recreate or live data obs
-                     // For now, toggle logic is invoked.
-                } else {
-                     // If not setup, maybe navigate to a setup screen? original code just toggles.
                 }
                 true
             }
@@ -87,48 +80,19 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 )
                 true
             }
-             "pref_key_locked_apps" -> {
-                 // Logic for locked apps? Original code used toggledAppsLocked but that was a switch.
-                 // Assuming this might be just viewing locked apps?
-                 // The original code had "Lock Home Apps" switch.
-                 // If this is a screen, I need to know where it goes. 
-                 // Actually, "Locked Apps" in original code was just a switch "lock_home_apps".
-                 // If the user wants a management screen, that might be different. 
-                 // Re-reading original SettingsFragment: 
-                 // SettingsSwitch(text = getLocalizedString(R.string.lock_home_apps) ... toggledAppsLocked ...)
-                 // So "Locked Apps" is a boolean toggle, not a screen.
-                 // My root_preferences defined it as a Preference, not SwitchPreference.
-                 // I should probably change it to SwitchPreference or navigate to a screen if one exists.
-                 // If it is just "Manage locked applications", usually implies a list.
-                 // But `Prefs.lockedApps` is a set. Maybe `AppDrawerFragment` with `LockedApps` flag?
-                 // Checking constants... existing flags: HiddenApps, PrivateApps. No LockedApps flag.
-                 // Wait, `Constants.AppDrawerFlag` has `HiddenApps`, `PrivateApps`.
-                 // Let's stick to what I know. "Locked Apps" in my XML might be misleading if it was just a switch.
-                 // I will assume for now I navigation to 'main' or specific screen isn't clear.
-                 // I'll leave it as no-op or TODO.
-                 true
-             }
-
             "pref_key_advanced" -> {
-                navigateToDetail("advanced")
+                findNavController().navigate(R.id.action_settingsFragment_to_advancedSettingsFragment)
                 true
             }
             "pref_key_expert" -> {
-                navigateToDetail("expert")
+                findNavController().navigate(R.id.action_settingsFragment_to_expertSettingsFragment)
                 true
             }
             "pref_key_about" -> {
-                navigateToDetail("about")
+                findNavController().navigate(R.id.action_settingsFragment_to_aboutSettingsFragment)
                 true
             }
             else -> super.onPreferenceTreeClick(preference)
         }
-    }
-
-    private fun navigateToDetail(startScreen: String) {
-        findNavController().navigate(
-            R.id.action_settingsFragment_to_settingsDetailFragment,
-            bundleOf("start_screen" to startScreen)
-        )
     }
 }

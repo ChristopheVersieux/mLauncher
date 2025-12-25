@@ -1,6 +1,8 @@
 ﻿package app.wazabe.mlauncher.helper
 
 import android.Manifest
+import androidx.biometric.BiometricManager
+ 
 import android.app.AlarmManager
 import android.app.AppOpsManager
 import android.app.UiModeManager
@@ -985,4 +987,10 @@ class CenteredImageSpan(drawable: Drawable) : ImageSpan(drawable) {
             drawable.draw(this)
         }
     }
+}
+fun Context.isBiometricEnabled(): Boolean {
+    val authenticators =
+        androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG or androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
+    return androidx.biometric.BiometricManager.from(this)
+        .canAuthenticate(authenticators) == androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
 }

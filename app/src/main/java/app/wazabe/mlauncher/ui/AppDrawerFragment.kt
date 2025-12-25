@@ -42,6 +42,7 @@ import com.github.droidworksstudio.common.searchCustomSearchEngine
 import com.github.droidworksstudio.common.searchOnPlayStore
 import com.github.droidworksstudio.common.showShortToast
 import app.wazabe.mlauncher.MainViewModel
+import app.wazabe.mlauncher.Mlauncher
 import app.wazabe.mlauncher.R
 import app.wazabe.mlauncher.data.AppCategory
 import app.wazabe.mlauncher.data.AppListItem
@@ -190,10 +191,19 @@ class AppDrawerFragment : BaseFragment() {
                         }
                     }
                 }
+
+                if (app.wazabe.mlauncher.Mlauncher.prefs.launcherFont != "system") {
+                    binding.root.post {
+                        binding.root.applyCustomFont()
+                    }
+                }
             }
 
 
+
             else -> {}
+
+
         }
 
         val viewModel = activity?.run {
@@ -209,7 +219,7 @@ class AppDrawerFragment : BaseFragment() {
             combinedScrollMaps.value = Pair(viewModel.appScrollMap.value ?: emptyMap(), contactMap)
         }
 
-        combinedScrollMaps.observe(viewLifecycleOwner) { (appMap, contactMap) ->
+       /* combinedScrollMaps.observe(viewLifecycleOwner) { (appMap, contactMap) ->
             binding.azSidebar.onLetterSelected = { section ->
                 when (binding.menuView.displayedChild) {
                     0 -> appMap[section]?.let { index ->
@@ -221,7 +231,7 @@ class AppDrawerFragment : BaseFragment() {
                     }
                 }
             }
-        }
+        }*/
 
 
         val gravity = when (Prefs(requireContext()).drawerAlignment) {
@@ -308,7 +318,7 @@ class AppDrawerFragment : BaseFragment() {
                 if (sectionLetter == lastSectionLetter) return
                 lastSectionLetter = sectionLetter
 
-                binding.azSidebar.setSelectedLetter(sectionLetter)
+                //binding.azSidebar.setSelectedLetter(sectionLetter)
             }
 
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -370,7 +380,7 @@ class AppDrawerFragment : BaseFragment() {
                 if (sectionLetter == lastSectionLetter) return
                 lastSectionLetter = sectionLetter
 
-                binding.azSidebar.setSelectedLetter(sectionLetter)
+                //binding.azSidebar.setSelectedLetter(sectionLetter)
             }
 
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -847,5 +857,26 @@ class AppDrawerFragment : BaseFragment() {
         viewModel.selectedContact(this, contactModel, n)
         // Close the drawer or fragment after selection
         findNavController().popBackStack()
+    }
+}
+
+fun View.applyCustomFont() {
+    // Exit if system font is selected
+    if (Mlauncher.globalTypeface == android.graphics.Typeface.DEFAULT) return
+
+    // 1. Handle Custom Components (using your specific interface)
+    if (this is app.wazabe.mlauncher.helper.CustomFontView) {
+        this.applyFont(Mlauncher.globalTypeface)
+    }
+    // 2. Handle Standard TextViews
+    else if (this is android.widget.TextView) {
+        this.typeface = Mlauncher.globalTypeface
+    }
+
+    // 3. Recursive crawl for containers (loops through all children)
+    if (this is android.view.ViewGroup) {
+        for (i in 0 until childCount) {
+            getChildAt(i).applyCustomFont()
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿package app.wazabe.mlauncher.ui
 
+import HomeAppsAdapter
 import android.annotation.SuppressLint
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
@@ -28,6 +29,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.Space
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -70,7 +72,6 @@ import app.wazabe.mlauncher.data.Constants.Action
 import app.wazabe.mlauncher.data.Constants.AppDrawerFlag
 import app.wazabe.mlauncher.data.Prefs
 import app.wazabe.mlauncher.databinding.FragmentHomeBinding
-import app.wazabe.mlauncher.helper.FontManager
 import app.wazabe.mlauncher.helper.IconCacheTarget
 import app.wazabe.mlauncher.helper.IconPackHelper.getSafeAppIcon
 import app.wazabe.mlauncher.helper.WeatherHelper
@@ -106,7 +107,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import app.wazabe.mlauncher.ui.adapter.AppDrawerAdapter
 import app.wazabe.mlauncher.ui.adapter.ContactDrawerAdapter
 
-class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListener {
+class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListener, android.content.SharedPreferences.OnSharedPreferenceChangeListener {
 
     private lateinit var prefs: Prefs
     private lateinit var viewModel: MainViewModel
@@ -120,6 +121,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     private lateinit var weatherHelper: WeatherHelper
     private lateinit var privateSpaceReceiver: PrivateSpaceReceiver
     private lateinit var vibrator: Vibrator
+    private lateinit var homeAppsAdapter: HomeAppsAdapter
 
     private var longPressToSelectApp: Int = 0
     private var _binding: FragmentHomeBinding? = null
@@ -181,13 +183,24 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         @Suppress("DEPRECATION")
         vibrator = context?.getSystemService(VIBRATOR_SERVICE) as Vibrator
 
-        FontManager.reloadFont(requireContext())
-
         initAppObservers()
         initClickListeners()
         initSwipeTouchListener()
         initPermissionCheck()
         initObservers()
+
+        homeAppsAdapter = HomeAppsAdapter(
+            prefs,
+            onClick = { location -> homeAppClicked(location) },
+            onLongClick = { location ->
+                showAppList(AppDrawerFlag.SetHomeApp, includeHiddenApps = true, includeRecentApps = false, location)
+            }
+        )
+
+        binding.homeAppsRecyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = homeAppsAdapter
+        }
 
         // Update view appearance/settings based on prefs
         updateUIFromPreferences()
@@ -195,6 +208,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     override fun onStart() {
         super.onStart()
+        updateUIFromPreferences()
 
         // Handle status bar once per view creation
         setTopPadding(binding.mainLayout)
@@ -229,6 +243,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 privateSpaceReceiver = PrivateSpaceReceiver()
                 ctx.registerReceiver(privateSpaceReceiver, IntentFilter(Intent.ACTION_PROFILE_AVAILABLE))
             }
+
+            prefs.prefsNormal.registerOnSharedPreferenceChangeListener(this)
         }
     }
 
@@ -245,6 +261,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 // Receiver not registered — safe to ignore
                 e.printStackTrace()
             }
+            prefs.prefsNormal.unregisterOnSharedPreferenceChangeListener(this)
         }
 
         dismissDialogs()
@@ -316,6 +333,23 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                     )
                 }
             }
+
+            // Alignments
+            clock.gravity = prefs.clockAlignment.value()
+            (clock.layoutParams as LinearLayout.LayoutParams).gravity = prefs.clockAlignment.value()
+
+            date.gravity = prefs.dateAlignment.value()
+            (date.layoutParams as LinearLayout.LayoutParams).gravity = prefs.dateAlignment.value()
+
+            alarm.gravity = prefs.alarmAlignment.value()
+            (alarm.layoutParams as LinearLayout.LayoutParams).gravity = prefs.alarmAlignment.value()
+
+            dailyWord.gravity = prefs.dailyWordAlignment.value()
+            (dailyWord.layoutParams as LinearLayout.LayoutParams).gravity = prefs.dailyWordAlignment.value()
+
+        }
+        if (::homeAppsAdapter.isInitialized) {
+            homeAppsAdapter.notifyDataSetChanged()
         }
     }
 
@@ -502,90 +536,46 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
             setDefaultLauncher.text = getLocalizedString(changeLauncherText)
         }
-
-        with(viewModel) {
-            homeAppsNum.observe(viewLifecycleOwner) {
-                if (prefs.appUsageStats) {
-                    updateAppCountWithUsageStats(it)
-                } else {
-                    updateAppCount(it)
-                }
-            }
-            launcherDefault.observe(viewLifecycleOwner) {
-                binding.setDefaultLauncher.isVisible = it
-            }
-        }
     }
 
     private fun initObservers() {
         with(viewModel) {
-            showDate.observe(viewLifecycleOwner) {
-                binding.date.isVisible = it
-            }
-            showClock.observe(viewLifecycleOwner) {
-                binding.clock.isVisible = it
-            }
-            showAlarm.observe(viewLifecycleOwner) {
-                binding.alarm.isVisible = it
-            }
-            showDailyWord.observe(viewLifecycleOwner) {
-                binding.dailyWord.isVisible = it
+            launcherDefault.observe(viewLifecycleOwner) { isDefault ->
+                binding.setDefaultLauncher.isVisible = isDefault == true
             }
 
-            clockAlignment.observe(viewLifecycleOwner) { clockGravity ->
-                binding.clock.gravity = clockGravity.value()
-
-                // Set layout_gravity to align the TextClock (clock) within the parent (LinearLayout)
-                binding.clock.layoutParams =
-                    (binding.clock.layoutParams as LinearLayout.LayoutParams).apply {
-                        gravity = clockGravity.value()
-                    }
-            }
-
-            dateAlignment.observe(viewLifecycleOwner) { dateGravity ->
-                binding.date.gravity = dateGravity.value()
-
-                // Set layout_gravity to align the TextClock (date) within the parent (LinearLayout)
-                binding.date.layoutParams =
-                    (binding.date.layoutParams as LinearLayout.LayoutParams).apply {
-                        gravity = dateGravity.value()
-                    }
-            }
-
-            alarmAlignment.observe(viewLifecycleOwner) { alarmGravity ->
-                binding.alarm.gravity = alarmGravity.value()
-
-                // Set layout_gravity to align the TextView (alarm) within the parent (LinearLayout)
-                binding.alarm.layoutParams =
-                    (binding.alarm.layoutParams as LinearLayout.LayoutParams).apply {
-                        gravity = alarmGravity.value()
-                    }
-            }
-
-            dailyWordAlignment.observe(viewLifecycleOwner) { dailyWordGravity ->
-                binding.dailyWord.gravity = dailyWordGravity.value()
-
-                // Set layout_gravity to align the TextView (alarm) within the parent (LinearLayout)
-                binding.dailyWord.layoutParams =
-                    (binding.dailyWord.layoutParams as LinearLayout.LayoutParams).apply {
-                        gravity = dailyWordGravity.value()
-                    }
-            }
-
-            homeAppsAlignment.observe(viewLifecycleOwner) { (homeAppsGravity, onBottom) ->
-                val horizontalAlignment = if (onBottom) Gravity.BOTTOM else Gravity.CENTER_VERTICAL
-                binding.homeAppsLayout.gravity = homeAppsGravity.value() or horizontalAlignment
-
-                binding.homeAppsLayout.children.forEach { view ->
-                    if (prefs.appUsageStats) {
-                        (view as LinearLayout).gravity = homeAppsGravity.value()
-                    } else {
-                        (view as TextView).gravity = homeAppsGravity.value()
-                    }
+            homeAppsNum.observe(viewLifecycleOwner) { num ->
+                homeAppsAdapter.notifyDataSetChanged()
+                if (prefs.appUsageStats) {
+                    updateAppCountWithUsageStats(num)
+                } else {
+                    updateAppCount(num)
                 }
             }
         }
     }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: android.content.SharedPreferences?, key: String?) {
+        when (key) {
+            "showDate", "showClock", "showAlarm", "showDailyWord", "showBattery",
+            "dateSize", "clockSize", "alarmSize", "dailyWordSize", "batterySize", "appSize",
+            "dateColor", "clockColor", "alarmColor", "dailyWordColor", "batteryColor", "appColor",
+            "backgroundColor", "opacityNum", "showBackground", "textPaddingSize" -> {
+                updateUIFromPreferences()
+            }
+            "homeAlignment", "clockAlignment", "dateAlignment", "alarmAlignment", "dailyWordAlignment", "drawerAlignment", "homeAlignmentBottom" -> {
+                updateUIFromPreferences()
+                // Some alignments might require layout updates
+                binding.mainLayout.requestLayout()
+            }
+            "iconPackHome", "customIconPackHome", "iconPackAppList", "customIconPackAppList" -> {
+                // Reload icons if needed - HomeFragment usually handles this via AppReloader or similar
+                // For now, refresh UI
+                updateUIFromPreferences()
+            }
+        }
+    }
+
 
     private fun homeAppClicked(location: Int) {
         CrashHandler.logUserAction("Clicked Home App: $location")
@@ -817,7 +807,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     @SuppressLint("InflateParams", "ClickableViewAccessibility")
     private fun updateAppCountWithUsageStats(newAppsNum: Int) {
         val appUsageMonitor = AppUsageMonitor.getInstance(requireContext())
-        val oldAppsNum = binding.homeAppsLayout.childCount // current number of apps
+        val oldAppsNum = binding.homeAppsRecyclerView.childCount // current number of apps
         val diff = newAppsNum - oldAppsNum
 
         if (diff > 0) {
@@ -895,11 +885,11 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 parentLinearLayout.addView(newAppView)
 
                 // Add parentLinearLayout to homeAppsLayout
-                binding.homeAppsLayout.addView(parentLinearLayout)
+                //binding.homeAppsLayout.addView(parentLinearLayout)
             }
         } else if (diff < 0) {
             // Remove extra apps
-            binding.homeAppsLayout.removeViews(oldAppsNum + diff, -diff)
+            //binding.homeAppsLayout.removeViews(oldAppsNum + diff, -diff)
         }
 
         // Create a new TextView instance
@@ -954,7 +944,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 totalScreenTime,
                 homeScreenPager,
                 fabLayout,
-                homeAppsLayout,
+                //homeAppsLayout,
                 privateLayout
             )
 
@@ -991,7 +981,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 // Add extra space above fabLayout if it's visible
                 if (prefs.homeAlignmentBottom) {
                     if (visibleViews.contains(fabLayout)) {
-                        if (view == homeAppsLayout) {
+                        if (view == homeAppsRecyclerView) {
                             bottomMargin += 65
                         }
                     }
@@ -1010,7 +1000,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     @SuppressLint("InflateParams", "DiscouragedApi", "UseCompatLoadingForDrawables", "ClickableViewAccessibility")
     private fun updateAppCount(newAppsNum: Int) {
-        val oldAppsNum = binding.homeAppsLayout.childCount // current number of apps
+        val oldAppsNum = newAppsNum//binding.homeAppsLayout.childCount // current number of apps
         val diff = newAppsNum - oldAppsNum
 
         if (diff > 0) {
@@ -1044,6 +1034,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                     if (packageName.isNotBlank() && prefs.iconPackHome != Constants.IconPacks.Disabled) {
                         val iconPackPackage = prefs.customIconPackHome
                         // Try to get app icon, possibly using icon pack, with graceful fallback
+                        AppLogger.e(message = "ICON "+iconPackPackage)
                         val nonNullDrawable: Drawable = getSafeAppIcon(
                             context = context,
                             packageName = packageName,
@@ -1169,11 +1160,11 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                     }
                 }
                 // Add the view to the layout
-                binding.homeAppsLayout.addView(view)
+               // binding.homeAppsLayout.addView(view)
             }
         } else if (diff < 0) {
             // Remove extra apps
-            binding.homeAppsLayout.removeViews(oldAppsNum + diff, -diff)
+            //binding.homeAppsLayout.removeViews(oldAppsNum + diff, -diff)
         }
 
         // Update the total number of pages and calculate maximum apps per page
@@ -1228,8 +1219,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         AppLogger.d(homeScreenPager, "Showing apps for currentPage=$currentPage, visibleRange=$visibleRange")
 
         for (i in 0 until getTotalAppsCount()) {
-            val view = binding.homeAppsLayout.getChildAt(i)
-            view.isVisible = i in visibleRange
+            //val view = binding.homeAppsLayout.getChildAt(i)
+            //view.isVisible = i in visibleRange
         }
 
         // Update page selector icons
@@ -1292,7 +1283,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
     private fun getTotalAppsCount(): Int {
-        val count = binding.homeAppsLayout.childCount
+        val count = binding.homeAppsRecyclerView.childCount
         AppLogger.d(homeScreenPager, "getTotalAppsCount: $count")
         return count
     }
@@ -1526,6 +1517,9 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             gravity,
             { appModel ->
                 viewModel.selectedApp(this, appModel, appsAdapter.flag, appsAdapter.location)
+                if (appsAdapter.flag == AppDrawerFlag.SetHomeApp) {
+                    homeAppsAdapter.notifyDataSetChanged()
+                }
                 drawerBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             },
             { appModel ->
@@ -1566,20 +1560,35 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
         val drawerBinding = binding.appDrawerLayout
 
-        // Handle window insets manually since Edge-to-Edge is enabled
-        ViewCompat.setOnApplyWindowInsetsListener(drawerBinding.root) { view, insets ->
+        var statusBarSize = 0
+        ViewCompat.setOnApplyWindowInsetsListener(drawerBinding.root) { _, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            
+            statusBarSize = systemBars.top // On stocke la valeur
 
-
-            // Update peek height to include navigation bar so 60dp handle remains fully visible
+            // On garde uniquement la logique du bas ici
             val basePeekHeight = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, 60f, resources.displayMetrics
             ).toInt()
             drawerBehavior.peekHeight = basePeekHeight + systemBars.bottom
-            
             insets
         }
+
+// 2. On ajuste la marge en temps réel pendant le glissement
+        drawerBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {}
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                // slideOffset va de 0.0 (fermé) à 1.0 (ouvert)
+                val headerParams = drawerBinding.drawerHeader.layoutParams as RelativeLayout.LayoutParams
+
+                // La marge est proportionnelle à l'ouverture
+                // Si fermé (0.0) -> marge = 0
+                // Si ouvert (1.0) -> marge = statusBarSize
+                headerParams.topMargin = (slideOffset * statusBarSize).toInt()
+
+                drawerBinding.drawerHeader.layoutParams = headerParams
+            }
+        })
 
         drawerBinding.drawerFabAction.setOnClickListener(this)
         drawerBinding.drawerFabSettings.setOnClickListener(this)

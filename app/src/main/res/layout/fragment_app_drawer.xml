@@ -173,10 +173,10 @@
         android:layout_margin="8dp"
         android:visibility="gone">
 
-        <app.wazabe.mlauncher.ui.components.AZSidebarView
+        <!--app.wazabe.mlauncher.ui.components.AZSidebarView
             android:id="@+id/azSidebar"
             android:layout_width="32dp"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent" /-->
     </FrameLayout>
 
 

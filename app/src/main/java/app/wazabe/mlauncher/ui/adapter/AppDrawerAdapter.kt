@@ -447,6 +447,11 @@ class AppDrawerAdapter(
             // ----------------------------
             // 5️⃣ App title
             appTitle.text = appListItem.label
+
+            if (app.wazabe.mlauncher.Mlauncher.prefs.launcherFont != "system") {
+                appTitle.typeface = app.wazabe.mlauncher.Mlauncher.globalTypeface
+            }
+
             val params = appTitle.layoutParams as FrameLayout.LayoutParams
             params.gravity = appLabelGravity
             appTitle.layoutParams = params

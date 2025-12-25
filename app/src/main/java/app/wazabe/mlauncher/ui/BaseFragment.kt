@@ -2,6 +2,7 @@
 
 import android.app.WallpaperManager
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.graphics.createBitmap
 import androidx.fragment.app.Fragment
@@ -20,6 +21,11 @@ open class BaseFragment : Fragment() {
         super.onCreate(savedInstanceState)
         // Attach the observer; lazy properties will initialize here
         lifecycle.addObserver(systemBarObserver)
+
+        val typedValue = android.util.TypedValue()
+        requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorSurface, typedValue, true)
+        view?.setBackgroundColor(typedValue.data)
+
 
         updateAllWidgets(requireContext())
 
@@ -47,6 +53,13 @@ open class BaseFragment : Fragment() {
             wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_SYSTEM) // home
             wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK)   // lock
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val typedValue = android.util.TypedValue()
+        requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorSurface, typedValue, true)
+        view.setBackgroundColor(typedValue.data)
     }
 }
 

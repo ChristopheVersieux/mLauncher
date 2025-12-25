@@ -18,13 +18,6 @@
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_mainFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-        <action
             android:id="@+id/action_mainFragment_to_notesManagerFragment"
             app:destination="@id/notesManagerFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
@@ -33,31 +26,6 @@
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
 
-    <fragment
-        android:id="@+id/appListFragment"
-        android:name="app.wazabe.mlauncher.ui.AppDrawerFragment"
-        android:label="appListFragment"
-        tools:layout="@layout/fragment_app_drawer">
-        <action
-            android:id="@+id/action_appListFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim"
-            app:popUpTo="@+id/settingsFragment"
-            app:popUpToInclusive="true" />
-
-        <action
-            android:id="@+id/action_appListFragment_to_appListFragment"
-            app:destination="@id/appListFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim"
-            app:popUpTo="@+id/appListFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
 
     <fragment
         android:id="@+id/notesManagerFragment"
@@ -77,93 +45,5 @@
         android:label="appLocationSearchFragment"
         tools:layout="@layout/fragment_location_search" />
 
-    <fragment
-        android:id="@+id/settingsFragment"
-        android:name="app.wazabe.mlauncher.ui.SettingsPreferenceFragment"
-        android:label="SettingsFragment">
-        <action
-            android:id="@+id/action_settingsFragment_to_appListFragment"
-            app:destination="@id/appListFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
 
-        <action
-            android:id="@+id/action_settingsFragment_to_appFavoriteFragment"
-            app:destination="@id/appFavoriteFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-
-        <action
-            android:id="@+id/action_settingsFragment_to_locationSearchFragment"
-            app:destination="@id/locationSearchFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-        <action
-            android:id="@+id/action_settingsFragment_to_settingsDetailFragment"
-            app:destination="@id/settingsDetailFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-            
-        <action
-            android:id="@+id/action_settingsFragment_to_featuresSettingsFragment"
-            app:destination="@id/featuresSettingsFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-    </fragment>
-    <fragment
-        android:id="@+id/settingsDetailFragment"
-        android:name="app.wazabe.mlauncher.ui.SettingsFragment"
-        android:label="SettingsDetailFragment"
-        android:layout="@layout/fragment_settings">
-        <argument
-            android:name="start_screen"
-            app:argType="string"
-            android:defaultValue="main" />
-             <action
-            android:id="@+id/action_settingsFragment_to_appListFragment"
-            app:destination="@id/appListFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-
-        <action
-            android:id="@+id/action_settingsFragment_to_appFavoriteFragment"
-            app:destination="@id/appFavoriteFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-
-        <action
-            android:id="@+id/action_settingsFragment_to_locationSearchFragment"
-            app:destination="@id/locationSearchFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/featuresSettingsFragment"
-        android:name="app.wazabe.mlauncher.ui.FeaturesSettingsFragment"
-        android:label="FeaturesSettingsFragment">
-        <action
-            android:id="@+id/action_featuresSettingsFragment_to_locationSearchFragment"
-            app:destination="@id/locationSearchFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-    </fragment>
 </navigation>

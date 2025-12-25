@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="@string/advanced_settings_title">
+        <Preference
+            app:key="appInfo"
+            android:title="@string/advanced_settings_app_info_title"
+            android:icon="@drawable/ic_app_info"
+            app:useSimpleSummaryProvider="true" />
+
+        <Preference
+            app:key="resetDefaultLauncher"
+            android:title="@string/advanced_settings_change_default_launcher"
+            android:icon="@drawable/ic_change_default_launcher" />
+
+        <Preference
+            app:key="restartApp"
+            android:title="@string/advanced_settings_restart_title"
+            android:icon="@drawable/ic_restart" />
+
+        <Preference
+            app:key="exitLauncher"
+            android:title="@string/settings_exit_mlauncher_title"
+            android:icon="@drawable/ic_exit" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/advanced_settings_backup_restore_title">
+        <Preference
+            app:key="backupRestore"
+            android:title="@string/advanced_settings_backup_restore_title"
+            android:icon="@drawable/ic_backup_restore" />
+
+        <Preference
+            app:key="saveLoadTheme"
+            android:title="@string/advanced_settings_theme_title"
+            android:icon="@drawable/ic_theme" />
+
+        <Preference
+            app:key="wotdSettings"
+            android:title="@string/advanced_settings_wotd_title"
+            android:icon="@drawable/ic_word_of_the_day" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/advanced_settings_help_feedback_title">
+        <Preference
+            app:key="helpFeedback"
+            android:title="@string/advanced_settings_help_feedback_title"
+            android:icon="@drawable/ic_help_feedback" />
+
+        <Preference
+            app:key="communitySupport"
+            android:title="@string/advanced_settings_community_support_title"
+            android:icon="@drawable/ic_community" />
+
+        <Preference
+            app:key="shareApp"
+            android:title="@string/advanced_settings_share_application_title"
+            android:icon="@drawable/ic_share_app" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

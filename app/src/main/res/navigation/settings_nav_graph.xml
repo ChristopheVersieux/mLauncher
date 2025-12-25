@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/settingsFragment"
         android:name="app.wazabe.mlauncher.ui.SettingsPreferenceFragment"
-        android:label="SettingsFragment">
+        android:label="@string/home_button_settings">
         <action
             android:id="@+id/action_settingsFragment_to_appListFragment"
             app:destination="@id/appListFragment"
@@ -32,17 +32,52 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-        <action
-            android:id="@+id/action_settingsFragment_to_settingsDetailFragment"
-            app:destination="@id/settingsDetailFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
             
         <action
             android:id="@+id/action_settingsFragment_to_featuresSettingsFragment"
             app:destination="@id/featuresSettingsFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_settingsFragment_to_lookFeelSettingsFragment"
+            app:destination="@id/lookFeelSettingsFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_settingsFragment_to_gesturesSettingsFragment"
+            app:destination="@id/gesturesSettingsFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_settingsFragment_to_notesSettingsFragment"
+            app:destination="@id/notesSettingsFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_settingsFragment_to_advancedSettingsFragment"
+            app:destination="@id/advancedSettingsFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_settingsFragment_to_expertSettingsFragment"
+            app:destination="@id/expertSettingsFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_settingsFragment_to_aboutSettingsFragment"
+            app:destination="@id/aboutSettingsFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -52,13 +87,13 @@
     <fragment
         android:id="@+id/appListFragment"
         android:name="app.wazabe.mlauncher.ui.AppDrawerFragment"
-        android:label="appListFragment"
+        android:label="@string/settings_hidden_apps_title"
         tools:layout="@layout/fragment_app_drawer" />
 
     <fragment
         android:id="@+id/appFavoriteFragment"
         android:name="app.wazabe.mlauncher.ui.FavoriteFragment"
-        android:label="appFavoriteFragment"
+        android:label="@string/settings_favorite_apps_title"
         tools:layout="@layout/fragment_favorite" />
 
     <fragment
@@ -70,12 +105,53 @@
     <fragment
         android:id="@+id/featuresSettingsFragment"
         android:name="app.wazabe.mlauncher.ui.FeaturesSettingsFragment"
-        android:label="FeaturesSettingsFragment"
-        tools:layout="@layout/fragment_settings" />
+        android:label="@string/settings_features_title">
+        <action
+            android:id="@+id/action_featuresSettingsFragment_to_locationSearchFragment"
+            app:destination="@id/locationSearchFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+
 
     <fragment
-        android:id="@+id/settingsDetailFragment"
-        android:name="app.wazabe.mlauncher.ui.SettingsFragment"
-        android:label="SettingsDetailFragment" />
+        android:id="@+id/lookFeelSettingsFragment"
+        android:name="app.wazabe.mlauncher.ui.LookFeelSettingsFragment"
+        android:label="@string/look_feel_settings_title" />
+
+    <fragment
+        android:id="@+id/gesturesSettingsFragment"
+        android:name="app.wazabe.mlauncher.ui.GesturesSettingsFragment"
+        android:label="@string/gestures_settings_title">
+        <action
+            android:id="@+id/action_gesturesSettingsFragment_to_appListFragment"
+            app:destination="@id/appListFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/notesSettingsFragment"
+        android:name="app.wazabe.mlauncher.ui.NotesSettingsFragment"
+        android:label="@string/notes_settings_title" />
+
+    <fragment
+        android:id="@+id/advancedSettingsFragment"
+        android:name="app.wazabe.mlauncher.ui.AdvancedSettingsFragment"
+        android:label="@string/advanced_settings_title" />
+
+    <fragment
+        android:id="@+id/expertSettingsFragment"
+        android:name="app.wazabe.mlauncher.ui.ExpertSettingsFragment"
+        android:label="@string/expert_settings_title" />
+
+    <fragment
+        android:id="@+id/aboutSettingsFragment"
+        android:name="app.wazabe.mlauncher.ui.AboutSettingsFragment"
+        android:label="@string/about_settings_title" />
 
 </navigation>

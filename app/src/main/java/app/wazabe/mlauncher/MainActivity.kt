@@ -11,17 +11,15 @@ import android.os.Bundle
 import android.provider.OpenableColumns
 import android.provider.Settings
 import android.view.KeyEvent
+import android.view.View
 import android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import com.github.droidworksstudio.common.CrashHandler
-import com.github.droidworksstudio.common.showLongToast
 import app.wazabe.mlauncher.data.Constants
 import app.wazabe.mlauncher.data.Migration
 import app.wazabe.mlauncher.data.Prefs
@@ -29,10 +27,17 @@ import app.wazabe.mlauncher.databinding.ActivityMainBinding
 import app.wazabe.mlauncher.helper.IconCacheTarget
 import app.wazabe.mlauncher.helper.IconPackHelper
 import app.wazabe.mlauncher.helper.emptyString
+import app.wazabe.mlauncher.helper.hideNavigationBar
+import app.wazabe.mlauncher.helper.hideStatusBar
 import app.wazabe.mlauncher.helper.ismlauncherDefault
+import app.wazabe.mlauncher.helper.showNavigationBar
+import app.wazabe.mlauncher.helper.showStatusBar
 import app.wazabe.mlauncher.helper.utils.AppReloader
 import app.wazabe.mlauncher.helper.utils.SystemBarObserver
+import app.wazabe.mlauncher.ui.BaseActivity
 import app.wazabe.mlauncher.ui.onboarding.OnboardingActivity
+import com.github.droidworksstudio.common.CrashHandler
+import com.github.droidworksstudio.common.showLongToast
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import org.xmlpull.v1.XmlPullParser
@@ -46,7 +51,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.Executors
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private lateinit var prefs: Prefs
     private lateinit var migration: Migration
@@ -120,7 +125,6 @@ class MainActivity : AppCompatActivity() {
 
         // Enables edge-to-edge mode
         enableEdgeToEdge()
-
         val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (navController.currentDestination?.id != R.id.mainFragment) {
@@ -171,14 +175,23 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
+        if (prefs.launcherFont != "system") {
+            binding.root.post {
+                binding.root.applyCustomFont()
+            }
+        }
+
+
+
         migration()
 
         navController = this.findNavController(R.id.nav_host_fragment)
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
-        if (prefs.firstOpen) {
-            viewModel.firstOpen(true)
-            prefs.firstOpen = false
-        }
+        // Disabled: auto-open app drawer on first launch
+        // if (prefs.firstOpen) {
+        //     viewModel.firstOpen(true)
+        //     prefs.firstOpen = false
+        // }
 
         viewModel.getAppList(includeHiddenApps = true)
 
@@ -523,4 +536,33 @@ class MainActivity : AppCompatActivity() {
         migration.deleteOldCacheFiles(applicationContext)
     }
 
+    fun toggleStatusBar(show: Boolean) {
+        if (show) showStatusBar(window) else hideStatusBar(window)
+    }
+
+    fun toggleNavigationBar(show: Boolean) {
+        if (show) showNavigationBar(window) else hideNavigationBar(window)
+    }
+
+}
+
+fun View.applyCustomFont() {
+    // Exit if system font is selected
+    if (Mlauncher.globalTypeface == android.graphics.Typeface.DEFAULT) return
+
+    // 1. Handle Custom Components (using your specific interface)
+    if (this is app.wazabe.mlauncher.helper.CustomFontView) {
+        this.applyFont(Mlauncher.globalTypeface)
+    }
+    // 2. Handle Standard TextViews
+    else if (this is android.widget.TextView) {
+        this.typeface = Mlauncher.globalTypeface
+    }
+
+    // 3. Recursive crawl for containers (loops through all children)
+    if (this is android.view.ViewGroup) {
+        for (i in 0 until childCount) {
+            getChildAt(i).applyCustomFont()
+        }
+    }
 }

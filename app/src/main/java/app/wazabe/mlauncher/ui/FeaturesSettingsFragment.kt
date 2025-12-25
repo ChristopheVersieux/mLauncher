@@ -2,67 +2,170 @@ package app.wazabe.mlauncher.ui
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
+import app.wazabe.mlauncher.Mlauncher
 import app.wazabe.mlauncher.R
+import app.wazabe.mlauncher.helper.utils.AppReloader
+import com.github.droidworksstudio.common.AppLogger
 
-class FeaturesSettingsFragment : PreferenceFragmentCompat() {
+class FeaturesSettingsFragment : GenericPref() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.features_preferences, rootKey)
 
-        // Inverse dependency handling for GPS Location vs Manual Location
-        // In XML we set dependency="GPS_LOCATION".
-        // If GPS_LOCATION is SwitchPreference, we need to ensure its disableDependentsState is correctly set if we want Manual to be disabled when GPS is ENABLED.
-        // Default "dependency" disables when the dependent key is OFF.
-        // We want Manual Location (pref_key_manual_location) disabled when GPS (GPS_LOCATION) is ON.
-        // So GPS_LOCATION needs android:disableDependentsState="true" in XML?
-        // Let's verify what I wrote in XML. I didn't verify that attribute.
-        // I will do it programmatically here to be safe and cleaner if XML didn't support it perfectly or if I forgot it.
-        
-        // Actually, let's fix the XML attribute via Replace if I forgot it, or just handle it here.
-        // Handling here:
         val gpsPref = findPreference<SwitchPreferenceCompat>("GPS_LOCATION")
         val manualPref = findPreference<Preference>("pref_key_manual_location")
         val weatherPref = findPreference<SwitchPreferenceCompat>("SHOW_WEATHER")
 
-        // Initial state logic
+        val themePref = findPreference<Preference>("APP_THEME")
+
+        themePref?.onPreferenceChangeListener =
+            Preference.OnPreferenceChangeListener { _, newValue ->
+                val themeString = newValue.toString()
+
+                // 1. Map the value (Check your R.xml for the actual entryValues!)
+                val mode = when (themeString) {
+                    "Light", "0" -> AppCompatDelegate.MODE_NIGHT_NO
+                    "Dark", "1" -> AppCompatDelegate.MODE_NIGHT_YES
+                    else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                }
+                // 3. Apply Change
+                // This static call tells all Activities to recreate with the new configuration
+                AppCompatDelegate.setDefaultNightMode(mode)
+
+                true // Return true so the preference actually saves to SharedPreferences
+            }
+
+
+        val langPref = findPreference<Preference>("APP_LANGUAGE")
+
+        langPref?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+            val langCode = newValue.toString() // e.g., "en", "fr", "ar", or "system"
+
+            Toast.makeText(requireContext(), "Changing language to: $langCode", Toast.LENGTH_SHORT).show()
+
+            // 1. Update the Locale for the current process immediately
+            val locale = if (langCode == "system") {
+                java.util.Locale.getDefault()
+            } else {
+                java.util.Locale(langCode)
+            }
+
+            java.util.Locale.setDefault(locale)
+            val resources = requireContext().resources
+            val config = resources.configuration
+            config.setLocale(locale)
+
+            // updateConfiguration ensures the current fragment/activity sees the change before restart
+            resources.updateConfiguration(config, resources.displayMetrics)
+
+            // 2. Restart the app to refresh the entire Activity stack with new strings
+            view?.postDelayed({
+                val intent = requireActivity().packageManager.getLaunchIntentForPackage(requireActivity().packageName)
+                intent?.let { safeIntent ->
+                    // Clear the task stack so the app starts fresh from the main screen
+                    safeIntent.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(safeIntent)
+                    requireActivity().finish()
+                }
+            }, 200)
+
+            true // Return true to save the new value to SharedPreferences
+        }
+
+
+        val fontPref = findPreference<ListPreference>("LAUNCHER_FONT")
+
+        fontPref?.let { pref ->
+            val fontEntries = mutableListOf<String>()
+            val fontValues = mutableListOf<String>()
+
+            fontEntries.add("System Default")
+            fontValues.add("system")
+
+            try {
+                // DIAGNOSTIC TOAST 1: Checking if folder exists
+                val fontFiles = requireContext().assets.list("fonts")
+
+                if (fontFiles.isNullOrEmpty()) {
+                    Toast.makeText(requireContext(), "Error: 'fonts' folder is empty or not found in assets", Toast.LENGTH_LONG).show()
+                } else {
+                    // DIAGNOSTIC TOAST 2: Showing how many files were found
+                    for (fileName in fontFiles) {
+                        if (fileName.endsWith(".ttf") || fileName.endsWith(".otf")) {
+                            val displayName = fileName.substringBeforeLast(".")
+                                .replace("_", " ")
+                                .replaceFirstChar { it.uppercase() }
+
+                            fontEntries.add(displayName)
+                            fontValues.add("fonts/$fileName")
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Assets Error: ${e.message}", Toast.LENGTH_LONG).show()
+                e.printStackTrace()
+            }
+
+            pref.entries = fontEntries.toTypedArray()
+            pref.entryValues = fontValues.toTypedArray()
+        }
+
+        fontPref?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, _ ->
+            Mlauncher.reloadFont()
+
+            AppReloader.restartApp(this.context!!)
+
+            true
+        }
+
+            // Initial state logic
         fun updateState() {
+            AppLogger.e(message= "here")
+
             val isWeatherOn = weatherPref?.isChecked == true
             val isGpsOn = gpsPref?.isChecked == true
-            
+
             gpsPref?.isEnabled = isWeatherOn
             // Manual location enabled if Weather is ON AND GPS is OFF
+
+                AppLogger.e(message= "isWeatherOn"+ isWeatherOn)
+                AppLogger.e(message= "isGpsOn"+ isGpsOn)
+
+                AppLogger.e(message= "ENABLED"+ ( isWeatherOn && !isGpsOn))
             manualPref?.isEnabled = isWeatherOn && !isGpsOn
         }
 
         gpsPref?.setOnPreferenceChangeListener { _, newValue ->
             // post to let the state update happen or just use the new value
-            val isGpsOn = newValue as Boolean
-            val isWeatherOn = weatherPref?.isChecked == true
-            manualPref?.isEnabled = isWeatherOn && !isGpsOn
+            updateState()
             true
         }
-        
-         weatherPref?.setOnPreferenceChangeListener { _, newValue ->
-            val isWeatherOn = newValue as Boolean
-             gpsPref?.isEnabled = isWeatherOn
-             val isGpsOn = gpsPref?.isChecked == true
-             manualPref?.isEnabled = isWeatherOn && !isGpsOn
+
+        weatherPref?.setOnPreferenceChangeListener { _, newValue ->
+            updateState()
             true
         }
-        
-        // Update initially
+
         updateState()
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val typedValue = android.util.TypedValue()
-        requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorSurface, typedValue, true)
+        requireContext().theme.resolveAttribute(
+            com.google.android.material.R.attr.colorSurface,
+            typedValue,
+            true
+        )
         view.setBackgroundColor(typedValue.data)
     }
 
@@ -74,7 +177,9 @@ class FeaturesSettingsFragment : PreferenceFragmentCompat() {
                 )
                 true
             }
+
             else -> super.onPreferenceTreeClick(preference)
         }
     }
+
 }

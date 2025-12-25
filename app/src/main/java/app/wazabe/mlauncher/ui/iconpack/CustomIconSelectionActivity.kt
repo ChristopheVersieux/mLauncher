@@ -1,5 +1,4 @@
-﻿package app.wazabe.mlauncher.ui.iconpack
-
+package app.wazabe.mlauncher.ui.iconpack
 
 import android.content.Context
 import android.content.Intent
@@ -14,9 +13,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import com.github.droidworksstudio.common.getLocalizedString
-import app.wazabe.mlauncher.MainViewModel
 import app.wazabe.mlauncher.R
 import app.wazabe.mlauncher.data.Constants
 import app.wazabe.mlauncher.data.Prefs
@@ -31,20 +28,18 @@ import java.util.concurrent.Executors
 
 class CustomIconSelectionActivity : androidx.appcompat.app.AppCompatActivity() {
     private lateinit var prefs: Prefs
-    private lateinit var viewModel: MainViewModel
     val defaultPackage = "default"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         prefs = Prefs(this)
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
         val installedIconPacks = findInstalledIconPacks()
-        val iconCacheTarget = intent.getStringExtra("IconCacheTarget")
+        val iconCacheTarget = intent.getStringExtra("icon_cache_target") ?: IconCacheTarget.HOME.name
         val currentSelected = when (iconCacheTarget) {
             IconCacheTarget.HOME.name -> prefs.customIconPackHome
             IconCacheTarget.APP_LIST.name -> prefs.customIconPackAppList
-            else -> throw IllegalArgumentException("Invalid IconCacheTarget")
+            else -> prefs.customIconPackHome
         }
 
         showIconPackSelectionDialog(
@@ -70,16 +65,12 @@ class CustomIconSelectionActivity : androidx.appcompat.app.AppCompatActivity() {
             when (iconCacheTarget) {
                 IconCacheTarget.HOME.name -> {
                     prefs.iconPackHome = iconPackType
-                    viewModel.iconPackHome.value = iconPackType
                     prefs.customIconPackHome = customIconPackType
-                    viewModel.customIconPackHome.value = customIconPackType
                 }
 
                 IconCacheTarget.APP_LIST.name -> {
                     prefs.iconPackAppList = iconPackType
-                    viewModel.iconPackAppList.value = iconPackType
                     prefs.customIconPackAppList = customIconPackType
-                    viewModel.customIconPackAppList.value = customIconPackType
                 }
             }
 

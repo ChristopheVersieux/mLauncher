@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="@string/expert_settings_title">
+        <SwitchPreferenceCompat
+            android:key="EXPERT_OPTIONS"
+            android:title="@string/expert_options_display" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/personalization">
+        <SeekBarPreference
+            android:key="TEXT_SIZE_SETTINGS"
+            android:title="@string/settings_text_size"
+            app:showSeekBarValue="true"
+            app:min="10" android:max="30" />
+
+        <SwitchPreferenceCompat
+            android:key="LOCK_ORIENTATION"
+            android:title="@string/lock_orientation" />
+
+        <SwitchPreferenceCompat
+            android:key="FORCE_COLORED_WALLPAPER"
+            android:title="@string/force_colored_wallpaper" />
+
+        <SwitchPreferenceCompat
+            android:key="SETTINGS_LOCKED"
+            android:title="@string/lock_settings" />
+
+        <SwitchPreferenceCompat
+            android:key="HAPTIC_FEEDBACK"
+            android:title="@string/haptic_feedback" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

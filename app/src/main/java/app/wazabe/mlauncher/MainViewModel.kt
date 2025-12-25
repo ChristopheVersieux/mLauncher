@@ -82,24 +82,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val homeAppsOrder = MutableLiveData<List<AppListItem>>()  // Store actual app items
     val launcherDefault = MutableLiveData<Boolean>()
 
-    val showDate = MutableLiveData(prefs.showDate)
-    val showClock = MutableLiveData(prefs.showClock)
-    val showAlarm = MutableLiveData(prefs.showAlarm)
-    val showDailyWord = MutableLiveData(prefs.showDailyWord)
-    val clockAlignment = MutableLiveData(prefs.clockAlignment)
-    val dateAlignment = MutableLiveData(prefs.dateAlignment)
-    val alarmAlignment = MutableLiveData(prefs.alarmAlignment)
-    val dailyWordAlignment = MutableLiveData(prefs.dailyWordAlignment)
-    val homeAppsAlignment = MutableLiveData(Pair(prefs.homeAlignment, prefs.homeAlignmentBottom))
     val homeAppsNum = MutableLiveData(prefs.homeAppsNum)
     val homePagesNum = MutableLiveData(prefs.homePagesNum)
-    val opacityNum = MutableLiveData(prefs.opacityNum)
-    val filterStrength = MutableLiveData(prefs.filterStrength)
     val recentCounter = MutableLiveData(prefs.recentCounter)
-    val customIconPackHome = MutableLiveData(prefs.customIconPackHome)
-    val iconPackHome = MutableLiveData(prefs.iconPackHome)
-    val customIconPackAppList = MutableLiveData(prefs.customIconPackAppList)
-    val iconPackAppList = MutableLiveData(prefs.iconPackAppList)
 
     private val prefsNormal = prefs.prefsNormal
     private val pinnedAppsKey = prefs.pinnedAppsKey
@@ -180,22 +165,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun firstOpen(value: Boolean) {
         firstOpen.postValue(value)
-    }
-
-    fun setShowDate(visibility: Boolean) {
-        showDate.value = visibility
-    }
-
-    fun setShowClock(visibility: Boolean) {
-        showClock.value = visibility
-    }
-
-    fun setShowAlarm(visibility: Boolean) {
-        showAlarm.value = visibility
-    }
-
-    fun setShowDailyWord(visibility: Boolean) {
-        showDailyWord.value = visibility
     }
 
     fun setDefaultLauncher(visibility: Boolean) {
@@ -391,26 +360,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateDrawerAlignment(gravity: Constants.Gravity) {
         prefs.drawerAlignment = gravity
-    }
-
-    fun updateDateAlignment(gravity: Constants.Gravity) {
-        dateAlignment.value = gravity
-    }
-
-    fun updateClockAlignment(gravity: Constants.Gravity) {
-        clockAlignment.value = gravity
-    }
-
-    fun updateAlarmAlignment(gravity: Constants.Gravity) {
-        alarmAlignment.value = gravity
-    }
-
-    fun updateDailyWordAlignment(gravity: Constants.Gravity) {
-        dailyWordAlignment.value = gravity
-    }
-
-    fun updateHomeAppsAlignment(gravity: Constants.Gravity, onBottom: Boolean) {
-        homeAppsAlignment.value = Pair(gravity, onBottom)
     }
 
     fun updateAppOrder(fromPosition: Int, toPosition: Int) {

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="@string/display_options">
+        <SwitchPreferenceCompat
+            android:key="AUTO_EXPAND_NOTES"
+            android:title="@string/auto_expand_notes" />
+
+        <SwitchPreferenceCompat
+            android:key="CLICK_EDIT_DELETE"
+            android:title="@string/click_to_edit_delete" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/notes_colors">
+        <Preference
+            android:key="NOTES_BACKGROUND_COLOR"
+            android:title="@string/notes_background_color" />
+
+        <Preference
+            android:key="BUBBLE_BACKGROUND_COLOR"
+            android:title="@string/bubble_background_color" />
+
+        <Preference
+            android:key="BUBBLE_MESSAGE_COLOR"
+            android:title="@string/bubble_message_color" />
+
+        <Preference
+            android:key="BUBBLE_TIMEDATE_COLOR"
+            android:title="@string/bubble_date_time_color" />
+
+        <Preference
+            android:key="BUBBLE_CATEGORY_COLOR"
+            android:title="@string/bubble_category_color" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/input_colors">
+        <Preference
+            android:key="INPUT_MESSAGE_COLOR"
+            android:title="@string/message_input_color" />
+
+        <Preference
+            android:key="INPUT_MESSAGEHINT_COLOR"
+            android:title="@string/message_input_hint_color" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

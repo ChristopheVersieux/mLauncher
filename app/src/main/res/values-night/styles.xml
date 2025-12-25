@@ -43,9 +43,24 @@
 
         <item name="colorSurface">@android:color/system_neutral1_900</item>
         <item name="colorOnSurface">@android:color/system_neutral1_10</item>
-        <item name="colorPrimary">@android:color/system_accent1_200</item>
+        <item name="colorPrimary">@android:color/system_accent1_0</item>
         <item name="colorPrimaryDark">@android:color/system_accent1_600</item>
         <item name="colorAccent">@android:color/system_accent1_200</item>
+        <item name="colorOnPrimary">@android:color/black</item>
+    </style>
+
+    <style name="Theme.mLauncher.Settings" parent="Theme.mLauncher">
+        <item name="android:windowShowWallpaper">false</item>
+        <item name="android:windowBackground">?attr/colorSurface</item>
+        <item name="android:windowIsTranslucent">false</item>
+
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:fitsSystemWindows">true</item>
+
+        <!-- Make status bar match app bar color -->
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="WindowAnimationTransition">

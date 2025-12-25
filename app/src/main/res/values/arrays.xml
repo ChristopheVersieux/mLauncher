@@ -36,26 +36,26 @@
         <item>@string/lang_turkish</item>
     </string-array>
     <string-array name="language_values">
-        <item>System</item>
-        <item>Arabic</item>
-        <item>Czech</item>
-        <item>Dutch</item>
-        <item>English</item>
-        <item>French</item>
-        <item>German</item>
-        <item>Hebrew</item>
-        <item>Italian</item>
-        <item>Japanese</item>
-        <item>Korean</item>
-        <item>Lithuanian</item>
-        <item>Polish</item>
-        <item>Portuguese</item>
-        <item>Romanian</item>
-        <item>Russian</item>
-        <item>Slovak</item>
-        <item>Spanish</item>
-        <item>Thai</item>
-        <item>Turkish</item>
+        <item>system</item>
+        <item>ar</item>
+        <item>cs</item>
+        <item>nl</item>
+        <item>en</item>
+        <item>fr</item>
+        <item>de</item>
+        <item>iw</item>
+        <item>it</item>
+        <item>ja</item>
+        <item>ko</item>
+        <item>lt</item>
+        <item>pl</item>
+        <item>pt</item>
+        <item>ro</item>
+        <item>ru</item>
+        <item>sk</item>
+        <item>es</item>
+        <item>th</item>
+        <item>tr</item>
     </string-array>
 
     <!-- Font Family -->
@@ -126,5 +126,54 @@
     <string-array name="temp_unit_values">
         <item>Celsius</item>
         <item>Fahrenheit</item>
+    </string-array>
+    
+    <!-- Alignment -->
+    <string-array name="alignment_names">
+        <item>@string/left</item>
+        <item>@string/center</item>
+        <item>@string/right</item>
+    </string-array>
+    <string-array name="alignment_values">
+        <item>Left</item>
+        <item>Center</item>
+        <item>Right</item>
+    </string-array>
+    <!-- Actions -->
+    <string-array name="action_entries">
+        <item>@string/open_app</item>
+        <item>@string/lock_screen</item>
+        <item>@string/private_space</item>
+        <item>@string/show_notifications</item>
+        <item>@string/show_app_list</item>
+        <item>@string/show_widget_page</item>
+        <item>@string/show_notes_manager</item>
+        <item>@string/show_digital_wellbeing</item>
+        <item>@string/open_quick_settings</item>
+        <item>@string/show_recents</item>
+        <item>@string/open_power_dialog</item>
+        <item>@string/take_a_screenshot</item>
+        <item>@string/previous_page</item>
+        <item>@string/next_page</item>
+        <item>@string/restart_launcher</item>
+        <item>@string/disabled</item>
+    </string-array>
+    <string-array name="action_values">
+        <item>OpenApp</item>
+        <item>LockScreen</item>
+        <item>TogglePrivateSpace</item>
+        <item>ShowNotification</item>
+        <item>ShowAppList</item>
+        <item>ShowWidgetPage</item>
+        <item>ShowNotesManager</item>
+        <item>ShowDigitalWellbeing</item>
+        <item>OpenQuickSettings</item>
+        <item>ShowRecents</item>
+        <item>OpenPowerDialog</item>
+        <item>TakeScreenShot</item>
+        <item>PreviousPage</item>
+        <item>NextPage</item>
+        <item>RestartApp</item>
+        <item>Disabled</item>
     </string-array>
 </resources>

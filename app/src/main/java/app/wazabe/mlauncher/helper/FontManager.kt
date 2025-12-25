@@ -24,14 +24,14 @@ object FontManager {
             val prefs = Prefs(context)
             val fontFamily = prefs.fontFamily
 
-            cachedTypeface = when (fontFamily) {
+           /* cachedTypeface = when (fontFamily) {
                 Constants.FontFamily.Custom -> {
                     val file = File(context.filesDir, "CustomFont.ttf")
                     if (file.exists()) Typeface.createFromFile(file) else null
                 }
 
-                else -> fontFamily.getFont(context)
-            }
+                //else -> fontFamily.getFont(context)
+            }*/
 
             cachedTypeface
         } catch (e: Exception) {

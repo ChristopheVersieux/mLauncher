@@ -29,7 +29,7 @@ object AppLogger {
     }
 
     fun e(tag: String = DEFAULT_TAG, message: String, throwable: Throwable? = null) {
-        Log.e(tag, message, throwable)
+        Log.e(tag, message)
     }
 
     fun wtf(tag: String = DEFAULT_TAG, message: String, throwable: Throwable? = null) {

@@ -3,7 +3,6 @@
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.UserHandle
-import android.preference.PreferenceManager
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.content.edit
 import androidx.core.graphics.toColorInt
@@ -19,6 +18,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import java.lang.reflect.ParameterizedType
+import androidx.preference.PreferenceManager
 
 class Prefs(val context: Context) {
     // Build Moshi instance once (ideally a singleton)
@@ -173,6 +173,10 @@ class Prefs(val context: Context) {
             }
         }
     }
+    // Inside your Prefs.kt
+    var launcherFont: String
+        get() = prefsNormal.getString("LAUNCHER_FONT", "system") ?: "system"
+        set(value) = prefsNormal.edit().putString("LAUNCHER_FONT", value).apply()
 
     var appVersion: Int
         get() = prefsNormal.getInt(APP_VERSION, -1)
@@ -623,6 +627,16 @@ class Prefs(val context: Context) {
         return loadApp("$i")
     }
 
+    var useIconPack: Boolean
+    get() = getSetting("USE_ICON_PACK", false)
+    set(value) = prefsNormal.edit { putBoolean("USE_ICON_PACK", value) }
+
+    // Stocke le nom du package du pack d'icônes (ex: "com.viper.black")
+    var iconPackPackage: String
+        get() = prefsNormal.getString("ICON_PACK_PACKAGE", "") ?: ""
+        set(value) = prefsNormal.edit { putString("ICON_PACK_PACKAGE", value) }
+
+
     fun setHomeAppModel(i: Int, appListItem: AppListItem) {
         storeApp("$i", appListItem)
     }
@@ -768,7 +782,7 @@ class Prefs(val context: Context) {
 
     var textPaddingSize: Int
         get() {
-            return getSetting(TEXT_PADDING_SIZE, 50)
+            return getSetting(TEXT_PADDING_SIZE, 30)
         }
         set(value) = prefsNormal.edit { putInt(TEXT_PADDING_SIZE, value) }
 
@@ -824,8 +838,8 @@ class Prefs(val context: Context) {
     }
 
     // return app label
-    fun getAppName(location: Int): String {
-        return getHomeAppModel(location).label
+    fun getAppName(i: Int): String {
+        return prefsNormal.getString("${APP_NAME}_$i", "") ?: ""
     }
 
     fun getAppAlias(appPackage: String): String {

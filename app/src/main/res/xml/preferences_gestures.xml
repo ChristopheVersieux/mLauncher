@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="@string/tap_click_actions">
+        <ListPreference
+            android:key="DOUBLE_TAP_ACTION"
+            android:title="@string/double_tap"
+            android:entries="@array/action_entries"
+            android:entryValues="@array/action_values"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:key="CLICK_CLOCK_ACTION"
+            android:title="@string/clock_click_app"
+            android:entries="@array/action_entries"
+            android:entryValues="@array/action_values"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:key="CLICK_DATE_ACTION"
+            android:title="@string/date_click_app"
+            android:entries="@array/action_entries"
+            android:entryValues="@array/action_values"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:key="CLICK_APP_USAGE_ACTION"
+            android:title="@string/usage_click_app"
+            android:entries="@array/action_entries"
+            android:entryValues="@array/action_values"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:key="CLICK_FLOATING_ACTION"
+            android:title="@string/floating_click_app"
+            android:entries="@array/action_entries"
+            android:entryValues="@array/action_values"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/swipe_movement">
+        <ListPreference
+            android:key="SWIPE_UP_ACTION"
+            android:title="@string/short_swipe_up_app"
+            android:entries="@array/action_entries"
+            android:entryValues="@array/action_values"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:key="SWIPE_DOWN_ACTION"
+            android:title="@string/short_swipe_down_app"
+            android:entries="@array/action_entries"
+            android:entryValues="@array/action_values"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:key="SWIPE_LEFT_ACTION"
+            android:title="@string/short_swipe_left_app"
+            android:entries="@array/action_entries"
+            android:entryValues="@array/action_values"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:key="SWIPE_RIGHT_ACTION"
+            android:title="@string/short_swipe_right_app"
+            android:entries="@array/action_entries"
+            android:entryValues="@array/action_values"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:key="LONG_SWIPE_UP_ACTION"
+            android:title="@string/long_swipe_up_app"
+            android:entries="@array/action_entries"
+            android:entryValues="@array/action_values"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:key="LONG_SWIPE_DOWN_ACTION"
+            android:title="@string/long_swipe_down_app"
+            android:entries="@array/action_entries"
+            android:entryValues="@array/action_values"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:key="LONG_SWIPE_LEFT_ACTION"
+            android:title="@string/long_swipe_left_app"
+            android:entries="@array/action_entries"
+            android:entryValues="@array/action_values"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:key="LONG_SWIPE_RIGHT_ACTION"
+            android:title="@string/long_swipe_right_app"
+            android:entries="@array/action_entries"
+            android:entryValues="@array/action_values"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/threshold">
+        <SeekBarPreference
+            android:key="SHORT_SWIPE_THRESHOLD"
+            android:title="@string/settings_short_threshold"
+            app:showSeekBarValue="true"
+            app:min="0" android:max="100" />
+
+        <SeekBarPreference
+            android:key="LONG_SWIPE_THRESHOLD"
+            android:title="@string/settings_long_threshold"
+            app:showSeekBarValue="true"
+            app:min="0" android:max="100" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

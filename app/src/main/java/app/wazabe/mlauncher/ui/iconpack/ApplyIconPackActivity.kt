@@ -1,11 +1,9 @@
-﻿package app.wazabe.mlauncher.ui.iconpack
+package app.wazabe.mlauncher.ui.iconpack
 
 import android.os.Bundle
 import android.widget.CheckBox
 import android.widget.LinearLayout
-import androidx.lifecycle.ViewModelProvider
 import com.github.droidworksstudio.common.getLocalizedString
-import app.wazabe.mlauncher.MainViewModel
 import app.wazabe.mlauncher.R
 import app.wazabe.mlauncher.data.Constants
 import app.wazabe.mlauncher.data.Prefs
@@ -17,12 +15,10 @@ import java.util.concurrent.Executors
 
 class ApplyIconPackActivity : androidx.appcompat.app.AppCompatActivity() {
     private lateinit var prefs: Prefs
-    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         prefs = Prefs(this)
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
         val packageName = intent.getStringExtra("packageName").toString()
         val packageClass = intent.getStringExtra("packageClass").toString()
@@ -63,9 +59,7 @@ class ApplyIconPackActivity : androidx.appcompat.app.AppCompatActivity() {
                             IconPackHelper.preloadIcons(this, customIconPackType, IconCacheTarget.HOME)
                         }
                         prefs.iconPackHome = iconPackType
-                        viewModel.iconPackHome.value = iconPackType
                         prefs.customIconPackHome = customIconPackType
-                        viewModel.customIconPackHome.value = customIconPackType
                     }
 
                     if (checkBoxAppList.isChecked) {
@@ -74,9 +68,7 @@ class ApplyIconPackActivity : androidx.appcompat.app.AppCompatActivity() {
                             IconPackHelper.preloadIcons(this, customIconPackType, IconCacheTarget.APP_LIST)
                         }
                         prefs.iconPackAppList = iconPackType
-                        viewModel.iconPackAppList.value = iconPackType
                         prefs.customIconPackAppList = customIconPackType
-                        viewModel.customIconPackAppList.value = customIconPackType
                     }
 
                     AppReloader.restartApp(this)
@@ -92,4 +84,3 @@ class ApplyIconPackActivity : androidx.appcompat.app.AppCompatActivity() {
         }
     }
 }
-

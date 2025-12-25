@@ -1,37 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:minHeight="48dp"
+    android:backgroundTint="@color/red"
+    android:background="?attr/selectableItemBackground"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="4dp">
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="8dp">
 
     <ImageView
         android:id="@+id/appIconLeft"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="16dp"
         android:contentDescription="@string/app_name"
-        android:visibility="gone" />
+        android:scaleType="fitXY"
+        tools:src="@android:drawable/sym_def_app_icon"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/appLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:gravity="center_vertical"
         android:ellipsize="end"
-        android:gravity="center_vertical|start"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp"
+        android:includeFontPadding="false"
+        android:maxLines="1"
         android:singleLine="true"
-        android:textSize="14sp" />
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="16sp"
+        tools:text="Application Name" />
 
     <ImageView
         android:id="@+id/appIconRight"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="16dp"
         android:contentDescription="@string/app_name"
-        android:visibility="gone" />
+        android:scaleType="fitCenter"
+        android:visibility="gone"
+        tools:src="@android:drawable/sym_def_app_icon" />
 
 </LinearLayout>

@@ -547,33 +547,6 @@ object Constants {
         Roboto,
         SourceCodePro;
 
-        fun getFont(context: Context): Typeface? {
-            return when (this) {
-                System -> getTrueSystemFont()
-                Bitter -> ResourcesCompat.getFont(context, R.font.bitter)
-                Doto -> ResourcesCompat.getFont(context, R.font.doto)
-                FiraCode -> ResourcesCompat.getFont(context, R.font.fira_code)
-                Hack -> ResourcesCompat.getFont(context, R.font.hack)
-                Lato -> ResourcesCompat.getFont(context, R.font.lato)
-                Merriweather -> ResourcesCompat.getFont(context, R.font.merriweather)
-                Montserrat -> ResourcesCompat.getFont(context, R.font.montserrat)
-                Quicksand -> ResourcesCompat.getFont(context, R.font.quicksand)
-                Raleway -> ResourcesCompat.getFont(context, R.font.raleway)
-                Roboto -> ResourcesCompat.getFont(context, R.font.roboto)
-                SourceCodePro -> ResourcesCompat.getFont(context, R.font.source_code_pro)
-                Custom -> {
-                    val customFontFile = File(context.filesDir, "CustomFont.ttf")
-                    if (customFontFile.exists()) {
-                        try {
-                            Typeface.createFromFile(customFontFile)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            getTrueSystemFont()
-                        }
-                    } else getTrueSystemFont()
-                }
-            }
-        }
 
         fun getString(): String {
             return when (this) {
