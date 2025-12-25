@@ -13,12 +13,11 @@
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/settings_toolbar"
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
             android:minHeight="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:titleTextColor="?attr/colorOnPrimary"
-            app:navigationIconTint="?attr/colorOnPrimary" />
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
         <androidx.fragment.app.FragmentContainerView
             android:background="?attr/colorSurface"

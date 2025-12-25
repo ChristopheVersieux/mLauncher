@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@android:color/system_accent1_600</color>
+    <color name="colorPrimary">@android:color/system_accent1_800</color>
     <color name="colorPrimaryDark">@android:color/darker_gray</color>
     <color name="colorPrimaryBackground">@color/background_bubble</color>
     <color name="transparent">#00000000</color>

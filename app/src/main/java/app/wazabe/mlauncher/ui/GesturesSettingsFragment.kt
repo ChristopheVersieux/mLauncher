@@ -67,10 +67,4 @@ class GesturesSettingsFragment : GenericPref() {
         )
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val typedValue = android.util.TypedValue()
-        requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorSurface, typedValue, true)
-        view.setBackgroundColor(typedValue.data)
-    }
 }

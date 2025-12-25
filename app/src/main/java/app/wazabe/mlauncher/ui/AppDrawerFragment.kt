@@ -130,8 +130,6 @@ class AppDrawerFragment : BaseFragment() {
             searchTextView.text = letterToChar.toString()
         }
 
-        val backgroundColor = getHexForOpacity(prefs)
-        binding.mainLayout.setBackgroundColor(backgroundColor)
 
         val flagString = arguments?.getString("flag", AppDrawerFlag.LaunchApp.toString())
             ?: AppDrawerFlag.LaunchApp.toString()

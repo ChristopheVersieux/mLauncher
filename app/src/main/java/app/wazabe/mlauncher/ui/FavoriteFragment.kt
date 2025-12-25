@@ -47,8 +47,6 @@ class FavoriteFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val backgroundColor = getHexForOpacity(prefs)
-        binding.mainLayout.setBackgroundColor(backgroundColor)
 
         viewModel = activity?.run {
             ViewModelProvider(this)[MainViewModel::class.java]
@@ -145,16 +143,10 @@ class FavoriteFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
 
-        val backgroundColor = getHexForOpacity(prefs)
-        binding.mainLayout.setBackgroundColor(backgroundColor)
     }
 
     private fun initObservers() {
-        binding.pageName.apply {
-            text = getLocalizedString(R.string.favorite_apps)
-            textSize = prefs.appSize * 1.1f
-            setTextColor(prefs.appColor)
-        }
+
 
         with(viewModel) {
             homeAppsNum.observe(viewLifecycleOwner) { newAppsNum ->
