@@ -1891,15 +1891,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     private fun createWidgetWrapper(widgetInfo: AppWidgetProviderInfo, appWidgetId: Int) {
         val hostView = try {
-            val widgetContext = try {
-                requireContext().createPackageContext(
-                    widgetInfo.provider.packageName,
-                    Context.CONTEXT_IGNORE_SECURITY or Context.CONTEXT_INCLUDE_CODE
-                )
-            } catch (_: Exception) {
-                requireContext()
-            }
-            appWidgetHost.createView(widgetContext, appWidgetId, widgetInfo)
+            appWidgetHost.createView(requireContext(), appWidgetId, widgetInfo)
         } catch (e: Exception) {
             appWidgetHost.deleteAppWidgetId(appWidgetId)
             return
@@ -2004,10 +1996,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 savedWidgets.forEach { saved ->
                     val info = appWidgetManager.getAppWidgetInfo(saved.appWidgetId) ?: return@forEach
                     val hostView = try {
-                        val widgetContext = try {
-                            requireContext().createPackageContext(info.provider.packageName, Context.CONTEXT_IGNORE_SECURITY or Context.CONTEXT_INCLUDE_CODE)
-                        } catch (_: Exception) { requireContext() }
-                        appWidgetHost.createView(widgetContext, saved.appWidgetId, info)
+                        appWidgetHost.createView(requireContext(), saved.appWidgetId, info)
                     } catch (e: Exception) { return@forEach }
 
                     val wrapper = ResizableWidgetWrapper(
