@@ -105,7 +105,7 @@ import com.github.droidworksstudio.common.AppLogger
 import com.github.droidworksstudio.common.ColorIconsExtensions
 import com.github.droidworksstudio.common.ColorManager
 import com.github.droidworksstudio.common.attachGestureManager
-import com.github.droidworksstudio.common.getLocalizedString
+
 import com.github.droidworksstudio.common.isGestureNavigationEnabled
 import com.github.droidworksstudio.common.isSystemApp
 import com.github.droidworksstudio.common.launchCalendar
@@ -420,7 +420,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             date.format24Hour = datePattern
 
             alarm.text = getNextAlarm(requireContext(), prefs)
-            dailyWord.text = wordOfTheDay(prefs)
+            dailyWord.text = wordOfTheDay(requireContext(), prefs)
         }
     }
 
@@ -575,7 +575,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 R.string.advanced_settings_set_as_default_launcher
             }
 
-            setDefaultLauncher.text = getLocalizedString(changeLauncherText)
+            setDefaultLauncher.text = getString(changeLauncherText)
         }
     }
 
@@ -839,7 +839,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
 
-    private fun showLongPressToast() = showShortToast(getLocalizedString(longPressToSelectApp))
+    private fun showLongPressToast() = showShortToast(getString(longPressToSelectApp))
 
     private fun textOnClick(view: View) = onClick(view)
 
@@ -935,7 +935,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         }
 
         // Create a new TextView instance
-        val totalText = getLocalizedString(R.string.total_screen_time)
+        val totalText = getString(R.string.total_screen_time)
         val totalTime = appUsageMonitor.getTotalScreenTime(requireContext())
         val totalScreenTime = formatMillisToHMS(totalTime, true)
         AppLogger.d("totalScreenTime", totalScreenTime)
@@ -1344,7 +1344,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                     override fun onAuthenticationFailed() {
                         AppLogger.e(
                             "Authentication",
-                            getLocalizedString(R.string.text_authentication_failed)
+                            getString(R.string.text_authentication_failed)
                         )
                     }
 
@@ -1355,13 +1355,13 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                         when (errorCode) {
                             BiometricPrompt.ERROR_USER_CANCELED -> AppLogger.e(
                                 "Authentication",
-                                getLocalizedString(R.string.text_authentication_cancel)
+                                getString(R.string.text_authentication_cancel)
                             )
 
                             else ->
                                 AppLogger.e(
                                     "Authentication",
-                                    getLocalizedString(R.string.text_authentication_error).format(
+                                    getString(R.string.text_authentication_error).format(
                                         errorMessage,
                                         errorCode
                                     )
@@ -1567,7 +1567,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             },
             { appModel ->
                 if (requireContext().isSystemApp(appModel.activityPackage))
-                    showShortToast(getLocalizedString(R.string.can_not_delete_system_apps))
+                    showShortToast(getString(R.string.can_not_delete_system_apps))
                 else {
                     val intent = Intent(Intent.ACTION_DELETE, "package:${appModel.activityPackage}".toUri())
                     requireContext().startActivity(intent)
@@ -1743,16 +1743,16 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             container.addView(option)
         }
 
-        addOption(getLocalizedString(R.string.widgets_add_widget)) { showCustomWidgetPicker() }
+        addOption(getString(R.string.widgets_add_widget)) { showCustomWidgetPicker() }
 
-        val editTitle = if (isEditingWidgets) getLocalizedString(R.string.widgets_stop_editing_widget) else getLocalizedString(R.string.widgets_edit_widget)
+        val editTitle = if (isEditingWidgets) getString(R.string.widgets_stop_editing_widget) else getString(R.string.widgets_edit_widget)
         addOption(editTitle) {
             isEditingWidgets = !isEditingWidgets
             updateWidgetEditMode()
         }
 
         if (isEditingWidgets) {
-            addOption(getLocalizedString(R.string.widgets_remove_widget)) { removeAllWidgets() }
+            addOption(getString(R.string.widgets_remove_widget)) { removeAllWidgets() }
         }
 
         bottomSheetDialog.setContentView(container)

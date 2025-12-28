@@ -7,7 +7,7 @@ import android.graphics.Typeface
 import androidx.compose.runtime.Composable
 import androidx.core.content.res.ResourcesCompat
 import com.github.droidworksstudio.common.AppLogger
-import com.github.droidworksstudio.common.getLocalizedString
+import androidx.compose.ui.res.stringResource
 import app.wazabe.mlauncher.Mlauncher
 import app.wazabe.mlauncher.R
 import app.wazabe.mlauncher.helper.IconCacheTarget
@@ -163,54 +163,54 @@ object Constants {
         Turkish;
 
         // Function to get a string from a context (for non-Composable use)
-        fun getString(): String {
+        fun getString(context: Context): String? {
             return when (this) {
-                System -> getLocalizedString(R.string.system_default)
-                Arabic -> getLocalizedString(R.string.lang_arabic)
-                Czech -> getLocalizedString(R.string.lang_czech)
-                Dutch -> getLocalizedString(R.string.lang_dutch)
-                English -> getLocalizedString(R.string.lang_english)
-                French -> getLocalizedString(R.string.lang_french)
-                German -> getLocalizedString(R.string.lang_german)
-                Hebrew -> getLocalizedString(R.string.lang_hebrew)
-                Italian -> getLocalizedString(R.string.lang_italian)
-                Japanese -> getLocalizedString(R.string.lang_japanese)
-                Korean -> getLocalizedString(R.string.lang_korean)
-                Lithuanian -> getLocalizedString(R.string.lang_lithuanian)
-                Polish -> getLocalizedString(R.string.lang_polish)
-                Portuguese -> getLocalizedString(R.string.lang_portuguese)
-                Romanian -> getLocalizedString(R.string.lang_romanian)
-                Russian -> getLocalizedString(R.string.lang_russian)
-                Slovak -> getLocalizedString(R.string.lang_slovak)
-                Spanish -> getLocalizedString(R.string.lang_spanish)
-                Thai -> getLocalizedString(R.string.lang_thai)
-                Turkish -> getLocalizedString(R.string.lang_turkish)
+                System -> null
+                Arabic -> context.getString(R.string.lang_arabic)
+                Czech -> context.getString(R.string.lang_czech)
+                Dutch -> context.getString(R.string.lang_dutch)
+                English -> context.getString(R.string.lang_english)
+                French -> context.getString(R.string.lang_french)
+                German -> context.getString(R.string.lang_german)
+                Hebrew -> context.getString(R.string.lang_hebrew)
+                Italian -> context.getString(R.string.lang_italian)
+                Japanese -> context.getString(R.string.lang_japanese)
+                Korean -> context.getString(R.string.lang_korean)
+                Lithuanian -> context.getString(R.string.lang_lithuanian)
+                Polish -> context.getString(R.string.lang_polish)
+                Portuguese -> context.getString(R.string.lang_portuguese)
+                Romanian -> context.getString(R.string.lang_romanian)
+                Russian -> context.getString(R.string.lang_russian)
+                Slovak -> context.getString(R.string.lang_slovak)
+                Spanish -> context.getString(R.string.lang_spanish)
+                Thai -> context.getString(R.string.lang_thai)
+                Turkish -> context.getString(R.string.lang_turkish)
             }
         }
 
         @Composable
         override fun string(): String {
             return when (this) {
-                System -> getLocalizedString(R.string.system_default)
-                Arabic -> getLocalizedString(R.string.lang_arabic)
-                Czech -> getLocalizedString(R.string.lang_czech)
-                Dutch -> getLocalizedString(R.string.lang_dutch)
-                English -> getLocalizedString(R.string.lang_english)
-                French -> getLocalizedString(R.string.lang_french)
-                German -> getLocalizedString(R.string.lang_german)
-                Hebrew -> getLocalizedString(R.string.lang_hebrew)
-                Italian -> getLocalizedString(R.string.lang_italian)
-                Japanese -> getLocalizedString(R.string.lang_japanese)
-                Korean -> getLocalizedString(R.string.lang_korean)
-                Lithuanian -> getLocalizedString(R.string.lang_lithuanian)
-                Polish -> getLocalizedString(R.string.lang_polish)
-                Portuguese -> getLocalizedString(R.string.lang_portuguese)
-                Romanian -> getLocalizedString(R.string.lang_romanian)
-                Russian -> getLocalizedString(R.string.lang_russian)
-                Slovak -> getLocalizedString(R.string.lang_slovak)
-                Spanish -> getLocalizedString(R.string.lang_spanish)
-                Thai -> getLocalizedString(R.string.lang_thai)
-                Turkish -> getLocalizedString(R.string.lang_turkish)
+                System -> stringResource(R.string.system_default)
+                Arabic -> stringResource(R.string.lang_arabic)
+                Czech -> stringResource(R.string.lang_czech)
+                Dutch -> stringResource(R.string.lang_dutch)
+                English -> stringResource(R.string.lang_english)
+                French -> stringResource(R.string.lang_french)
+                German -> stringResource(R.string.lang_german)
+                Hebrew -> stringResource(R.string.lang_hebrew)
+                Italian -> stringResource(R.string.lang_italian)
+                Japanese -> stringResource(R.string.lang_japanese)
+                Korean -> stringResource(R.string.lang_korean)
+                Lithuanian -> stringResource(R.string.lang_lithuanian)
+                Polish -> stringResource(R.string.lang_polish)
+                Portuguese -> stringResource(R.string.lang_portuguese)
+                Romanian -> stringResource(R.string.lang_romanian)
+                Russian -> stringResource(R.string.lang_russian)
+                Slovak -> stringResource(R.string.lang_slovak)
+                Spanish -> stringResource(R.string.lang_spanish)
+                Thai -> stringResource(R.string.lang_thai)
+                Turkish -> stringResource(R.string.lang_turkish)
             }
         }
 
@@ -282,9 +282,17 @@ object Constants {
         @Composable
         override fun string(): String {
             return when (this) {
-                Left -> getLocalizedString(R.string.left)
-                Center -> getLocalizedString(R.string.center)
-                Right -> getLocalizedString(R.string.right)
+                Left -> stringResource(R.string.left)
+                Center -> stringResource(R.string.center)
+                Right -> stringResource(R.string.right)
+            }
+        }
+
+        fun getString(context: Context): String {
+            return when (this) {
+                Left -> context.getString(R.string.left)
+                Center -> context.getString(R.string.center)
+                Right -> context.getString(R.string.right)
             }
         }
 
@@ -298,39 +306,39 @@ object Constants {
         }
     }
 
-    fun getCustomIconPackName(target: String): String {
+    fun getCustomIconPackName(context: Context, target: String): String {
         return when (target) {
             IconCacheTarget.APP_LIST.name -> {
-                val customPackageName = Prefs(Mlauncher.getContext()).customIconPackAppList
+                val customPackageName = Prefs(context).customIconPackAppList
                 if (customPackageName.isEmpty()) {
-                    getLocalizedString(R.string.system_custom)
+                    context.getString(R.string.system_custom)
                 }
                 try {
-                    val pm = Mlauncher.getContext().packageManager
+                    val pm = context.packageManager
                     val appInfo = pm.getApplicationInfo(customPackageName, 0)
                     val customName = pm.getApplicationLabel(appInfo).toString()
-                    getLocalizedString(R.string.system_custom_plus, customName)
+                    context.getString(R.string.system_custom_plus, customName)
                 } catch (_: NameNotFoundException) {
-                    getLocalizedString(R.string.system_custom)
+                    context.getString(R.string.system_custom)
                 }
             }
 
             IconCacheTarget.HOME.name -> {
-                val customPackageName = Prefs(Mlauncher.getContext()).customIconPackHome
+                val customPackageName = Prefs(context).customIconPackHome
                 if (customPackageName.isEmpty()) {
-                    getLocalizedString(R.string.system_custom)
+                    context.getString(R.string.system_custom)
                 }
                 try {
-                    val pm = Mlauncher.getContext().packageManager
+                    val pm = context.packageManager
                     val appInfo = pm.getApplicationInfo(customPackageName, 0)
                     val customName = pm.getApplicationLabel(appInfo).toString()
-                    getLocalizedString(R.string.system_custom_plus, customName)
+                    context.getString(R.string.system_custom_plus, customName)
                 } catch (_: NameNotFoundException) {
-                    getLocalizedString(R.string.system_custom)
+                    context.getString(R.string.system_custom)
                 }
             }
 
-            else -> getLocalizedString(R.string.system_custom)
+            else -> context.getString(R.string.system_custom)
         }
     }
 
@@ -343,28 +351,28 @@ object Constants {
         SpinnerDots,
         Disabled;
 
-        fun getString(target: String): String {
+        fun getString(context: Context, target: String): String {
             return when (this) {
-                System -> getLocalizedString(R.string.system_default)
-                Custom -> getCustomIconPackName(target)
-                CloudDots -> getLocalizedString(R.string.app_icons_cloud_dots)
-                LauncherDots -> getLocalizedString(R.string.app_icons_launcher_dots)
-                NiagaraDots -> getLocalizedString(R.string.app_icons_niagara_dots)
-                SpinnerDots -> getLocalizedString(R.string.app_icons_spinner_dots)
-                Disabled -> getLocalizedString(R.string.disabled)
+                System -> context.getString(R.string.system_default)
+                Custom -> getCustomIconPackName(context, target)
+                CloudDots -> context.getString(R.string.app_icons_cloud_dots)
+                LauncherDots -> context.getString(R.string.app_icons_launcher_dots)
+                NiagaraDots -> context.getString(R.string.app_icons_niagara_dots)
+                SpinnerDots -> context.getString(R.string.app_icons_spinner_dots)
+                Disabled -> context.getString(R.string.disabled)
             }
         }
 
         @Composable
         override fun string(): String {
             return when (this) {
-                System -> getLocalizedString(R.string.system_default)
-                Custom -> getLocalizedString(R.string.system_custom)
-                CloudDots -> getLocalizedString(R.string.app_icons_cloud_dots)
-                LauncherDots -> getLocalizedString(R.string.app_icons_launcher_dots)
-                NiagaraDots -> getLocalizedString(R.string.app_icons_niagara_dots)
-                SpinnerDots -> getLocalizedString(R.string.app_icons_spinner_dots)
-                Disabled -> getLocalizedString(R.string.disabled)
+                System -> stringResource(R.string.system_default)
+                Custom -> stringResource(R.string.system_custom)
+                CloudDots -> stringResource(R.string.app_icons_cloud_dots)
+                LauncherDots -> stringResource(R.string.app_icons_launcher_dots)
+                NiagaraDots -> stringResource(R.string.app_icons_niagara_dots)
+                SpinnerDots -> stringResource(R.string.app_icons_spinner_dots)
+                Disabled -> stringResource(R.string.disabled)
             }
         }
     }
@@ -387,46 +395,46 @@ object Constants {
         RestartApp,
         Disabled;
 
-        fun getString(): String {
+        fun getString(context: Context): String {
             return when (this) {
-                OpenApp -> getLocalizedString(R.string.open_app)
-                LockScreen -> getLocalizedString(R.string.lock_screen)
-                TogglePrivateSpace -> getLocalizedString(R.string.private_space, "Toggle")
-                ShowNotification -> getLocalizedString(R.string.show_notifications)
-                ShowAppList -> getLocalizedString(R.string.show_app_list)
-                ShowWidgetPage -> getLocalizedString(R.string.show_widget_page)
-                ShowNotesManager -> getLocalizedString(R.string.show_notes_manager)
-                ShowDigitalWellbeing -> getLocalizedString(R.string.show_digital_wellbeing)
-                OpenQuickSettings -> getLocalizedString(R.string.open_quick_settings)
-                ShowRecents -> getLocalizedString(R.string.show_recents)
-                OpenPowerDialog -> getLocalizedString(R.string.open_power_dialog)
-                TakeScreenShot -> getLocalizedString(R.string.take_a_screenshot)
-                PreviousPage -> getLocalizedString(R.string.previous_page)
-                NextPage -> getLocalizedString(R.string.next_page)
-                RestartApp -> getLocalizedString(R.string.restart_launcher)
-                Disabled -> getLocalizedString(R.string.disabled)
+                OpenApp -> context.getString(R.string.open_app)
+                LockScreen -> context.getString(R.string.lock_screen)
+                TogglePrivateSpace -> context.getString(R.string.private_space, "Toggle")
+                ShowNotification -> context.getString(R.string.show_notifications)
+                ShowAppList -> context.getString(R.string.show_app_list)
+                ShowWidgetPage -> context.getString(R.string.show_widget_page)
+                ShowNotesManager -> context.getString(R.string.show_notes_manager)
+                ShowDigitalWellbeing -> context.getString(R.string.show_digital_wellbeing)
+                OpenQuickSettings -> context.getString(R.string.open_quick_settings)
+                ShowRecents -> context.getString(R.string.show_recents)
+                OpenPowerDialog -> context.getString(R.string.open_power_dialog)
+                TakeScreenShot -> context.getString(R.string.take_a_screenshot)
+                PreviousPage -> context.getString(R.string.previous_page)
+                NextPage -> context.getString(R.string.next_page)
+                RestartApp -> context.getString(R.string.restart_launcher)
+                Disabled -> context.getString(R.string.disabled)
             }
         }
 
         @Composable
         override fun string(): String {
             return when (this) {
-                OpenApp -> getLocalizedString(R.string.open_app)
-                LockScreen -> getLocalizedString(R.string.lock_screen)
-                TogglePrivateSpace -> getLocalizedString(R.string.private_space)
-                ShowNotification -> getLocalizedString(R.string.show_notifications)
-                ShowAppList -> getLocalizedString(R.string.show_app_list)
-                ShowWidgetPage -> getLocalizedString(R.string.show_widget_page)
-                ShowNotesManager -> getLocalizedString(R.string.show_notes_manager)
-                ShowDigitalWellbeing -> getLocalizedString(R.string.show_digital_wellbeing)
-                OpenQuickSettings -> getLocalizedString(R.string.open_quick_settings)
-                ShowRecents -> getLocalizedString(R.string.show_recents)
-                OpenPowerDialog -> getLocalizedString(R.string.open_power_dialog)
-                TakeScreenShot -> getLocalizedString(R.string.take_a_screenshot)
-                PreviousPage -> getLocalizedString(R.string.previous_page)
-                NextPage -> getLocalizedString(R.string.next_page)
-                RestartApp -> getLocalizedString(R.string.restart_launcher)
-                Disabled -> getLocalizedString(R.string.disabled)
+                OpenApp -> stringResource(R.string.open_app)
+                LockScreen -> stringResource(R.string.lock_screen)
+                TogglePrivateSpace -> stringResource(R.string.private_space)
+                ShowNotification -> stringResource(R.string.show_notifications)
+                ShowAppList -> stringResource(R.string.show_app_list)
+                ShowWidgetPage -> stringResource(R.string.show_widget_page)
+                ShowNotesManager -> stringResource(R.string.show_notes_manager)
+                ShowDigitalWellbeing -> stringResource(R.string.show_digital_wellbeing)
+                OpenQuickSettings -> stringResource(R.string.open_quick_settings)
+                ShowRecents -> stringResource(R.string.show_recents)
+                OpenPowerDialog -> stringResource(R.string.open_power_dialog)
+                TakeScreenShot -> stringResource(R.string.take_a_screenshot)
+                PreviousPage -> stringResource(R.string.previous_page)
+                NextPage -> stringResource(R.string.next_page)
+                RestartApp -> stringResource(R.string.restart_launcher)
+                Disabled -> stringResource(R.string.disabled)
             }
         }
     }
@@ -444,19 +452,19 @@ object Constants {
         Yahoo,
         Yandex;
 
-        fun getString(): String {
+        fun getString(context: Context): String {
             return when (this) {
-                Bing -> getLocalizedString(R.string.search_bing)
-                Brave -> getLocalizedString(R.string.search_brave)
-                DuckDuckGo -> getLocalizedString(R.string.search_duckduckgo)
-                Google -> getLocalizedString(R.string.search_google)
-                Mojeek -> getLocalizedString(R.string.search_mojeek)
-                Qwant -> getLocalizedString(R.string.search_qwant)
-                Seznam -> getLocalizedString(R.string.search_seznam)
-                StartPage -> getLocalizedString(R.string.search_startpage)
-                SwissCow -> getLocalizedString(R.string.search_swisscow)
-                Yahoo -> getLocalizedString(R.string.search_yahoo)
-                Yandex -> getLocalizedString(R.string.search_yandex)
+                Bing -> context.getString(R.string.search_bing)
+                Brave -> context.getString(R.string.search_brave)
+                DuckDuckGo -> context.getString(R.string.search_duckduckgo)
+                Google -> context.getString(R.string.search_google)
+                Mojeek -> context.getString(R.string.search_mojeek)
+                Qwant -> context.getString(R.string.search_qwant)
+                Seznam -> context.getString(R.string.search_seznam)
+                StartPage -> context.getString(R.string.search_startpage)
+                SwissCow -> context.getString(R.string.search_swisscow)
+                Yahoo -> context.getString(R.string.search_yahoo)
+                Yandex -> context.getString(R.string.search_yandex)
             }
         }
 
@@ -479,17 +487,17 @@ object Constants {
         @Composable
         override fun string(): String {
             return when (this) {
-                Bing -> getLocalizedString(R.string.search_bing)
-                Brave -> getLocalizedString(R.string.search_brave)
-                DuckDuckGo -> getLocalizedString(R.string.search_duckduckgo)
-                Google -> getLocalizedString(R.string.search_google)
-                Mojeek -> getLocalizedString(R.string.search_mojeek)
-                Qwant -> getLocalizedString(R.string.search_qwant)
-                Seznam -> getLocalizedString(R.string.search_seznam)
-                StartPage -> getLocalizedString(R.string.search_startpage)
-                SwissCow -> getLocalizedString(R.string.search_swisscow)
-                Yahoo -> getLocalizedString(R.string.search_yahoo)
-                Yandex -> getLocalizedString(R.string.search_yandex)
+                Bing -> stringResource(R.string.search_bing)
+                Brave -> stringResource(R.string.search_brave)
+                DuckDuckGo -> stringResource(R.string.search_duckduckgo)
+                Google -> stringResource(R.string.search_google)
+                Mojeek -> stringResource(R.string.search_mojeek)
+                Qwant -> stringResource(R.string.search_qwant)
+                Seznam -> stringResource(R.string.search_seznam)
+                StartPage -> stringResource(R.string.search_startpage)
+                SwissCow -> stringResource(R.string.search_swisscow)
+                Yahoo -> stringResource(R.string.search_yahoo)
+                Yandex -> stringResource(R.string.search_yandex)
             }
         }
     }
@@ -500,11 +508,11 @@ object Constants {
         Dark,
         Light;
 
-        fun getString(): String {
+        fun getString(context: Context): String {
             return when (this) {
-                System -> getLocalizedString(R.string.system_default)
-                Dark -> getLocalizedString(R.string.dark)
-                Light -> getLocalizedString(R.string.light)
+                System -> context.getString(R.string.system_default)
+                Dark -> context.getString(R.string.dark)
+                Light -> context.getString(R.string.light)
             }
         }
 
@@ -512,9 +520,9 @@ object Constants {
         @Composable
         override fun string(): String {
             return when (this) {
-                System -> getLocalizedString(R.string.system_default)
-                Dark -> getLocalizedString(R.string.dark)
-                Light -> getLocalizedString(R.string.light)
+                System -> stringResource(R.string.system_default)
+                Dark -> stringResource(R.string.dark)
+                Light -> stringResource(R.string.light)
             }
         }
     }
@@ -527,8 +535,8 @@ object Constants {
         @Composable
         override fun string(): String {
             return when (this) {
-                Celsius -> getLocalizedString(R.string.celsius)
-                Fahrenheit -> getLocalizedString(R.string.fahrenheit)
+                Celsius -> stringResource(R.string.celsius)
+                Fahrenheit -> stringResource(R.string.fahrenheit)
             }
         }
     }
@@ -550,40 +558,40 @@ object Constants {
         SourceCodePro;
 
 
-        fun getString(): String {
+        fun getString(context: Context): String {
             return when (this) {
-                System -> getLocalizedString(R.string.system_default)
-                Bitter -> getLocalizedString(R.string.settings_font_bitter)
-                Doto -> getLocalizedString(R.string.settings_font_doto)
-                FiraCode -> getLocalizedString(R.string.settings_font_firacode)
-                Hack -> getLocalizedString(R.string.settings_font_hack)
-                Lato -> getLocalizedString(R.string.settings_font_lato)
-                Merriweather -> getLocalizedString(R.string.settings_font_merriweather)
-                Montserrat -> getLocalizedString(R.string.settings_font_montserrat)
-                Quicksand -> getLocalizedString(R.string.settings_font_quicksand)
-                Raleway -> getLocalizedString(R.string.settings_font_raleway)
-                Roboto -> getLocalizedString(R.string.settings_font_roboto)
-                SourceCodePro -> getLocalizedString(R.string.settings_font_sourcecodepro)
-                Custom -> getLocalizedString(R.string.system_custom)
+                System -> context.getString(R.string.system_default)
+                Bitter -> context.getString(R.string.settings_font_bitter)
+                Doto -> context.getString(R.string.settings_font_doto)
+                FiraCode -> context.getString(R.string.settings_font_firacode)
+                Hack -> context.getString(R.string.settings_font_hack)
+                Lato -> context.getString(R.string.settings_font_lato)
+                Merriweather -> context.getString(R.string.settings_font_merriweather)
+                Montserrat -> context.getString(R.string.settings_font_montserrat)
+                Quicksand -> context.getString(R.string.settings_font_quicksand)
+                Raleway -> context.getString(R.string.settings_font_raleway)
+                Roboto -> context.getString(R.string.settings_font_roboto)
+                SourceCodePro -> context.getString(R.string.settings_font_sourcecodepro)
+                Custom -> context.getString(R.string.system_custom)
             }
         }
 
         @Composable
         override fun string(): String {
             return when (this) {
-                System -> getLocalizedString(R.string.system_default)
-                Bitter -> getLocalizedString(R.string.settings_font_bitter)
-                Doto -> getLocalizedString(R.string.settings_font_doto)
-                FiraCode -> getLocalizedString(R.string.settings_font_firacode)
-                Hack -> getLocalizedString(R.string.settings_font_hack)
-                Lato -> getLocalizedString(R.string.settings_font_lato)
-                Merriweather -> getLocalizedString(R.string.settings_font_merriweather)
-                Montserrat -> getLocalizedString(R.string.settings_font_montserrat)
-                Quicksand -> getLocalizedString(R.string.settings_font_quicksand)
-                Raleway -> getLocalizedString(R.string.settings_font_raleway)
-                Roboto -> getLocalizedString(R.string.settings_font_roboto)
-                SourceCodePro -> getLocalizedString(R.string.settings_font_sourcecodepro)
-                Custom -> getLocalizedString(R.string.system_custom)
+                System -> stringResource(R.string.system_default)
+                Bitter -> stringResource(R.string.settings_font_bitter)
+                Doto -> stringResource(R.string.settings_font_doto)
+                FiraCode -> stringResource(R.string.settings_font_firacode)
+                Hack -> stringResource(R.string.settings_font_hack)
+                Lato -> stringResource(R.string.settings_font_lato)
+                Merriweather -> stringResource(R.string.settings_font_merriweather)
+                Montserrat -> stringResource(R.string.settings_font_montserrat)
+                Quicksand -> stringResource(R.string.settings_font_quicksand)
+                Raleway -> stringResource(R.string.settings_font_raleway)
+                Roboto -> stringResource(R.string.settings_font_roboto)
+                SourceCodePro -> stringResource(R.string.settings_font_sourcecodepro)
+                Custom -> stringResource(R.string.system_custom)
             }
         }
     }

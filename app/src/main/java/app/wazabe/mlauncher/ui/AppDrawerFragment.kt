@@ -34,7 +34,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.droidworksstudio.common.AppLogger
-import com.github.droidworksstudio.common.getLocalizedString
+
 import com.github.droidworksstudio.common.hasSoftKeyboard
 import com.github.droidworksstudio.common.isGestureNavigationEnabled
 import com.github.droidworksstudio.common.isSystemApp
@@ -180,7 +180,7 @@ class AppDrawerFragment : BaseFragment() {
                     val currentApp = prefs.getHomeAppModel(n)
                     if (currentApp.activityPackage.isNotEmpty() && currentApp.activityClass.isNotEmpty()) {
                         isVisible = true
-                        text = getLocalizedString(R.string.clear_home_app)
+                        text = getString(R.string.clear_home_app)
                         setTextColor(prefs.appColor)
                         textSize = prefs.appSize.toFloat()
                         setOnClickListener {
@@ -448,18 +448,18 @@ class AppDrawerFragment : BaseFragment() {
                 }
 
                 AppDrawerFlag.HiddenApps -> {
-                    binding.search.queryHint = getLocalizedString(R.string.hidden_apps)
+                    binding.search.queryHint = getString(R.string.hidden_apps)
                 }
 
                 AppDrawerFlag.SetHomeApp -> {
-                    binding.search.queryHint = getLocalizedString(R.string.please_select_app)
+                    binding.search.queryHint = getString(R.string.please_select_app)
                 }
 
                 else -> {}
             }
         }
 
-        binding.listEmptyHint.text = applyTextColor(getLocalizedString(R.string.drawer_list_empty_hint), prefs.appColor)
+        binding.listEmptyHint.text = applyTextColor(getString(R.string.drawer_list_empty_hint), prefs.appColor)
 
         binding.search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -500,7 +500,7 @@ class AppDrawerFragment : BaseFragment() {
                 if (flag == AppDrawerFlag.SetHomeApp) {
                     binding.drawerButton.apply {
                         isVisible = !newText.isNullOrEmpty()
-                        text = if (isVisible) getLocalizedString(R.string.rename) else null
+                        text = if (isVisible) getString(R.string.rename) else null
                         setOnClickListener { if (isVisible) renameListener(flag, n) }
                     }
                     binding.clearHomeButton.apply {
@@ -543,9 +543,9 @@ class AppDrawerFragment : BaseFragment() {
             binding.systemApps.isVisible = isSystemProfileAvailable
 
             binding.search.queryHint = when (profileType) {
-                "WORK" -> getLocalizedString(R.string.show_work_apps)
-                "PRIVATE" -> getLocalizedString(R.string.show_private_apps)
-                else -> getLocalizedString(R.string.show_apps)
+                "WORK" -> getString(R.string.show_work_apps)
+                "PRIVATE" -> getString(R.string.show_private_apps)
+                else -> getString(R.string.show_apps)
             }
         }
 
@@ -592,7 +592,7 @@ class AppDrawerFragment : BaseFragment() {
     private fun setAppViewDetails() {
         binding.apply {
             searchSwitcher.setImageResource(R.drawable.ic_contacts)
-            search.queryHint = getLocalizedString(R.string.show_apps)
+            search.queryHint = getString(R.string.show_apps)
             search.setQuery("", false)
         }
     }
@@ -600,7 +600,7 @@ class AppDrawerFragment : BaseFragment() {
     private fun setContactViewDetails() {
         binding.apply {
             searchSwitcher.setImageResource(R.drawable.ic_apps)
-            search.queryHint = getLocalizedString(R.string.show_contacts)
+            search.queryHint = getString(R.string.show_contacts)
             search.setQuery("", false)
         }
     }
@@ -788,7 +788,7 @@ class AppDrawerFragment : BaseFragment() {
 
     private fun appDeleteListener(): (appListItem: AppListItem) -> Unit = { appModel ->
         if (requireContext().isSystemApp(appModel.activityPackage))
-            showShortToast(getLocalizedString(R.string.can_not_delete_system_apps))
+            showShortToast(getString(R.string.can_not_delete_system_apps))
         else {
             val appPackage = appModel.activityPackage
             val intent = Intent(Intent.ACTION_DELETE)

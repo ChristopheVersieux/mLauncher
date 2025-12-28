@@ -13,7 +13,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import com.github.droidworksstudio.common.getLocalizedString
+
 import app.wazabe.mlauncher.R
 import app.wazabe.mlauncher.data.Constants
 import app.wazabe.mlauncher.data.Prefs
@@ -148,7 +148,7 @@ class CustomIconSelectionActivity : androidx.appcompat.app.AppCompatActivity() {
 
         // Add status message view at the bottom, initially hidden and right-aligned
         val statusTextView = TextView(context).apply {
-            text = getLocalizedString(R.string.applying_icon_pack)
+            text = getString(R.string.applying_icon_pack)
             isVisible = false
             textSize = 14f
             gravity = Gravity.END // Align text to the right
@@ -162,10 +162,10 @@ class CustomIconSelectionActivity : androidx.appcompat.app.AppCompatActivity() {
         container.addView(statusTextView)
 
         val dialog = MaterialAlertDialogBuilder(context)
-            .setTitle(getLocalizedString(R.string.choose_icon_pack))
+            .setTitle(getString(R.string.choose_icon_pack))
             .setView(container)
-            .setPositiveButton(getLocalizedString(R.string.apply), null) // We override this below
-            .setNegativeButton(getLocalizedString(R.string.cancel)) { _, _ ->
+            .setPositiveButton(getString(R.string.apply), null) // We override this below
+            .setNegativeButton(getString(R.string.cancel)) { _, _ ->
                 finish()
             }
             .create()

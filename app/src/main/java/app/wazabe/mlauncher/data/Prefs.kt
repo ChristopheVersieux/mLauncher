@@ -3,6 +3,7 @@
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.UserHandle
+import androidx.core.app.AppLocalesStorageHelper
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.content.edit
 import androidx.core.graphics.toColorInt
@@ -387,15 +388,15 @@ class Prefs(val context: Context) {
         set(value) = prefsNormal.edit { putBoolean(NAVIGATION_BAR, value) }
 
     var showDate: Boolean
-        get() = getSetting(SHOW_DATE, true)
+        get() = getSetting(SHOW_DATE, false)
         set(value) = prefsNormal.edit { putBoolean(SHOW_DATE, value) }
 
     var showClock: Boolean
-        get() = getSetting(SHOW_CLOCK, true)
+        get() = getSetting(SHOW_CLOCK, false)
         set(value) = prefsNormal.edit { putBoolean(SHOW_CLOCK, value) }
 
     var showClockFormat: Boolean
-        get() = getSetting(SHOW_CLOCK_FORMAT, true)
+        get() = getSetting(SHOW_CLOCK_FORMAT, false)
         set(value) = prefsNormal.edit { putBoolean(SHOW_CLOCK_FORMAT, value) }
 
     var showAlarm: Boolean
@@ -403,7 +404,7 @@ class Prefs(val context: Context) {
         set(value) = prefsNormal.edit { putBoolean(SHOW_ALARM, value) }
 
     var showDailyWord: Boolean
-        get() = getSetting(SHOW_DAILY_WORD, false)
+        get() = getSetting(SHOW_DAILY_WORD, true)
         set(value) = prefsNormal.edit { putBoolean(SHOW_DAILY_WORD, value) }
 
     var showFloating: Boolean
@@ -411,11 +412,11 @@ class Prefs(val context: Context) {
         set(value) = prefsNormal.edit { putBoolean(SHOW_FLOATING, value) }
 
     var showBattery: Boolean
-        get() = getSetting(SHOW_BATTERY, true)
+        get() = getSetting(SHOW_BATTERY, false)
         set(value) = prefsNormal.edit { putBoolean(SHOW_BATTERY, value) }
 
     var showWeather: Boolean
-        get() = getSetting(SHOW_WEATHER, true)
+        get() = getSetting(SHOW_WEATHER, false)
         set(value) = prefsNormal.edit { putBoolean(SHOW_WEATHER, value) }
 
     var gpsLocation: Boolean
@@ -580,7 +581,7 @@ class Prefs(val context: Context) {
         get() {
             return getEnumSetting(APP_LANGUAGE, Constants.Language.System)
         }
-        set(value) = prefsNormal.edit { putString(APP_LANGUAGE, value.name) }
+        set(value) = prefsNormal.edit { AppLogger.e(message="SET LANG To "+value.name);putString(APP_LANGUAGE, value.name) }
 
     var searchEngines: Constants.SearchEngines
         get() {

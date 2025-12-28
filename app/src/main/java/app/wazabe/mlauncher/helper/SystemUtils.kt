@@ -45,8 +45,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import com.github.droidworksstudio.common.AppLogger
 import com.github.droidworksstudio.common.ColorIconsExtensions
-import com.github.droidworksstudio.common.getLocalizedString
-import com.github.droidworksstudio.common.getLocalizedStringArray
+
 import com.github.droidworksstudio.common.openAccessibilitySettings
 import com.github.droidworksstudio.common.requestUsagePermission
 import com.github.droidworksstudio.common.showLongToast
@@ -121,13 +120,13 @@ fun hasContactsPermission(context: Context): Boolean {
 
 fun showPermissionDialog(context: Context) {
     val builder = MaterialAlertDialogBuilder(context)
-    builder.setTitle(getLocalizedString(R.string.permission_required))
-    builder.setMessage(getLocalizedString(R.string.access_usage_data_permission))
-    builder.setPositiveButton(getLocalizedString(R.string.goto_settings)) { dialogInterface: DialogInterface, _: Int ->
+    builder.setTitle(context.getString(R.string.permission_required))
+    builder.setMessage(context.getString(R.string.access_usage_data_permission))
+    builder.setPositiveButton(context.getString(R.string.goto_settings)) { dialogInterface: DialogInterface, _: Int ->
         dialogInterface.dismiss()
         context.requestUsagePermission()
     }
-    builder.setNegativeButton(getLocalizedString(R.string.cancel)) { dialogInterface: DialogInterface, _: Int ->
+    builder.setNegativeButton(context.getString(R.string.cancel)) { dialogInterface: DialogInterface, _: Int ->
         dialogInterface.dismiss()
     }
     val dialog = builder.create()
@@ -194,8 +193,8 @@ fun getNextAlarm(context: Context, prefs: Prefs): CharSequence {
     }
 }
 
-fun wordOfTheDay(prefs: Prefs): String {
-    val dailyWordsArray = loadWordList(prefs)
+fun wordOfTheDay(context: Context, prefs: Prefs): String {
+    val dailyWordsArray = loadWordList(context, prefs)
     val dayOfYear = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
     val wordIndex =
         (dayOfYear - 1) % dailyWordsArray.size // Subtracting 1 to align with array indexing
@@ -241,11 +240,11 @@ fun communitySupportButton(context: Context) {
 }
 
 fun checkWhoInstalled(context: Context): String {
-    val appName = getLocalizedString(R.string.app_name)
+    val appName = context.getString(R.string.app_name)
     val descriptionTemplate =
-        getLocalizedString(R.string.advanced_settings_share_application_description)
+        context.getString(R.string.advanced_settings_share_application_description)
     val descriptionTemplate2 =
-        getLocalizedString(R.string.advanced_settings_share_application_description_addon)
+        context.getString(R.string.advanced_settings_share_application_description_addon)
 
     val installerPackageName: String? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         // For API level 30 and above
@@ -397,13 +396,13 @@ fun sp2px(resources: Resources, sp: Float): Float {
 }
 
 
-fun loadWordList(prefs: Prefs): List<String> {
+fun loadWordList(context: Context, prefs: Prefs): List<String> {
     val customWordListString = prefs.wordList
     // If the user has imported their own list, use it
     return if (customWordListString != emptyString()) {
         prefs.wordList.split("||")
     } else {
-        getLocalizedStringArray(R.array.word_of_the_day).toList()
+        context.resources.getStringArray(R.array.word_of_the_day).toList()
     }
 }
 

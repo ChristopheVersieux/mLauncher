@@ -42,11 +42,15 @@ open class BaseActivity : AppCompatActivity() {
         // Apply localization using AppCompatDelegate
         val prefs = app.wazabe.mlauncher.data.Prefs(this)
         val locale = prefs.appLanguage.locale()
-        
-        // DEBUG: Toast to verify expected locale
-        android.widget.Toast.makeText(this, "Target: ${locale.toLanguageTag()} | System: ${java.util.Locale.getDefault().toLanguageTag()}", android.widget.Toast.LENGTH_LONG).show()
 
-        val localeList = androidx.core.os.LocaleListCompat.create(locale)
+        // DEBUG: Toast to verify expected locale
+        //android.widget.Toast.makeText(this, "Target: ${locale.toLanguageTag()} | System: ${java.util.Locale.getDefault().toLanguageTag()}", android.widget.Toast.LENGTH_LONG).show()
+
+        val localeList = if (prefs.appLanguage == app.wazabe.mlauncher.data.Constants.Language.System) {
+            androidx.core.os.LocaleListCompat.getEmptyLocaleList()
+        } else {
+            androidx.core.os.LocaleListCompat.create(locale)
+        }
         androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(localeList)
 
 

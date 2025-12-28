@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.github.droidworksstudio.common.getLocalizedString
+
 import app.wazabe.mlauncher.MainViewModel
 import app.wazabe.mlauncher.R
 import app.wazabe.mlauncher.data.Prefs

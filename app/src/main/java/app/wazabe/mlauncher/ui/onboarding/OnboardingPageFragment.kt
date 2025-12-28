@@ -24,7 +24,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewbinding.ViewBinding
 import androidx.viewpager2.widget.ViewPager2
-import com.github.droidworksstudio.common.getLocalizedString
+
 import com.github.droidworksstudio.common.openAccessibilitySettings
 import com.github.droidworksstudio.common.requestRuntimePermission
 import com.github.droidworksstudio.common.requestUsagePermission
@@ -108,9 +108,9 @@ class OnboardingPageFragment : Fragment() {
         when (val binding = binding) {
             is FragmentOnboardingPageOneBinding -> {
                 val appName = getString(R.string.app_name)
-                binding.title.text = getLocalizedString(R.string.welcome_to_launcher, appName)
+                binding.title.text = getString(R.string.welcome_to_launcher, appName)
 
-                val privacyPolicyText = getLocalizedString(
+                val privacyPolicyText = getString(
                     R.string.continue_by_you_agree,
                     getString(R.string.privacy_policy)
                 )
@@ -136,10 +136,10 @@ class OnboardingPageFragment : Fragment() {
                 handler.removeCallbacks(usagePermissionCheckRunnable)
                 handler.post(launcherDefaultCheckRunnable)
 
-                binding.permissionButton.text = getLocalizedString(R.string.advanced_settings_set_as_default_launcher)
+                binding.permissionButton.text = getString(R.string.advanced_settings_set_as_default_launcher)
                 binding.permissionButton.setOnClickListener { setDefaultHomeScreen() }
 
-                binding.nextButton.text = getLocalizedString(R.string.next)
+                binding.nextButton.text = getString(R.string.next)
                 binding.nextButton.setOnClickListener { finishOnboarding()  }
             }
 
@@ -150,7 +150,7 @@ class OnboardingPageFragment : Fragment() {
 
                 binding.permissionButton.setOnClickListener { requireContext().requestUsagePermission() }
 
-                binding.nextButton.text = getLocalizedString(R.string.next)
+                binding.nextButton.text = getString(R.string.next)
                 binding.nextButton.setOnClickListener { viewPager?.currentItem = viewPager.currentItem + 1 }
             }
 
@@ -167,7 +167,7 @@ class OnboardingPageFragment : Fragment() {
                     )
                 }
 
-                binding.nextButton.text = getLocalizedString(R.string.next)
+                binding.nextButton.text = getString(R.string.next)
                 binding.nextButton.setOnClickListener { viewPager?.currentItem = viewPager.currentItem + 1 }
             }
 
@@ -178,13 +178,13 @@ class OnboardingPageFragment : Fragment() {
 
                 binding.permissionButton.setOnClickListener {
                     MaterialAlertDialogBuilder(requireContext())
-                        .setTitle(getLocalizedString(R.string.accessibility_service_why_we_need))
-                        .setMessage(getLocalizedString(R.string.accessibility_service_more_info))
-                        .setPositiveButton(getLocalizedString(R.string.allow)) { dialog, _ ->
+                        .setTitle(getString(R.string.accessibility_service_why_we_need))
+                        .setMessage(getString(R.string.accessibility_service_more_info))
+                        .setPositiveButton(getString(R.string.allow)) { dialog, _ ->
                             dialog.dismiss()
                             requireContext().openAccessibilitySettings()
                         }
-                        .setNegativeButton(getLocalizedString(R.string.deny)) { dialog, _ ->
+                        .setNegativeButton(getString(R.string.deny)) { dialog, _ ->
                             dialog.dismiss()
                             finishOnboarding()
                         }
@@ -192,7 +192,7 @@ class OnboardingPageFragment : Fragment() {
                         .show()
                 }
 
-                binding.startButton.text = getLocalizedString(R.string.start)
+                binding.startButton.text = getString(R.string.start)
                 binding.startButton.setOnClickListener { finishOnboarding() }
             }
         }
@@ -223,12 +223,12 @@ class OnboardingPageFragment : Fragment() {
         override fun run() {
             (binding as? FragmentOnboardingPageTwoBinding)?.apply {
                 if (hasUsageAccessPermission(requireContext())) {
-                    permissionText.text = getLocalizedString(R.string.permission_granted)
+                    permissionText.text = getString(R.string.permission_granted)
                     permissionButton.isEnabled = false
                     nextButton.isEnabled = true
                     permissionReviewText.isVisible = false
                 } else {
-                    permissionText.text = getLocalizedString(R.string.grant_usage_permission)
+                    permissionText.text = getString(R.string.grant_usage_permission)
                     permissionButton.isEnabled = true
                     nextButton.isEnabled = false
                 }
@@ -241,12 +241,12 @@ class OnboardingPageFragment : Fragment() {
         override fun run() {
             (binding as? FragmentOnboardingPageThreeBinding)?.apply {
                 if (hasLocationPermission(requireContext())) {
-                    permissionText.text = getLocalizedString(R.string.permission_granted)
+                    permissionText.text = getString(R.string.permission_granted)
                     permissionButton.isEnabled = false
                     nextButton.isEnabled = true
                     permissionReviewText.isVisible = false
                 } else {
-                    permissionText.text = getLocalizedString(R.string.grant_location_permission)
+                    permissionText.text = getString(R.string.grant_location_permission)
                     permissionButton.isEnabled = true
                     nextButton.isEnabled = true
                 }

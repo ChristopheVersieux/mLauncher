@@ -81,7 +81,7 @@ fun showCustomToast(
 
             scaleType = ImageView.ScaleType.CENTER_INSIDE
             adjustViewBounds = true
-            contentDescription = getLocalizedString(R.string.show)
+            contentDescription = context.getString(R.string.show)
             elevation = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 6f,

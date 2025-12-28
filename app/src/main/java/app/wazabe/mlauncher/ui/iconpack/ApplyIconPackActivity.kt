@@ -3,7 +3,7 @@ package app.wazabe.mlauncher.ui.iconpack
 import android.os.Bundle
 import android.widget.CheckBox
 import android.widget.LinearLayout
-import com.github.droidworksstudio.common.getLocalizedString
+
 import app.wazabe.mlauncher.R
 import app.wazabe.mlauncher.data.Constants
 import app.wazabe.mlauncher.data.Prefs
@@ -31,12 +31,12 @@ class ApplyIconPackActivity : androidx.appcompat.app.AppCompatActivity() {
 
             // Create the CheckBoxes
             val checkBoxHome = CheckBox(this).apply {
-                text = getLocalizedString(R.string.apply_to_home) // e.g., "Apply to Home"
+                text = getString(R.string.apply_to_home) // e.g., "Apply to Home"
                 isChecked = true // default value
             }
 
             val checkBoxAppList = CheckBox(this).apply {
-                text = getLocalizedString(R.string.apply_to_app_list) // e.g., "Apply to App List"
+                text = getString(R.string.apply_to_app_list) // e.g., "Apply to App List"
                 isChecked = true // default value
             }
 
@@ -45,10 +45,10 @@ class ApplyIconPackActivity : androidx.appcompat.app.AppCompatActivity() {
             layout.addView(checkBoxAppList)
 
             MaterialAlertDialogBuilder(this)
-                .setTitle(getLocalizedString(R.string.apply_icon_pack))
-                .setMessage(getLocalizedString(R.string.apply_icon_pack_are_you_sure, packageName))
+                .setTitle(getString(R.string.apply_icon_pack))
+                .setMessage(getString(R.string.apply_icon_pack_are_you_sure, packageName))
                 .setView(layout)
-                .setPositiveButton(getLocalizedString(R.string.apply)) { _, _ ->
+                .setPositiveButton(getString(R.string.apply)) { _, _ ->
 
                     val iconPackType = Constants.IconPacks.Custom
                     val customIconPackType = packageClass
@@ -73,7 +73,7 @@ class ApplyIconPackActivity : androidx.appcompat.app.AppCompatActivity() {
 
                     AppReloader.restartApp(this)
                 }
-                .setNegativeButton(getLocalizedString(R.string.cancel)) { _, _ ->
+                .setNegativeButton(getString(R.string.cancel)) { _, _ ->
                     finish()
                 }
                 .setCancelable(false)

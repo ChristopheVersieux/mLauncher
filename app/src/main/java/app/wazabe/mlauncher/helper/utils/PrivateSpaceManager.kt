@@ -8,7 +8,7 @@ import android.os.Looper
 import android.os.UserHandle
 import android.os.UserManager
 import com.github.droidworksstudio.common.AppLogger
-import com.github.droidworksstudio.common.getLocalizedString
+
 import com.github.droidworksstudio.common.showLongToast
 import app.wazabe.mlauncher.MainActivity
 import app.wazabe.mlauncher.R
@@ -64,7 +64,7 @@ class PrivateSpaceManager(private val context: Context) {
     ): Boolean {
         if (!isPrivateSpaceSupported()) {
             if (showToast) {
-                context.showLongToast(getLocalizedString(R.string.alert_requires_android_v))
+                context.showLongToast(context.getString(R.string.alert_requires_android_v))
             }
             return false
         }
@@ -74,14 +74,14 @@ class PrivateSpaceManager(private val context: Context) {
         }
         if (!ismlauncherDefault(context)) {
             if (showToast) {
-                context.showLongToast(getLocalizedString(R.string.toast_private_space_default_home_screen))
+                context.showLongToast(context.getString(R.string.toast_private_space_default_home_screen))
             }
             if (launchSettings) {
                 (context as MainActivity).setDefaultHomeScreen(context)
             }
         } else {
             if (showToast) {
-                context.showLongToast(getLocalizedString(R.string.toast_private_space_not_available))
+                context.showLongToast(context.getString(R.string.toast_private_space_not_available))
             }
         }
         return false
@@ -119,7 +119,7 @@ class PrivateSpaceManager(private val context: Context) {
             return
         }
         if (!ismlauncherDefault(context)) {
-            context.showLongToast(getLocalizedString(R.string.toast_private_space_default_home_screen))
+            context.showLongToast(context.getString(R.string.toast_private_space_default_home_screen))
             return
         }
 
@@ -129,7 +129,7 @@ class PrivateSpaceManager(private val context: Context) {
         if (showToast) {
             Handler(Looper.getMainLooper()).post {
                 if (isPrivateSpaceLocked() == !lock) {
-                    context.showLongToast(getLocalizedString(R.string.toast_private_space_locked))
+                    context.showLongToast(context.getString(R.string.toast_private_space_locked))
                 }
             }
         }

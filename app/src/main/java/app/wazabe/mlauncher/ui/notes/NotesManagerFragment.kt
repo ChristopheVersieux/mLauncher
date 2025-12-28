@@ -16,8 +16,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.droidworksstudio.common.getCurrentTimestamp
-import com.github.droidworksstudio.common.getLocalizedString
-import com.github.droidworksstudio.common.getLocalizedStringArray
+
 import com.github.droidworksstudio.common.isGestureNavigationEnabled
 import com.github.droidworksstudio.common.share.ShareUtils
 import app.wazabe.mlauncher.MainViewModel
@@ -86,9 +85,9 @@ class NotesManagerFragment : BaseFragment() {
         viewModel.ismlauncherDefault()
 
         val categoryAdapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, getLocalizedStringArray(R.array.categories))
+            ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, resources.getStringArray(R.array.categories))
         val priorityAdapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, getLocalizedStringArray(R.array.priorities))
+            ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, resources.getStringArray(R.array.priorities))
 
 
         binding.apply {
@@ -100,14 +99,14 @@ class NotesManagerFragment : BaseFragment() {
             recyclerView.adapter = adapter
 
             inputMessage.apply {
-                hint = getLocalizedString(R.string.message_hint)
+                hint = getString(R.string.message_hint)
                 setTextColor(prefs.inputMessageColor)
                 setHintTextColor(prefs.inputMessageColor)
                 backgroundTintList = ColorStateList.valueOf(prefs.inputMessageHintColor)
             }
 
             categoryLabel.apply {
-                hint = getLocalizedString(R.string.category)
+                hint = getString(R.string.category)
                 defaultHintTextColor = ColorStateList.valueOf(prefs.inputMessageHintColor)
             }
             categoryDropdown.apply {
@@ -118,7 +117,7 @@ class NotesManagerFragment : BaseFragment() {
 
 
             priorityLabel.apply {
-                hint = getLocalizedString(R.string.priority)
+                hint = getString(R.string.priority)
                 defaultHintTextColor = ColorStateList.valueOf(prefs.inputMessageHintColor)
             }
             priorityDropdown.apply {
@@ -158,7 +157,7 @@ class NotesManagerFragment : BaseFragment() {
                 isFocusable = false
                 isFocusableInTouchMode = false
                 setOnClickListener {
-                    val options = getLocalizedStringArray(R.array.priorities)
+                    val options = resources.getStringArray(R.array.priorities)
                     val popup = MaterialAlertDialogBuilder(requireContext())
                         .setItems(options) { _, which ->
                             binding.priorityDropdown.setText(options[which], false)

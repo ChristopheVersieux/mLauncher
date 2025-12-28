@@ -22,7 +22,7 @@ import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import com.github.creativecodecat.components.views.FontBottomSheetDialogLocked
 import com.github.droidworksstudio.common.AppLogger
-import com.github.droidworksstudio.common.getLocalizedString
+
 import app.wazabe.mlauncher.R
 import app.wazabe.mlauncher.helper.getInstallSource
 import kotlin.math.abs
@@ -621,25 +621,25 @@ class ResizableWidgetWrapper(
         }
 
         if (isResizeMode) {
-            addMenuItem(getLocalizedString(R.string.widgets_exit_resize)) {
+            addMenuItem(context.getString(R.string.widgets_exit_resize)) {
                 isResizeMode = false
                 setHandlesVisible(false)
                 reloadActivity()
             }
         } else {
-            addMenuItem(getLocalizedString(R.string.widgets_resize)) {
+            addMenuItem(context.getString(R.string.widgets_resize)) {
                 isResizeMode = true
                 setHandlesVisible(true)
             }
         }
 
-        addMenuItem(getLocalizedString(R.string.widgets_remove)) {
+        addMenuItem(context.getString(R.string.widgets_remove)) {
             appWidgetHost.deleteAppWidgetId(hostView.appWidgetId)
             (parent as? ViewGroup)?.removeView(this)
             onDelete()
         }
 
-        addMenuItem(getLocalizedString(R.string.widgets_open)) {
+        addMenuItem(context.getString(R.string.widgets_open)) {
             context.packageManager.getLaunchIntentForPackage(widgetInfo.provider.packageName)?.let {
                 context.startActivity(it)
             }
@@ -647,7 +647,7 @@ class ResizableWidgetWrapper(
 
         // Settings (only if widget has a config activity)
         widgetInfo.configure?.let { configureComponent ->
-            addMenuItem(getLocalizedString(R.string.widgets_settings)) {
+            addMenuItem(context.getString(R.string.widgets_settings)) {
 
                 val intent = Intent().apply {
                     component = configureComponent
@@ -662,7 +662,7 @@ class ResizableWidgetWrapper(
         val installerPackage = getInstallSource(packageManager, widgetInfo.provider.packageName)
         when (installerPackage) {
             "Google Play Store" -> { // Google Play
-                addMenuItem(getLocalizedString(R.string.widgets_view_in_store)) {
+                addMenuItem(context.getString(R.string.widgets_view_in_store)) {
                     context.startActivity(
                         Intent(
                             Intent.ACTION_VIEW,
@@ -673,7 +673,7 @@ class ResizableWidgetWrapper(
             }
 
             "Amazon Appstore" -> { // Amazon Appstore
-                addMenuItem(getLocalizedString(R.string.widgets_view_in_store)) {
+                addMenuItem(context.getString(R.string.widgets_view_in_store)) {
                     context.startActivity(
                         Intent(
                             Intent.ACTION_VIEW,
@@ -685,7 +685,7 @@ class ResizableWidgetWrapper(
 
             else -> {
                 // Debug / unknown installer, do not show "View in Store"
-                AppLogger.d(TAG, "WidgetMenu: Skipping '${getLocalizedString(R.string.widgets_view_in_store)}': unrecognized installer package='$installerPackage'")
+                AppLogger.d(TAG, "WidgetMenu: Skipping '${context.getString(R.string.widgets_view_in_store)}': unrecognized installer package='$installerPackage'")
             }
         }
 

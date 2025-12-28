@@ -23,8 +23,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.github.droidworksstudio.common.getCurrentTimestamp
-import com.github.droidworksstudio.common.getLocalizedString
-import com.github.droidworksstudio.common.getLocalizedStringArray
+
 import com.github.droidworksstudio.common.share.ShareUtils
 import com.github.droidworksstudio.common.AnalyticsHelper
 import app.wazabe.mlauncher.R
@@ -105,7 +104,7 @@ class NotesManagerAdapter(
 
         holder.messageText.text = message.text
         holder.messageTimestamp.text = message.timestamp
-        holder.messageCategory.text = getLocalizedString(R.string.message_category, message.category)
+        holder.messageCategory.text = context.getString(R.string.message_category, message.category)
 
         holder.shareButton.apply {
             backgroundTintList = ColorStateList.valueOf(prefs.bubbleBackgroundColor)
@@ -197,9 +196,9 @@ class NotesManagerAdapter(
     private fun onDeleteClick(position: Int) {
         AnalyticsHelper.logUserAction("Notes onDeleteClick")
         MaterialAlertDialogBuilder(context)
-            .setTitle(getLocalizedString(R.string.confirm_delete_title))
-            .setMessage(getLocalizedString(R.string.confirm_delete_message))
-            .setPositiveButton(getLocalizedString(R.string.delete)) { _, _ ->
+            .setTitle(context.getString(R.string.confirm_delete_title))
+            .setMessage(context.getString(R.string.confirm_delete_message))
+            .setPositiveButton(context.getString(R.string.delete)) { _, _ ->
                 messages.removeAt(position)
                 if (expandedPosition == position) {
                     expandedPosition = null
@@ -209,7 +208,7 @@ class NotesManagerAdapter(
                 onMessageUpdated()
                 AnalyticsHelper.logUserAction("Note Deleted")
             }
-            .setNegativeButton(getLocalizedString(R.string.cancel), null)
+            .setNegativeButton(context.getString(R.string.cancel), null)
             .show()
     }
 
@@ -218,7 +217,7 @@ class NotesManagerAdapter(
         shareUtils.shareDialog?.dismiss()
 
         AnalyticsHelper.logUserAction("Notes onShareClick")
-        shareUtils.showMaterialShareDialog(context, getLocalizedString(R.string.share_note), messages[position].text)
+        shareUtils.showMaterialShareDialog(context, context.getString(R.string.share_note), messages[position].text)
     }
 
     private fun onEditClick(position: Int) {
@@ -229,7 +228,7 @@ class NotesManagerAdapter(
     @SuppressLint("NotifyDataSetChanged")
     private fun showEditDialog(position: Int) {
         val builder = MaterialAlertDialogBuilder(context)
-        builder.setTitle(getLocalizedString(R.string.edit_note))
+        builder.setTitle(context.getString(R.string.edit_note))
 
         // Container layout for the dialog content
         val container = LinearLayout(context).apply {
@@ -239,7 +238,7 @@ class NotesManagerAdapter(
 
         // --- Message Label and EditText ---
         val messageLabel = TextView(context).apply {
-            text = getLocalizedString(R.string.notes_settings_title)
+            text = context.getString(R.string.notes_settings_title)
         }
         val inputText = EditText(context).apply {
             setText(messages[position].text)
@@ -247,9 +246,9 @@ class NotesManagerAdapter(
 
         // --- Category Label and AutoCompleteTextView ---
         val categoryLabel = TextView(context).apply {
-            text = getLocalizedString(R.string.category)
+            text = context.getString(R.string.category)
         }
-        val categories = getLocalizedStringArray(R.array.categories)
+        val categories = context.resources.getStringArray(R.array.categories)
         val categoryInput = AutoCompleteTextView(context).apply {
             setAdapter(ArrayAdapter(context, android.R.layout.simple_dropdown_item_1line, categories))
             setText(messages[position].category, false)
@@ -257,10 +256,10 @@ class NotesManagerAdapter(
 
         // --- Priority Label and Spinner ---
         val priorityLabel = TextView(context).apply {
-            text = getLocalizedString(R.string.priority)
+            text = context.getString(R.string.priority)
         }
         val prioritySpinner = Spinner(context)
-        val priorities = getLocalizedStringArray(R.array.priorities)
+        val priorities = context.resources.getStringArray(R.array.priorities)
         prioritySpinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, priorities)
         prioritySpinner.setSelection(priorities.indexOf(messages[position].priority))
 
@@ -279,7 +278,7 @@ class NotesManagerAdapter(
 
         val timestamp = context.getCurrentTimestamp(prefs)
 
-        builder.setPositiveButton(getLocalizedString(R.string.save)) { _, _ ->
+        builder.setPositiveButton(context.getString(R.string.save)) { _, _ ->
             messages[position] = Message(
                 inputText.text.toString(),
                 timestamp,
@@ -291,7 +290,7 @@ class NotesManagerAdapter(
             AnalyticsHelper.logUserAction("Note Updated")
         }
 
-        builder.setNegativeButton(getLocalizedString(R.string.cancel), null)
+        builder.setNegativeButton(context.getString(R.string.cancel), null)
         builder.show()
     }
 

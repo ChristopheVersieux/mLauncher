@@ -30,7 +30,7 @@ class WordOfTheDayWidget : AppWidgetProvider() {
             appWidgetIds: IntArray
         ) {
             val prefs = Prefs(context)
-            val word = wordOfTheDay(prefs)
+            val word = wordOfTheDay(context, prefs)
 
             for (appWidgetId in appWidgetIds) {
                 val views = RemoteViews(context.packageName, R.layout.widget_word_of_the_day)

@@ -21,7 +21,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.github.droidworksstudio.common.AppLogger
-import com.github.droidworksstudio.common.getLocalizedString
+
 import com.github.droidworksstudio.common.hideKeyboard
 import com.github.droidworksstudio.common.showShortToast
 import app.wazabe.mlauncher.data.AppCategory
@@ -193,7 +193,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 override fun onAuthenticationFailed() {
                     AppLogger.e(
                         "Authentication",
-                        getLocalizedString(R.string.text_authentication_failed)
+                        appContext.getString(R.string.text_authentication_failed)
                     )
                 }
 
@@ -201,12 +201,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     when (errorCode) {
                         BiometricPrompt.ERROR_USER_CANCELED -> AppLogger.e(
                             "Authentication",
-                            getLocalizedString(R.string.text_authentication_cancel)
+                            appContext.getString(R.string.text_authentication_cancel)
                         )
 
                         else -> AppLogger.e(
                             "Authentication",
-                            getLocalizedString(R.string.text_authentication_error).format(
+                            appContext.getString(R.string.text_authentication_error).format(
                                 errorMessage, errorCode
                             )
                         )

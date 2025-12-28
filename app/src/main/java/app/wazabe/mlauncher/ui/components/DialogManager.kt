@@ -25,7 +25,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import com.github.creativecodecat.components.views.FontBottomSheetDialogLocked
 import com.github.droidworksstudio.common.getCpuBatteryInfo
-import com.github.droidworksstudio.common.getLocalizedString
+
 import com.github.droidworksstudio.common.getRamInfo
 import com.github.droidworksstudio.common.getSdCardInfo
 import com.github.droidworksstudio.common.getStorageInfo
@@ -85,15 +85,15 @@ class DialogManager(val context: Context, val activity: Activity) {
         }
 
         // Add the three items
-        layout.addView(createItem(getLocalizedString(R.string.advanced_settings_backup_restore_backup)) {
+        layout.addView(createItem(context.getString(R.string.advanced_settings_backup_restore_backup)) {
             (activity as MainActivity).createFullBackup()
         })
 
-        layout.addView(createItem(getLocalizedString(R.string.advanced_settings_backup_restore_restore)) {
+        layout.addView(createItem(context.getString(R.string.advanced_settings_backup_restore_restore)) {
             (activity as MainActivity).restoreFullBackup()
         })
 
-        layout.addView(createItem(getLocalizedString(R.string.advanced_settings_backup_restore_clear)) {
+        layout.addView(createItem(context.getString(R.string.advanced_settings_backup_restore_clear)) {
             confirmClearData()
         })
 
@@ -142,16 +142,16 @@ class DialogManager(val context: Context, val activity: Activity) {
         }
 
         // Add Download Option
-        layout.addView(createItem(getLocalizedString(R.string.advanced_settings_theme_download)) {
+        layout.addView(createItem(context.getString(R.string.advanced_settings_theme_download)) {
             themeDownloadButton(context)
         })
 
         // Add Export and Import options
-        layout.addView(createItem(getLocalizedString(R.string.advanced_settings_theme_export)) {
+        layout.addView(createItem(context.getString(R.string.advanced_settings_theme_export)) {
             (activity as MainActivity).createThemeBackup()
         })
 
-        layout.addView(createItem(getLocalizedString(R.string.advanced_settings_theme_import)) {
+        layout.addView(createItem(context.getString(R.string.advanced_settings_theme_import)) {
             (activity as MainActivity).restoreThemeBackup()
         })
 
@@ -200,12 +200,12 @@ class DialogManager(val context: Context, val activity: Activity) {
         }
 
         // Add Download Option
-        layout.addView(createItem(getLocalizedString(R.string.advanced_settings_wotd_download)) {
+        layout.addView(createItem(context.getString(R.string.advanced_settings_wotd_download)) {
             wordofthedayDownloadButton(context)
         })
 
         // Add Import options
-        layout.addView(createItem(getLocalizedString(R.string.advanced_settings_wotd_import)) {
+        layout.addView(createItem(context.getString(R.string.advanced_settings_wotd_import)) {
             (activity as MainActivity).restoreWordsBackup()
         })
 
@@ -220,12 +220,12 @@ class DialogManager(val context: Context, val activity: Activity) {
     // Function to handle the Clear Data action, with a confirmation dialog
     private fun confirmClearData() {
         MaterialAlertDialogBuilder(context)
-            .setTitle(getLocalizedString(R.string.advanced_settings_backup_restore_clear_title))
-            .setMessage(getLocalizedString(R.string.advanced_settings_backup_restore_clear_description))
-            .setPositiveButton(getLocalizedString(R.string.advanced_settings_backup_restore_clear_yes)) { _, _ ->
+            .setTitle(context.getString(R.string.advanced_settings_backup_restore_clear_title))
+            .setMessage(context.getString(R.string.advanced_settings_backup_restore_clear_description))
+            .setPositiveButton(context.getString(R.string.advanced_settings_backup_restore_clear_yes)) { _, _ ->
                 clearData()
             }
-            .setNegativeButton(getLocalizedString(R.string.advanced_settings_backup_restore_clear_no), null)
+            .setNegativeButton(context.getString(R.string.advanced_settings_backup_restore_clear_no), null)
             .show()
     }
 

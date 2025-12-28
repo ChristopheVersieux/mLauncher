@@ -29,7 +29,7 @@ import androidx.lifecycle.lifecycleScope
 import com.github.creativecodecat.components.views.FontBottomSheetDialogLocked
 import com.github.droidworksstudio.common.AppLogger
 import com.github.droidworksstudio.common.appWidgetManager
-import com.github.droidworksstudio.common.getLocalizedString
+
 import com.github.droidworksstudio.common.isGestureNavigationEnabled
 import app.wazabe.mlauncher.R
 import app.wazabe.mlauncher.data.Prefs
@@ -63,7 +63,7 @@ class WidgetFragment : Fragment() {
 
     companion object {
         private const val TAG = "WidgetFragment"
-        private val APP_WIDGET_HOST_ID = getLocalizedString(R.string.app_name).hashCode().absoluteValue
+        private var APP_WIDGET_HOST_ID: Int? = null
         private const val GRID_COLUMNS = 14
         private const val CELL_MARGIN = 16
 
@@ -125,7 +125,15 @@ class WidgetFragment : Fragment() {
 
             // Setup AppWidgetManager and Host
             appWidgetManager = requireContext().appWidgetManager
-            appWidgetHost = AppWidgetHost(requireContext(), APP_WIDGET_HOST_ID)
+            // Setup AppWidgetManager and Host
+            appWidgetManager = requireContext().appWidgetManager
+            
+            // Initialize host ID if null or use existing
+            if (APP_WIDGET_HOST_ID == null) {
+                APP_WIDGET_HOST_ID = getString(R.string.app_name).hashCode().absoluteValue
+            }
+            
+            appWidgetHost = AppWidgetHost(requireContext(), APP_WIDGET_HOST_ID!!)
             appWidgetHost.startListening()
             AppLogger.i(TAG, "🟢 AppWidgetHost started listening")
             cleanupOrphanedWidgets()
@@ -248,15 +256,15 @@ class WidgetFragment : Fragment() {
             container.addView(option)
         }
 
-        addOption(getLocalizedString(R.string.widgets_add_widget)) { showCustomWidgetPicker() }
+        addOption(getString(R.string.widgets_add_widget)) { showCustomWidgetPicker() }
 
         if (isEditingWidgets) {
-            addOption(getLocalizedString(R.string.widgets_reset_widget)) { resetAllWidgets() }
-            addOption(getLocalizedString(R.string.widgets_remove_widget)) { removeAllWidgets() }
+            addOption(getString(R.string.widgets_reset_widget)) { resetAllWidgets() }
+            addOption(getString(R.string.widgets_remove_widget)) { removeAllWidgets() }
         }
 
         // Toggleable edit mode option
-        val editTitle = if (isEditingWidgets) getLocalizedString(R.string.widgets_stop_editing_widget) else getLocalizedString(R.string.widgets_edit_widget)
+        val editTitle = if (isEditingWidgets) getString(R.string.widgets_stop_editing_widget) else getString(R.string.widgets_edit_widget)
         addOption(editTitle) {
             // Toggle edit mode
             isEditingWidgets = !isEditingWidgets
@@ -401,7 +409,7 @@ class WidgetFragment : Fragment() {
         val bottomSheetDialog = FontBottomSheetDialogLocked(requireContext())
         activeGridDialog = bottomSheetDialog
         bottomSheetDialog.setContentView(scrollView)
-        bottomSheetDialog.setTitle(getLocalizedString(R.string.widgets_select_widget))
+        bottomSheetDialog.setTitle(getString(R.string.widgets_select_widget))
         bottomSheetDialog.show()
 
         grouped.forEach { group ->
@@ -451,7 +459,7 @@ class WidgetFragment : Fragment() {
                 }
 
                 val labelView = TextView(requireContext()).apply {
-                    text = getLocalizedString(R.string.pass_a_string, widgetLabel)
+                    text = getString(R.string.pass_a_string, widgetLabel)
                     textSize = 14f
                     layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
                 }
@@ -902,7 +910,7 @@ class WidgetFragment : Fragment() {
         AppLogger.i(TAG, "🔗 WidgetFragment onAttach called, context=$context")
         widgetDao = WidgetDatabase.getDatabase(requireContext()).widgetDao()
         if (!isViewCreated()) {
-            appWidgetHost = AppWidgetHost(context, APP_WIDGET_HOST_ID)
+            appWidgetHost = AppWidgetHost(context, APP_WIDGET_HOST_ID!!)
             appWidgetHost.startListening()
             AppLogger.i(TAG, "🟢 Initialized AppWidgetHost")
         }
