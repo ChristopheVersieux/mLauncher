@@ -2,7 +2,11 @@
 
 import HomeAppsAdapter
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.admin.DevicePolicyManager
+import android.appwidget.AppWidgetHost
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProviderInfo
 import android.content.ComponentName
 import android.content.Context
 import android.content.Context.VIBRATOR_SERVICE
@@ -10,7 +14,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -28,49 +34,38 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
+import android.widget.ScrollView
 import android.widget.Space
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.widget.SearchView
 import androidx.biometric.BiometricPrompt
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
-import androidx.core.view.children
+import androidx.core.graphics.toColorInt
+import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.fragment.findNavController
-import com.github.droidworksstudio.common.AppLogger
-import com.github.droidworksstudio.common.ColorIconsExtensions
-import com.github.droidworksstudio.common.ColorManager
-import com.github.droidworksstudio.common.CrashHandler
-import com.github.droidworksstudio.common.attachGestureManager
-import com.github.droidworksstudio.common.getLocalizedString
-import com.github.droidworksstudio.common.isSystemApp
-import com.github.droidworksstudio.common.isGestureNavigationEnabled
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import com.github.droidworksstudio.common.launchCalendar
-import com.github.droidworksstudio.common.openAlarmApp
-import com.github.droidworksstudio.common.openBatteryManager
-import com.github.droidworksstudio.common.openCameraApp
-import com.github.droidworksstudio.common.openDeviceSettings
-import com.github.droidworksstudio.common.openDialerApp
-import com.github.droidworksstudio.common.openDigitalWellbeing
-import com.github.droidworksstudio.common.openPhotosApp
-import com.github.droidworksstudio.common.openTextMessagesApp
-import com.github.droidworksstudio.common.openWebBrowser
-import com.github.droidworksstudio.common.showShortToast
+import androidx.recyclerview.widget.LinearLayoutManager
+import app.wazabe.mlauncher.MainActivity
 import app.wazabe.mlauncher.MainViewModel
 import app.wazabe.mlauncher.R
 import app.wazabe.mlauncher.data.Constants
 import app.wazabe.mlauncher.data.Constants.Action
 import app.wazabe.mlauncher.data.Constants.AppDrawerFlag
 import app.wazabe.mlauncher.data.Prefs
+import app.wazabe.mlauncher.data.SavedWidgetEntity
+import app.wazabe.mlauncher.data.database.WidgetDao
+import app.wazabe.mlauncher.data.database.WidgetDatabase
+import app.wazabe.mlauncher.databinding.FragmentAppDrawerBottomSheetBinding
 import app.wazabe.mlauncher.databinding.FragmentHomeBinding
 import app.wazabe.mlauncher.helper.IconCacheTarget
 import app.wazabe.mlauncher.helper.IconPackHelper.getSafeAppIcon
@@ -83,13 +78,13 @@ import app.wazabe.mlauncher.helper.getSystemIcons
 import app.wazabe.mlauncher.helper.hasUsageAccessPermission
 import app.wazabe.mlauncher.helper.initActionService
 import app.wazabe.mlauncher.helper.ismlauncherDefault
+import app.wazabe.mlauncher.helper.openAppInfo
 import app.wazabe.mlauncher.helper.openFirstWeatherApp
 import app.wazabe.mlauncher.helper.receivers.BatteryReceiver
 import app.wazabe.mlauncher.helper.receivers.DeviceAdmin
 import app.wazabe.mlauncher.helper.receivers.PrivateSpaceReceiver
 import app.wazabe.mlauncher.helper.setTopPadding
 import app.wazabe.mlauncher.helper.showPermissionDialog
-import app.wazabe.mlauncher.helper.openAppInfo
 import app.wazabe.mlauncher.helper.utils.AppReloader
 import app.wazabe.mlauncher.helper.utils.BiometricHelper
 import app.wazabe.mlauncher.helper.utils.PrivateSpaceManager
@@ -97,15 +92,38 @@ import app.wazabe.mlauncher.helper.wordOfTheDay
 import app.wazabe.mlauncher.listener.GestureAdapter
 import app.wazabe.mlauncher.listener.NotificationDotManager
 import app.wazabe.mlauncher.services.ActionService
-import app.wazabe.mlauncher.ui.components.DialogManager
-import app.wazabe.mlauncher.ui.widgets.WidgetActivity
-import androidx.appcompat.widget.SearchView
-import androidx.core.net.toUri
-import androidx.recyclerview.widget.LinearLayoutManager
-import app.wazabe.mlauncher.databinding.FragmentAppDrawerBottomSheetBinding
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import app.wazabe.mlauncher.ui.adapter.AppDrawerAdapter
 import app.wazabe.mlauncher.ui.adapter.ContactDrawerAdapter
+import app.wazabe.mlauncher.ui.components.DialogManager
+import app.wazabe.mlauncher.ui.widgets.AppWidgetGroup
+import app.wazabe.mlauncher.ui.widgets.ResizableWidgetWrapper
+import app.wazabe.mlauncher.ui.widgets.WidgetActivity
+import com.github.creativecodecat.components.views.FontBottomSheetDialogLocked
+import com.github.droidworksstudio.common.AppLogger
+import com.github.droidworksstudio.common.ColorIconsExtensions
+import com.github.droidworksstudio.common.ColorManager
+import com.github.droidworksstudio.common.CrashHandler
+import com.github.droidworksstudio.common.attachGestureManager
+import com.github.droidworksstudio.common.getLocalizedString
+import com.github.droidworksstudio.common.isGestureNavigationEnabled
+import com.github.droidworksstudio.common.isSystemApp
+import com.github.droidworksstudio.common.launchCalendar
+import com.github.droidworksstudio.common.openAlarmApp
+import com.github.droidworksstudio.common.openBatteryManager
+import com.github.droidworksstudio.common.openCameraApp
+import com.github.droidworksstudio.common.openDeviceSettings
+import com.github.droidworksstudio.common.openDialerApp
+import com.github.droidworksstudio.common.openDigitalWellbeing
+import com.github.droidworksstudio.common.openPhotosApp
+import com.github.droidworksstudio.common.openTextMessagesApp
+import com.github.droidworksstudio.common.openWebBrowser
+import com.github.droidworksstudio.common.showShortToast
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.math.absoluteValue
+import kotlin.math.ceil
 
 class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListener, android.content.SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -122,6 +140,14 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     private lateinit var privateSpaceReceiver: PrivateSpaceReceiver
     private lateinit var vibrator: Vibrator
     private lateinit var homeAppsAdapter: HomeAppsAdapter
+
+    private lateinit var widgetDao: WidgetDao
+    private lateinit var appWidgetManager: AppWidgetManager
+    private lateinit var appWidgetHost: AppWidgetHost
+    private val widgetWrappers = mutableListOf<ResizableWidgetWrapper>()
+    private var isEditingWidgets: Boolean = false
+    private var activeGridDialog: FontBottomSheetDialogLocked? = null
+    private var lastWidgetInfo: AppWidgetProviderInfo? = null
 
     private var longPressToSelectApp: Int = 0
     private var _binding: FragmentHomeBinding? = null
@@ -204,6 +230,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
         // Update view appearance/settings based on prefs
         updateUIFromPreferences()
+        
+        initWidgetHost()
     }
 
     override fun onStart() {
@@ -246,6 +274,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
             prefs.prefsNormal.registerOnSharedPreferenceChangeListener(this)
         }
+        
+        restoreWidgets()
     }
 
     override fun onStop() {
@@ -264,6 +294,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             prefs.prefsNormal.unregisterOnSharedPreferenceChangeListener(this)
         }
 
+        appWidgetHost.stopListening()
         dismissDialogs()
     }
 
@@ -1659,4 +1690,346 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         dialogBuilder.flagSettingsBottomSheet?.dismiss()
         dialogBuilder.showDeviceBottomSheet?.dismiss()
     }
+
+    // --- Widget Logic ---
+
+    private fun initWidgetHost() {
+        widgetDao = WidgetDatabase.getDatabase(requireContext()).widgetDao()
+        appWidgetManager = AppWidgetManager.getInstance(requireContext())
+        appWidgetHost = AppWidgetHost(requireContext(), APP_WIDGET_HOST_ID)
+        appWidgetHost.startListening()
+
+        binding.homeWidgetGrid.apply {
+            setOnLongClickListener {
+                val resizing = widgetWrappers.any { it.isResizeMode }
+                if (!resizing) {
+                    showGridMenu()
+                    true
+                } else false
+            }
+        }
+    }
+
+    private fun showGridMenu() {
+        activeGridDialog?.dismiss()
+        val bottomSheetDialog = FontBottomSheetDialogLocked(requireContext())
+        activeGridDialog = bottomSheetDialog
+
+        val container = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(32, 32, 32, 32)
+        }
+
+        fun addOption(title: String, action: () -> Unit) {
+            val option = TextView(requireContext()).apply {
+                text = title
+                textSize = 16f
+                setPadding(16, 32, 16, 32)
+                setOnClickListener { action(); bottomSheetDialog.dismiss() }
+            }
+            container.addView(option)
+        }
+
+        addOption(getLocalizedString(R.string.widgets_add_widget)) { showCustomWidgetPicker() }
+
+        val editTitle = if (isEditingWidgets) getLocalizedString(R.string.widgets_stop_editing_widget) else getLocalizedString(R.string.widgets_edit_widget)
+        addOption(editTitle) {
+            isEditingWidgets = !isEditingWidgets
+            updateWidgetEditMode()
+        }
+
+        if (isEditingWidgets) {
+            addOption(getLocalizedString(R.string.widgets_remove_widget)) { removeAllWidgets() }
+        }
+
+        bottomSheetDialog.setContentView(container)
+        bottomSheetDialog.show()
+    }
+
+    private fun updateWidgetEditMode() {
+        if (isEditingWidgets) {
+            val border = GradientDrawable().apply {
+                setStroke(4, "#80F5A97F".toColorInt())
+                cornerRadius = 16f
+            }
+            binding.homeWidgetGrid.background = border
+        } else {
+            binding.homeWidgetGrid.background = null
+        }
+        widgetWrappers.forEach { it.invalidate() }
+    }
+
+    private fun showCustomWidgetPicker() {
+        val widgets = appWidgetManager.installedProviders
+        val pm = requireContext().packageManager
+
+        val grouped = widgets.groupBy { it.provider.packageName }.map { (pkg, widgetList) ->
+            val appInfo = try { pm.getApplicationInfo(pkg, 0) } catch (_: Exception) { null }
+            val appName = appInfo?.let { pm.getApplicationLabel(it).toString() } ?: pkg
+            val appIcon = appInfo?.let { pm.getApplicationIcon(it) }
+            AppWidgetGroup(appName, appIcon, widgetList.toMutableList())
+        }.sortedBy { it.appName.lowercase() }
+
+        val container = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(32, 32, 32, 32)
+        }
+        val scrollView = ScrollView(requireContext()).apply { addView(container) }
+
+        activeGridDialog?.dismiss()
+        val bottomSheetDialog = FontBottomSheetDialogLocked(requireContext())
+        activeGridDialog = bottomSheetDialog
+        bottomSheetDialog.setContentView(scrollView)
+        bottomSheetDialog.show()
+
+        grouped.forEach { group ->
+            val appRow = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(16, 24, 16, 24)
+                gravity = Gravity.CENTER_VERTICAL
+            }
+            val iconView = ImageView(requireContext()).apply {
+                setImageDrawable(group.appIcon)
+                layoutParams = LinearLayout.LayoutParams(96, 96)
+            }
+            val labelView = TextView(requireContext()).apply {
+                text = group.appName
+                textSize = 18f
+                setTypeface(null, Typeface.BOLD)
+                setPadding(24, 0, 0, 0)
+            }
+            appRow.addView(iconView)
+            appRow.addView(labelView, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+
+            val widgetContainer = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.VERTICAL
+                visibility = View.GONE
+            }
+
+            group.widgets.forEach { widgetInfo ->
+                val widgetLabel = widgetInfo.loadLabel(pm)
+                val widgetRow = TextView(requireContext()).apply {
+                    text = widgetLabel
+                    textSize = 16f
+                    setPadding(120, 24, 16, 24)
+                    setOnClickListener {
+                        addWidget(widgetInfo)
+                        bottomSheetDialog.dismiss()
+                    }
+                }
+                widgetContainer.addView(widgetRow)
+            }
+
+            appRow.setOnClickListener {
+                widgetContainer.visibility = if (widgetContainer.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+            }
+
+            container.addView(appRow)
+            container.addView(widgetContainer)
+        }
+    }
+
+    private fun addWidget(widgetInfo: AppWidgetProviderInfo) {
+        lastWidgetInfo = widgetInfo
+        val widgetId = appWidgetHost.allocateAppWidgetId()
+        val bound = appWidgetManager.bindAppWidgetIdIfAllowed(widgetId, widgetInfo.provider)
+        if (bound) {
+            maybeConfigureOrCreate(widgetInfo, widgetId)
+        } else {
+            val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_BIND).apply {
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, widgetInfo.provider)
+            }
+            (requireActivity() as MainActivity).launchWidgetPermission(intent) { resultCode, returnedId, _ ->
+                handleWidgetResult(resultCode, returnedId)
+            }
+        }
+    }
+
+    private fun handleWidgetResult(resultCode: Int, appWidgetId: Int) {
+        if (resultCode == Activity.RESULT_OK) {
+            lastWidgetInfo?.let { maybeConfigureOrCreate(it, appWidgetId) }
+        } else {
+            appWidgetHost.deleteAppWidgetId(appWidgetId)
+        }
+        lastWidgetInfo = null
+    }
+
+    private fun maybeConfigureOrCreate(widgetInfo: AppWidgetProviderInfo, widgetId: Int) {
+        if (widgetInfo.configure != null) {
+            val intent = Intent().apply {
+                component = widgetInfo.configure
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+            }
+            (requireActivity() as MainActivity).launchWidgetPermission(intent) { resultCode, returnedId, _ ->
+                if (resultCode == Activity.RESULT_OK) {
+                    createWidgetWrapperSafe(widgetInfo, returnedId)
+                } else {
+                    appWidgetHost.deleteAppWidgetId(returnedId)
+                }
+            }
+        } else {
+            createWidgetWrapperSafe(widgetInfo, widgetId)
+        }
+    }
+
+    private fun createWidgetWrapperSafe(widgetInfo: AppWidgetProviderInfo, appWidgetId: Int) {
+        binding.homeWidgetGrid.post {
+            createWidgetWrapper(widgetInfo, appWidgetId)
+        }
+    }
+
+    private fun createWidgetWrapper(widgetInfo: AppWidgetProviderInfo, appWidgetId: Int) {
+        val hostView = try {
+            val widgetContext = try {
+                requireContext().createPackageContext(
+                    widgetInfo.provider.packageName,
+                    Context.CONTEXT_IGNORE_SECURITY or Context.CONTEXT_INCLUDE_CODE
+                )
+            } catch (_: Exception) {
+                requireContext()
+            }
+            appWidgetHost.createView(widgetContext, appWidgetId, widgetInfo)
+        } catch (e: Exception) {
+            appWidgetHost.deleteAppWidgetId(appWidgetId)
+            return
+        }
+
+        val cellWidth = (binding.homeWidgetGrid.width - (GRID_COLUMNS - 1) * CELL_MARGIN) / GRID_COLUMNS
+        val cellHeight = cellWidth
+
+        val cellsW = ceil(widgetInfo.minWidth.toDouble() / (cellWidth + CELL_MARGIN)).toInt().coerceAtLeast(MIN_CELL_W)
+        val cellsH = ceil(widgetInfo.minHeight.toDouble() / (cellHeight + CELL_MARGIN)).toInt().coerceAtLeast(MIN_CELL_H)
+
+        val wrapper = ResizableWidgetWrapper(
+            requireContext(), hostView, widgetInfo, appWidgetHost,
+            onUpdate = { saveWidgets() },
+            onDelete = { deleteWidget(appWidgetId) },
+            isEditingProvider = { isEditingWidgets },
+            GRID_COLUMNS, CELL_MARGIN, cellsW, cellsH
+        )
+
+        addWrapperToGrid(wrapper)
+        saveWidgets()
+        updateEmptyPlaceholder()
+    }
+
+    private fun addWrapperToGrid(wrapper: ResizableWidgetWrapper) {
+        val parentWidth = binding.homeWidgetGrid.width.coerceAtLeast(1)
+        val cellWidth = (parentWidth - (GRID_COLUMNS - 1) * CELL_MARGIN) / GRID_COLUMNS
+        val cellHeight = cellWidth
+
+        val occupied = widgetWrappers.map { w ->
+            Pair(
+                ((w.translationX + cellWidth / 2) / (cellWidth + CELL_MARGIN)).toInt(),
+                ((w.translationY + cellHeight / 2) / (cellHeight + CELL_MARGIN)).toInt()
+            )
+        }
+
+        var row = 0
+        var col = 0
+        var placed = false
+        loop@ for (r in 0..100) {
+            for (c in 0 until GRID_COLUMNS) {
+                if (occupied.none { it.first == c && it.second == r }) {
+                    col = c
+                    row = r
+                    placed = true
+                    break@loop
+                }
+            }
+        }
+
+        wrapper.translationX = col * (cellWidth + CELL_MARGIN).toFloat()
+        wrapper.translationY = row * (cellHeight + CELL_MARGIN).toFloat()
+
+        binding.homeWidgetGrid.addView(wrapper)
+        widgetWrappers.add(wrapper)
+    }
+
+    private fun deleteWidget(widgetId: Int) {
+        appWidgetHost.deleteAppWidgetId(widgetId)
+        val wrapper = widgetWrappers.find { it.hostView.appWidgetId == widgetId }
+        wrapper?.let {
+            binding.homeWidgetGrid.removeView(it)
+            widgetWrappers.remove(it)
+        }
+        lifecycleScope.launch(Dispatchers.IO) {
+            widgetDao.deleteById(widgetId)
+        }
+        updateEmptyPlaceholder()
+    }
+
+    private fun removeAllWidgets() {
+        widgetWrappers.toList().forEach { deleteWidget(it.hostView.appWidgetId) }
+        updateEmptyPlaceholder()
+    }
+
+    private fun saveWidgets() {
+        val parentWidth = binding.homeWidgetGrid.width.coerceAtLeast(1)
+        val cellWidth = (parentWidth - CELL_MARGIN * (GRID_COLUMNS - 1)) / GRID_COLUMNS
+        val cellHeight = cellWidth
+
+        val savedList = widgetWrappers.map { wrapper ->
+            val col = ((wrapper.translationX + cellWidth / 2) / (cellWidth + CELL_MARGIN)).toInt().coerceIn(0, GRID_COLUMNS - 1)
+            val row = ((wrapper.translationY + cellHeight / 2) / (cellHeight + CELL_MARGIN)).toInt().coerceAtLeast(0)
+            val cellsW = ((wrapper.width + CELL_MARGIN) / (cellWidth + CELL_MARGIN))
+            val cellsH = ((wrapper.height + CELL_MARGIN) / (cellHeight + CELL_MARGIN))
+            SavedWidgetEntity(wrapper.hostView.appWidgetId, col, row, wrapper.width, wrapper.height, cellsW, cellsH)
+        }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            widgetDao.insertAll(savedList)
+        }
+    }
+
+    private fun restoreWidgets() {
+        lifecycleScope.launch {
+            val savedWidgets = withContext(Dispatchers.IO) { widgetDao.getAll() }
+            binding.homeWidgetGrid.post {
+                val parentWidth = binding.homeWidgetGrid.width.coerceAtLeast(1)
+                val cellWidth = (parentWidth - CELL_MARGIN * (GRID_COLUMNS - 1)) / GRID_COLUMNS
+                val cellHeight = cellWidth
+
+                savedWidgets.forEach { saved ->
+                    val info = appWidgetManager.getAppWidgetInfo(saved.appWidgetId) ?: return@forEach
+                    val hostView = try {
+                        val widgetContext = try {
+                            requireContext().createPackageContext(info.provider.packageName, Context.CONTEXT_IGNORE_SECURITY or Context.CONTEXT_INCLUDE_CODE)
+                        } catch (_: Exception) { requireContext() }
+                        appWidgetHost.createView(widgetContext, saved.appWidgetId, info)
+                    } catch (e: Exception) { return@forEach }
+
+                    val wrapper = ResizableWidgetWrapper(
+                        requireContext(), hostView, info, appWidgetHost,
+                        onUpdate = { saveWidgets() },
+                        onDelete = { deleteWidget(saved.appWidgetId) },
+                        isEditingProvider = { isEditingWidgets },
+                        GRID_COLUMNS, CELL_MARGIN, saved.cellsW, saved.cellsH
+                    )
+
+                    wrapper.translationX = saved.col * (cellWidth + CELL_MARGIN).toFloat()
+                    wrapper.translationY = saved.row * (cellHeight + CELL_MARGIN).toFloat()
+                    wrapper.layoutParams = FrameLayout.LayoutParams(saved.width, saved.height)
+
+                    binding.homeWidgetGrid.addView(wrapper)
+                    widgetWrappers.add(wrapper)
+                }
+                updateEmptyPlaceholder()
+            }
+        }
+    }
+
+    private fun updateEmptyPlaceholder() {
+        binding.widgetEmptyPlaceholder.visibility = if (widgetWrappers.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    companion object {
+        private val APP_WIDGET_HOST_ID = "CascadeLauncher".hashCode().absoluteValue
+        private const val GRID_COLUMNS = 14
+        private const val CELL_MARGIN = 16
+        private const val MIN_CELL_W = 2
+        private const val MIN_CELL_H = 1
+    }
+
 }

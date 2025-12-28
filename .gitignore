@@ -10,3 +10,4 @@ app/release
 app/build
 app/debug
 diff.*
+local.properties

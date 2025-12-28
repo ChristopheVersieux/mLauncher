@@ -71,6 +71,9 @@ class MainActivity : BaseActivity() {
 
     private lateinit var setDefaultHomeScreenLauncher: ActivityResultLauncher<Intent>
 
+    private lateinit var widgetPermissionLauncher: ActivityResultLauncher<Intent>
+    private var widgetResultCallback: ((Int, Int, Intent?) -> Unit)? = null
+
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         return when (keyCode) {
             KeyEvent.KEYCODE_MENU -> {
@@ -326,6 +329,15 @@ class MainActivity : BaseActivity() {
                 }
             }
 
+        widgetPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                widgetResultCallback?.invoke(
+                    result.resultCode,
+                    result.data?.getIntExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_ID, -1) ?: -1,
+                    result.data
+                )
+            }
+
         val systemBarObserver = SystemBarObserver(prefs)
         lifecycle.addObserver(systemBarObserver)
     }
@@ -542,6 +554,11 @@ class MainActivity : BaseActivity() {
 
     fun toggleNavigationBar(show: Boolean) {
         if (show) showNavigationBar(window) else hideNavigationBar(window)
+    }
+
+    fun launchWidgetPermission(intent: Intent, callback: (Int, Int, Intent?) -> Unit) {
+        widgetResultCallback = callback
+        widgetPermissionLauncher.launch(intent)
     }
 
 }

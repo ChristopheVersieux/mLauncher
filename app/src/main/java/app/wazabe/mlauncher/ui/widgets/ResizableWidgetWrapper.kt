@@ -35,6 +35,7 @@ class ResizableWidgetWrapper(
     val appWidgetHost: AppWidgetHost,
     val onUpdate: () -> Unit,
     val onDelete: () -> Unit,
+    val isEditingProvider: () -> Boolean,
     private val gridColumns: Int,
     private val cellMargin: Int,
     val defaultCellsW: Int = 1,
@@ -714,7 +715,7 @@ class ResizableWidgetWrapper(
         if (ev == null) return super.onInterceptTouchEvent(ev)
 
         // ✅ Bypass all if global edit mode is enabled
-        if (!isResizeMode && WidgetFragment.isEditingWidgets) {
+        if (!isResizeMode && isEditingProvider()) {
             // Track initial touch for dragging if needed
             if (ev.actionMasked == MotionEvent.ACTION_DOWN) {
                 lastX = ev.rawX
