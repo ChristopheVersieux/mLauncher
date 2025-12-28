@@ -74,7 +74,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val contactsRefreshing = AtomicBoolean(false)
 
     // setup variables with initial values
-    val firstOpen = MutableLiveData<Boolean>()
+    val firstOpen = MutableLiveData<Boolean>(prefs.firstSettingsOpen)
 
     val appList = MutableLiveData<List<AppListItem>?>()
     val contactList = MutableLiveData<List<ContactListItem>?>()
@@ -164,6 +164,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun firstOpen(value: Boolean) {
+        prefs.firstSettingsOpen = value
         firstOpen.postValue(value)
     }
 

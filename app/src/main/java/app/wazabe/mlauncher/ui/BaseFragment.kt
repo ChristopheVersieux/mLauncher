@@ -22,11 +22,6 @@ open class BaseFragment : Fragment() {
         // Attach the observer; lazy properties will initialize here
         lifecycle.addObserver(systemBarObserver)
 
-        val typedValue = android.util.TypedValue()
-        requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorSurface, typedValue, true)
-        view?.setBackgroundColor(typedValue.data)
-
-
         updateAllWidgets(requireContext())
 
         val themeMode = when (prefs.appTheme) {
@@ -57,9 +52,6 @@ open class BaseFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val typedValue = android.util.TypedValue()
-        requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorSurface, typedValue, true)
-        view.setBackgroundColor(typedValue.data)
     }
 }
 

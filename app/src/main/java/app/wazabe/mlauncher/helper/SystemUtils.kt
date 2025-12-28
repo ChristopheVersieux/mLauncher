@@ -412,10 +412,10 @@ fun loadWordList(prefs: Prefs): List<String> {
 
 fun getHexForOpacity(prefs: Prefs): Int {
     // Convert the opacity percentage (0-100) to a reversed decimal (0.0-1.0)
-    val setOpacity = ((100 - prefs.opacityNum.coerceIn(
+    val setOpacity = (prefs.opacityNum.coerceIn(
         0,
         100
-    )) / 100.0).toFloat() // Reverse the opacity, (0% = full opacity, 100% = transparent)
+    ) / 100.0).toFloat() // 0% = transparent, 100% = full opacity
 
     val backgroundColor = prefs.backgroundColor // This is already an Int
 
@@ -426,11 +426,11 @@ fun getHexForOpacity(prefs: Prefs): Int {
 
     // Combine opacity with RGB and return final color
     return if (prefs.showBackground) {
-        // Apply a minimum opacity constant for the background
-        android.graphics.Color.argb((Constants.MIN_OPACITY * 255), red, green, blue)
-    } else {
-        // Use the reversed opacity as a percentage (0-100%) converted to a float (0.0-1.0)
+        // Use the calculated alpha based on opacityNum
         android.graphics.Color.argb((setOpacity * 255).toInt(), red, green, blue)
+    } else {
+        // Fully transparent if showBackground is FALSE
+        android.graphics.Color.TRANSPARENT
     }
 }
 

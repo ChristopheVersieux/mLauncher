@@ -303,6 +303,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         val locale = prefs.appLanguage.locale()
         val is24HourFormat = DateFormat.is24HourFormat(requireContext())
 
+        updateTimeAndInfo()
+
         binding.apply {
             val best12Raw = DateFormat.getBestDateTimePattern(locale, "hm") // 12-hour with AM/PM
             val best12 = if (prefs.showClockFormat) {
@@ -331,7 +333,13 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             battery.textSize = prefs.batterySize.toFloat()
             homeScreenPager.textSize = prefs.appSize.toFloat()
 
+            clock.isVisible = prefs.showClock
+            date.isVisible = prefs.showDate
+            alarm.isVisible = prefs.showAlarm && alarm.text.toString().isNotBlank() && alarm.text.toString() != "No alarm is set."
+            dailyWord.isVisible = prefs.showDailyWord && dailyWord.text.toString().isNotBlank()
             battery.isVisible = prefs.showBattery
+            weather.isVisible = prefs.showWeather
+            totalScreenTime.isVisible = prefs.appUsageStats
             mainLayout.setBackgroundColor(getHexForOpacity(prefs))
 
             date.setTextColor(prefs.dateColor)
@@ -591,7 +599,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             "showDate", "showClock", "showAlarm", "showDailyWord", "showBattery",
             "dateSize", "clockSize", "alarmSize", "dailyWordSize", "batterySize", "appSize",
             "dateColor", "clockColor", "alarmColor", "dailyWordColor", "batteryColor", "appColor",
-            "backgroundColor", "opacityNum", "showBackground", "textPaddingSize" -> {
+            "backgroundColor", "opacityNum", "showBackground", "textPaddingSize",
+            "showWeather", "appUsageStats" -> {
                 updateUIFromPreferences()
             }
             "homeAlignment", "clockAlignment", "dateAlignment", "alarmAlignment", "dailyWordAlignment", "drawerAlignment", "homeAlignmentBottom" -> {
@@ -1031,7 +1040,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     @SuppressLint("InflateParams", "DiscouragedApi", "UseCompatLoadingForDrawables", "ClickableViewAccessibility")
     private fun updateAppCount(newAppsNum: Int) {
-        val oldAppsNum = newAppsNum//binding.homeAppsLayout.childCount // current number of apps
+        val oldAppsNum = binding.homeAppsRecyclerView.childCount // Try to get current count if still used functionally
+        // Note: For RecyclerView with adapter, this logic might be redundant, but keeping it for consistency if expected
         val diff = newAppsNum - oldAppsNum
 
         if (diff > 0) {

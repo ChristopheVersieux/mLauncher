@@ -367,8 +367,14 @@ class ResizableWidgetWrapper(
             // Attach long-press menu and drag to this view
             val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
                 override fun onLongPress(e: MotionEvent) {
-                    if (!isResizeMode && WidgetFragment.isEditingWidgets) {
-                        showWidgetMenu()
+                    if (isEditingProvider()) {
+                        if (!isResizeMode) {
+                            isResizeMode = true
+                            setHandlesVisible(true)
+                            view.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+                        } else {
+                            showWidgetMenu()
+                        }
                     }
                 }
             })
@@ -382,7 +388,7 @@ class ResizableWidgetWrapper(
                 if (isResizeMode) return@setOnTouchListener false
 
                 // 🟡 If not in global edit mode, don't consume — allow normal widget touch behavior
-                if (!WidgetFragment.isEditingWidgets) return@setOnTouchListener false
+                if (!isEditingProvider()) return@setOnTouchListener false
 
                 when (event.actionMasked) {
                     MotionEvent.ACTION_DOWN -> {
