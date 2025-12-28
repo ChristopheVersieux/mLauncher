@@ -36,26 +36,26 @@
         <item>@string/lang_turkish</item>
     </string-array>
     <string-array name="language_values">
-        <item>system</item>
-        <item>ar</item>
-        <item>cs</item>
-        <item>nl</item>
-        <item>en</item>
-        <item>fr</item>
-        <item>de</item>
-        <item>iw</item>
-        <item>it</item>
-        <item>ja</item>
-        <item>ko</item>
-        <item>lt</item>
-        <item>pl</item>
-        <item>pt</item>
-        <item>ro</item>
-        <item>ru</item>
-        <item>sk</item>
-        <item>es</item>
-        <item>th</item>
-        <item>tr</item>
+        <item>System</item>
+        <item>Arabic</item>
+        <item>Czech</item>
+        <item>Dutch</item>
+        <item>English</item>
+        <item>French</item>
+        <item>German</item>
+        <item>Hebrew</item>
+        <item>Italian</item>
+        <item>Japanese</item>
+        <item>Korean</item>
+        <item>Lithuanian</item>
+        <item>Polish</item>
+        <item>Portuguese</item>
+        <item>Romanian</item>
+        <item>Russian</item>
+        <item>Slovak</item>
+        <item>Spanish</item>
+        <item>Thai</item>
+        <item>Turkish</item>
     </string-array>
 
     <!-- Font Family -->
