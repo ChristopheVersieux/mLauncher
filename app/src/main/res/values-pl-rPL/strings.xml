@@ -86,6 +86,8 @@
     <string name="icon_packs">Pakiety ikon</string>
     <!-- Strings used for look & feel settings -->
     <string name="look_feel_settings_title">Wygląd &amp; Czuć</string>
+    <string name="system">System</string>
+    <string name="wallpaper_and_styles">Tapety i style</string>
     <string name="text_size_adjustments">Tekst &amp; Dostosowanie rozmiaru</string>
     <string name="app_text_size">Rozmiar tekstu aplikacji</string>
     <string name="date_text_size">Rozmiar tekstu daty</string>

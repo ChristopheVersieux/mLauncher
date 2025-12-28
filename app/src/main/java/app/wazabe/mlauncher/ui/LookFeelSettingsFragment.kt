@@ -1,8 +1,8 @@
 package app.wazabe.mlauncher.ui
 
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
@@ -14,6 +14,7 @@ import app.wazabe.mlauncher.helper.IconCacheTarget
 import app.wazabe.mlauncher.helper.emptyString
 import app.wazabe.mlauncher.ui.components.DialogManager
 import app.wazabe.mlauncher.ui.iconpack.CustomIconSelectionActivity
+import com.github.droidworksstudio.common.AppLogger
 
 class LookFeelSettingsFragment : PreferenceFragmentCompat() {
 
@@ -24,6 +25,32 @@ class LookFeelSettingsFragment : PreferenceFragmentCompat() {
         setPreferencesFromResource(R.xml.preferences_lookfeel, rootKey)
         prefs = Prefs(requireContext())
         dialogManager = DialogManager(requireContext(), requireActivity())
+
+        findPreference<Preference>("OPEN_WALLPAPER_SETTINGS")?.setOnPreferenceClickListener {
+            try {
+                // Try standard wallpaper picker
+                val intent = Intent(Intent.ACTION_SET_WALLPAPER)
+                startActivity(intent)
+            } catch (e: Exception) {
+                try {
+                    // Fallback to system settings wallpaper entry
+                    val intent = Intent("android.settings.WALLPAPER_SETTINGS")
+                    startActivity(intent)
+                } catch (e2: Exception) {
+                    // Final fallback
+                    val intent = Intent(Intent.ACTION_MAIN).apply {
+                        addCategory(Intent.CATEGORY_LAUNCHER)
+                        component = ComponentName("com.android.settings", "com.android.settings.Settings")
+                    }
+                    try {
+                        startActivity(intent)
+                    } catch (e3: Exception) {
+                        AppLogger.e("Wallpaper", "Could not open settings", e3)
+                    }
+                }
+            }
+            true
+        }
 
         // --- Side Effects (Immediate Action) ---
         findPreference<SwitchPreferenceCompat>("showStatusBar")?.onPreferenceChangeListener =

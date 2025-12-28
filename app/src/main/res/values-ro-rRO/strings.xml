@@ -86,6 +86,8 @@
     <string name="icon_packs">Pachete de pictograme</string>
     <!-- Strings used for look & feel settings -->
     <string name="look_feel_settings_title">Privește &amp; Simte</string>
+    <string name="system">Sistem</string>
+    <string name="wallpaper_and_styles">Imagini de fundal și stiluri</string>
     <string name="text_size_adjustments">Text &amp; Ajustări dimensiune</string>
     <string name="app_text_size">Dimensiunea textului aplicației</string>
     <string name="date_text_size">Dimensiunea textului datei</string>

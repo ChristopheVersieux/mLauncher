@@ -86,6 +86,8 @@
     <string name="icon_packs">חבילות אייקונים</string>
     <!-- Strings used for look & feel settings -->
     <string name="look_feel_settings_title">מראה &amp; תחושה</string>
+    <string name="system">מערכת</string>
+    <string name="wallpaper_and_styles">טפטים וסגנונות</string>
     <string name="text_size_adjustments">טקסט &amp; התאמות גודל</string>
     <string name="app_text_size">גודל הטקסט של היישום</string>
     <string name="date_text_size">גודל הטקסט של התאריך</string>

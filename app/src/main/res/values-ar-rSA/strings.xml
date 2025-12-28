@@ -86,6 +86,8 @@
     <string name="icon_packs">حزم الأيقونات</string>
     <!-- Strings used for look & feel settings -->
     <string name="look_feel_settings_title">الشكل و المظهر</string>
+    <string name="system">النظام</string>
+    <string name="wallpaper_and_styles">خلفيات وأنماط</string>
     <string name="text_size_adjustments">تعديلات حجم النص</string>
     <string name="app_text_size">حجم نص التطبيق</string>
     <string name="date_text_size">حجم نص التاريخ</string>

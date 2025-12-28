@@ -2,6 +2,12 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <PreferenceCategory android:title="@string/system">
+        <Preference
+            android:key="OPEN_WALLPAPER_SETTINGS"
+            android:title="@string/wallpaper_and_styles" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/layout_positioning">
         <SeekBarPreference
             android:key="TEXT_PADDING_SIZE"
