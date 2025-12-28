@@ -4,6 +4,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
     id("kotlin-android")
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.google.firebase.crashlytics)
 }
 
 // Top of build.gradle.kts
@@ -184,6 +186,7 @@ dependencies {
     // Moshi
     implementation(libs.moshi)
     implementation(libs.moshi.ktx)
+    implementation(libs.firebase.crashlytics)
     ksp(libs.moshi.codegen)
 
     // Room

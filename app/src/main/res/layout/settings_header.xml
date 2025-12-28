@@ -11,7 +11,7 @@
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:contentDescription="@string/app_name"
-        android:src="@drawable/ic_cascade_launcher" />
+        android:src="@drawable/app_launcher" />
 
     <TextView
         android:id="@+id/settings_title"

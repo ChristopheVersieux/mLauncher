@@ -45,7 +45,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import com.github.droidworksstudio.common.AppLogger
 import com.github.droidworksstudio.common.ColorIconsExtensions
-import com.github.droidworksstudio.common.CrashHandler
 import com.github.droidworksstudio.common.getLocalizedString
 import com.github.droidworksstudio.common.getLocalizedStringArray
 import com.github.droidworksstudio.common.openAccessibilitySettings
@@ -121,7 +120,6 @@ fun hasContactsPermission(context: Context): Boolean {
 
 
 fun showPermissionDialog(context: Context) {
-    CrashHandler.logUserAction("Show Usage Permission Dialog")
     val builder = MaterialAlertDialogBuilder(context)
     builder.setTitle(getLocalizedString(R.string.permission_required))
     builder.setMessage(getLocalizedString(R.string.access_usage_data_permission))

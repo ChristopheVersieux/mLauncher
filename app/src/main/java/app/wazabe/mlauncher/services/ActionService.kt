@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.view.accessibility.AccessibilityEvent
 import com.github.droidworksstudio.common.AppLogger
-import com.github.droidworksstudio.common.CrashHandler
 import java.lang.ref.WeakReference
 
 @SuppressLint("AccessibilityPolicy")

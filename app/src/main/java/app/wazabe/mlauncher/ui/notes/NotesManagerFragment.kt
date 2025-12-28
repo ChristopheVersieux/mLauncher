@@ -15,7 +15,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.droidworksstudio.common.CrashHandler
 import com.github.droidworksstudio.common.getCurrentTimestamp
 import com.github.droidworksstudio.common.getLocalizedString
 import com.github.droidworksstudio.common.getLocalizedStringArray

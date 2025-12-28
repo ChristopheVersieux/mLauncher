@@ -3,7 +3,6 @@
 import android.os.Bundle
 import android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
 import androidx.appcompat.app.AppCompatActivity
-import com.github.droidworksstudio.common.CrashHandler
 import app.wazabe.mlauncher.R
 
 class OnboardingActivity : AppCompatActivity() {

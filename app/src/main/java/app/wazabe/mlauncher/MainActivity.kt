@@ -36,7 +36,6 @@ import app.wazabe.mlauncher.helper.utils.AppReloader
 import app.wazabe.mlauncher.helper.utils.SystemBarObserver
 import app.wazabe.mlauncher.ui.BaseActivity
 import app.wazabe.mlauncher.ui.onboarding.OnboardingActivity
-import com.github.droidworksstudio.common.CrashHandler
 import com.github.droidworksstudio.common.showLongToast
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -141,9 +140,6 @@ class MainActivity : BaseActivity() {
 
         prefs = Prefs(this)
         migration = Migration(this)
-
-        // Initialize com.github.droidworksstudio.common.CrashHandler to catch uncaught exceptions
-        Thread.setDefaultUncaughtExceptionHandler(CrashHandler(applicationContext))
 
         requestedOrientation = if (prefs.lockOrientation) {
             if (prefs.lockOrientationPortrait) {

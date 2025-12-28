@@ -29,8 +29,8 @@
         android:enableOnBackInvokedCallback="true"
         android:excludeFromRecents="true"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/ic_cascade_launcher"
-        android:roundIcon="@drawable/ic_cascade_launcher"
+        android:icon="@drawable/app_launcher"
+        android:roundIcon="@drawable/app_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.mLauncher"
@@ -83,12 +83,6 @@
             android:excludeFromRecents="true"
             android:exported="false"
             android:theme="@style/Theme.mLauncher.Settings" />
-        <!-- CRASH REPORT ACTIVITY -->
-        <activity
-            android:name=".CrashReportActivity"
-            android:enabled="true"
-            android:excludeFromRecents="true"
-            android:exported="false" />
         <!-- ICON PACK ACTIVITIES -->
         <activity
             android:name=".ui.iconpack.ApplyIconPackActivity"

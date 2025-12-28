@@ -21,7 +21,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.github.droidworksstudio.common.AppLogger
-import com.github.droidworksstudio.common.CrashHandler
 import com.github.droidworksstudio.common.getLocalizedString
 import com.github.droidworksstudio.common.hideKeyboard
 import com.github.droidworksstudio.common.showShortToast
@@ -264,7 +263,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             return try {
                 appUsageTracker.updateLastUsedTimestamp(packageName)
                 launcher.startMainActivity(component, user, null, null)
-                CrashHandler.logUserAction("${component.packageName} App Launched")
                 true
             } catch (_: Exception) {
                 false

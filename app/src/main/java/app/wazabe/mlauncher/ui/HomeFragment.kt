@@ -102,7 +102,6 @@ import com.github.creativecodecat.components.views.FontBottomSheetDialogLocked
 import com.github.droidworksstudio.common.AppLogger
 import com.github.droidworksstudio.common.ColorIconsExtensions
 import com.github.droidworksstudio.common.ColorManager
-import com.github.droidworksstudio.common.CrashHandler
 import com.github.droidworksstudio.common.attachGestureManager
 import com.github.droidworksstudio.common.getLocalizedString
 import com.github.droidworksstudio.common.isGestureNavigationEnabled

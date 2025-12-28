@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
-import com.github.droidworksstudio.common.CrashHandler
 import app.wazabe.mlauncher.data.Constants
 import app.wazabe.mlauncher.data.Prefs
 import app.wazabe.mlauncher.helper.IconCacheTarget
@@ -73,9 +72,6 @@ class Mlauncher : Application() {
                     )
                 }
             }
-
-            Thread.setDefaultUncaughtExceptionHandler(CrashHandler(appContext!!))
-            CrashHandler.logUserAction("App Launched")
         }
 
         /**

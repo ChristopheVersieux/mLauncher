@@ -72,6 +72,6 @@
         android:key="pref_key_about"
         android:title="@string/about_settings_title"
         app:iconSpaceReserved="false"
-        app:icon="@drawable/ic_toast" />
+        app:icon="@drawable/app_launcher" />
 
 </PreferenceScreen>

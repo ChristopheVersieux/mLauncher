@@ -22,7 +22,6 @@ import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.github.droidworksstudio.common.CrashHandler
 import com.github.droidworksstudio.common.getCurrentTimestamp
 import com.github.droidworksstudio.common.getLocalizedString
 import com.github.droidworksstudio.common.getLocalizedStringArray
