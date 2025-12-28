@@ -13,6 +13,7 @@ import app.wazabe.mlauncher.data.Prefs
 import app.wazabe.mlauncher.helper.IconCacheTarget
 import app.wazabe.mlauncher.helper.IconPackHelper
 import app.wazabe.mlauncher.helper.utils.AppReloader
+import com.github.droidworksstudio.common.AppLogger
 import java.util.concurrent.Executors
 
 class Mlauncher : Application() {
@@ -45,7 +46,7 @@ class Mlauncher : Application() {
 
             // 1. Initial Font Load (Now uses the internal 'prefs')
             reloadFont()
-
+            AppLogger.e(message="INIT")
             // 2. Set theme mode
             val themeMode = when (prefs.appTheme) {
                 Constants.Theme.Light -> AppCompatDelegate.MODE_NIGHT_NO

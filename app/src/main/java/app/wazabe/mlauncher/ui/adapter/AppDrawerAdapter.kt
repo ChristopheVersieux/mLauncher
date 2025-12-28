@@ -28,9 +28,7 @@ import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.github.droidworksstudio.common.AppLogger
-import com.github.droidworksstudio.common.getLocalizedString
-import com.github.droidworksstudio.common.isSystemApp
-import com.github.droidworksstudio.common.showKeyboard
+
 import com.github.droidworksstudio.fuzzywuzzy.FuzzyFinder
 import app.wazabe.mlauncher.R
 import app.wazabe.mlauncher.data.AppListItem
@@ -44,6 +42,8 @@ import app.wazabe.mlauncher.helper.dp2px
 import app.wazabe.mlauncher.helper.getSystemIcons
 import app.wazabe.mlauncher.helper.utils.BiometricHelper
 import app.wazabe.mlauncher.helper.utils.visibleHideLayouts
+import com.github.droidworksstudio.common.isSystemApp
+import com.github.droidworksstudio.common.showKeyboard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -105,10 +105,8 @@ class AppDrawerAdapter(
 
         val appModel = appFilteredList[holder.absoluteAdapterPosition]
         AppLogger.d("AppListDebug", "🔧 Binding position=$position, label=${appModel.label}, package=${appModel.activityPackage}")
-
         // Pass icon cache and loading scope to bind
         holder.bind(flag, gravity, appModel, appClickListener, appInfoListener, appDeleteListener, iconCache, iconLoadingScope, prefs)
-
         holder.appHide.setOnClickListener {
             AppLogger.d("AppListDebug", "❌ Hide clicked for ${appModel.label} (${appModel.activityPackage})")
 
@@ -119,7 +117,6 @@ class AppDrawerAdapter(
             AppLogger.d("AppListDebug", "📤 notifyItemRemoved at ${holder.absoluteAdapterPosition}")
             appHideListener(flag, appModel)
         }
-
         holder.appLock.setOnClickListener {
             val appName = appModel.activityPackage
             val currentLockedApps = prefs.lockedApps
@@ -129,20 +126,20 @@ class AppDrawerAdapter(
                     override fun onAuthenticationSucceeded(appListItem: AppListItem) {
                         AppLogger.d("AppListDebug", "🔓 Auth succeeded for $appName - unlocking")
                         holder.appLock.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.padlock_off, 0, 0)
-                        holder.appLock.text = getLocalizedString(R.string.lock)
+                        holder.appLock.text = holder.itemView.context.getString(R.string.lock)
                         currentLockedApps.remove(appName)
                         prefs.lockedApps = currentLockedApps
                         AppLogger.d("AppListDebug", "🔐 Updated lockedApps: $currentLockedApps")
                     }
 
                     override fun onAuthenticationFailed() {
-                        AppLogger.e("Authentication", getLocalizedString(R.string.text_authentication_failed))
+                        AppLogger.e("Authentication", holder.itemView.context.getString(R.string.text_authentication_failed))
                     }
 
                     override fun onAuthenticationError(errorCode: Int, errorMessage: CharSequence?) {
                         val msg = when (errorCode) {
-                            BiometricPrompt.ERROR_USER_CANCELED -> getLocalizedString(R.string.text_authentication_cancel)
-                            else -> getLocalizedString(R.string.text_authentication_error).format(errorMessage, errorCode)
+                            BiometricPrompt.ERROR_USER_CANCELED -> holder.itemView.context.getString(R.string.text_authentication_cancel)
+                            else -> holder.itemView.context.getString(R.string.text_authentication_error).format(errorMessage, errorCode)
                         }
                         AppLogger.e("Authentication", msg)
                     }
@@ -150,7 +147,7 @@ class AppDrawerAdapter(
             } else {
                 AppLogger.d("AppListDebug", "🔒 Locking $appName")
                 holder.appLock.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.padlock, 0, 0)
-                holder.appLock.text = getLocalizedString(R.string.unlock)
+                holder.appLock.text = holder.itemView.context.getString(R.string.unlock)
                 currentLockedApps.add(appName)
             }
 
@@ -361,7 +358,7 @@ class AppDrawerAdapter(
                     0,
                     0
                 )
-                text = if (isLocked) getLocalizedString(R.string.unlock) else getLocalizedString(R.string.lock)
+                //text = if (isLocked) context.getString(R.string.unlock) else context.getString(R.string.lock)
             }
 
             appPin.apply {
@@ -372,7 +369,7 @@ class AppDrawerAdapter(
                     0,
                     0
                 )
-                text = if (isPinned) getLocalizedString(R.string.unpin) else getLocalizedString(R.string.pin)
+                text = if (isPinned) context.getString(R.string.unpin) else context.getString(R.string.pin)
             }
 
             appHide.apply {
@@ -383,7 +380,7 @@ class AppDrawerAdapter(
                     0,
                     0
                 )
-                text = if (isHidden) getLocalizedString(R.string.show) else getLocalizedString(R.string.hide)
+                text = if (isHidden) context.getString(R.string.show) else context.getString(R.string.hide)
             }
 
             // ----------------------------
@@ -417,9 +414,9 @@ class AppDrawerAdapter(
                     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
                     override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                         appSaveRename.text = when {
-                            text.isEmpty() -> getLocalizedString(R.string.reset)
-                            text.toString() == appListItem.customLabel -> getLocalizedString(R.string.cancel)
-                            else -> getLocalizedString(R.string.rename)
+                            text.isEmpty() -> context.getString(R.string.reset)
+                            text.toString() == appListItem.customLabel -> context.getString(R.string.cancel)
+                            else -> context.getString(R.string.rename)
                         }
                     }
                 })
@@ -431,8 +428,8 @@ class AppDrawerAdapter(
                     override fun afterTextChanged(s: Editable) {}
                     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
                     override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                        appSaveTag.text = if (text.toString() == appListItem.customTag) getLocalizedString(R.string.cancel)
-                        else getLocalizedString(R.string.tag)
+                        appSaveTag.text = if (text.toString() == appListItem.customTag) context.getString(R.string.cancel)
+                        else context.getString(R.string.tag)
                     }
                 })
             }

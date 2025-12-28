@@ -12,6 +12,15 @@ import app.wazabe.mlauncher.Mlauncher
 
 open class BaseActivity : AppCompatActivity() {
 
+    override fun attachBaseContext(newBase: Context) {
+        val prefs = app.wazabe.mlauncher.data.Prefs(newBase)
+        val locale = prefs.appLanguage.locale()
+        val config = android.content.res.Configuration(newBase.resources.configuration)
+        config.setLocale(locale)
+        val context = newBase.createConfigurationContext(config)
+        super.attachBaseContext(context)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // IMPORTANT: The Factory must be set BEFORE super.onCreate()
         // This intercepts the 'inflation' process as the XML is read.

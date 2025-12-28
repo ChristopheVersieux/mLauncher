@@ -301,6 +301,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
 
     private fun updateUIFromPreferences() {
+        AppLogger.e(message="HERE")
         val locale = prefs.appLanguage.locale()
         val is24HourFormat = DateFormat.is24HourFormat(requireContext())
 

@@ -42,7 +42,6 @@ class HomeAppsAdapter(
 
         // Gestion de l'icône (Compound Drawable)
         val appModel = prefs.getHomeAppModel(position)
-        //AppLogger.e(message = "ICON "+appModel.activityPackage)
         val icon = IconPackHelper.getSafeAppIcon(
             context = holder.itemView.context,
             packageName = appModel.activityPackage,
