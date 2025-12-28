@@ -71,6 +71,8 @@ object Constants {
 
     const val ACCESS_FINE_LOCATION = 666
     const val READ_CONTACTS = 777
+    const val REQUEST_BIND_APPWIDGET = 888
+    const val REQUEST_CONFIGURE_APPWIDGET = 999
 
     fun updateMaxHomePages(context: Context) {
         val prefs = Prefs(context)

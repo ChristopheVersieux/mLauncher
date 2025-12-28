@@ -11,6 +11,7 @@ import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -536,16 +537,10 @@ class WidgetFragment : Fragment() {
     private fun maybeConfigureOrCreate(widgetInfo: AppWidgetProviderInfo, widgetId: Int) {
         if (widgetInfo.configure != null) {
             AppLogger.i(TAG, "⚙️ Widget has configuration, launching config activity")
-            val intent = Intent().apply {
-                component = widgetInfo.configure
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-            }
-
             (activity as? WidgetActivity)?.let { widgetActivity ->
-                widgetActivity.launchWidgetPermission(intent) { resultCode, returnedId, _ ->
+                widgetActivity.launchWidgetConfiguration(appWidgetHost, widgetId) { resultCode, returnedId ->
                     if (resultCode == Activity.RESULT_OK) {
                         AppLogger.i(TAG, "✅ Widget configured, creating wrapper: $returnedId")
-                        // Ensure widgetInfo is captured properly in the lambda
                         widgetActivity.safeCreateWidget(widgetInfo, returnedId)
                     } else {
                         AppLogger.w(TAG, "❌ Widget config canceled, removing: $returnedId")
@@ -587,18 +582,10 @@ class WidgetFragment : Fragment() {
     }
 
     fun createWidgetWrapper(widgetInfo: AppWidgetProviderInfo, appWidgetId: Int) {
+        val appContext = requireContext().applicationContext
         val hostView = try {
-            val widgetContext = try {
-                requireContext().createPackageContext(
-                    widgetInfo.provider.packageName,
-                    Context.CONTEXT_IGNORE_SECURITY or Context.CONTEXT_INCLUDE_CODE
-                )
-            } catch (_: Exception) {
-                requireContext()
-            }
 
-            // Use the existing widget ID if it's valid, otherwise allocate a new one
-            val appWidgetManager = AppWidgetManager.getInstance(requireContext())
+            val appWidgetManager = AppWidgetManager.getInstance(appContext)
             val widgetIdToUse = if (isWidgetIdValid(appWidgetId, appWidgetManager)) {
                 appWidgetId
             } else {
@@ -613,8 +600,7 @@ class WidgetFragment : Fragment() {
                 newWidgetId
             }
 
-            // Now create the host view
-            appWidgetHost.createView(widgetContext, widgetIdToUse, widgetInfo)
+            appWidgetHost.createView(appContext, widgetIdToUse, widgetInfo)
 
         } catch (e: Exception) {
             AppLogger.e(TAG, "⚠️ Failed to create widgetId=$appWidgetId, removing", e)
@@ -810,16 +796,8 @@ class WidgetFragment : Fragment() {
                         }
 
                         val hostView = try {
-                            val widgetContext = try {
-                                requireContext().createPackageContext(
-                                    info.provider.packageName,
-                                    Context.CONTEXT_IGNORE_SECURITY or Context.CONTEXT_INCLUDE_CODE
-                                )
-                            } catch (_: Exception) {
-                                requireContext()
-                            }
-
-                            appWidgetHost.createView(widgetContext, saved.appWidgetId, info)
+                            val appContext = requireContext().applicationContext
+                            appWidgetHost.createView(appContext, saved.appWidgetId, info)
                         } catch (e: Exception) {
                             AppLogger.e(TAG, "⚠️ Failed to restore widgetId=${saved.appWidgetId}, removing", e)
                             safeRemoveWidget(saved.appWidgetId)

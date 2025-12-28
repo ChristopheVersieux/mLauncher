@@ -2,6 +2,8 @@
 
 import android.app.Activity
 import android.app.role.RoleManager
+import android.appwidget.AppWidgetHost
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -36,6 +38,7 @@ import app.wazabe.mlauncher.helper.utils.AppReloader
 import app.wazabe.mlauncher.helper.utils.SystemBarObserver
 import app.wazabe.mlauncher.ui.BaseActivity
 import app.wazabe.mlauncher.ui.onboarding.OnboardingActivity
+import com.github.droidworksstudio.common.AppLogger
 import com.github.droidworksstudio.common.showLongToast
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -72,6 +75,8 @@ class MainActivity : BaseActivity() {
 
     private lateinit var widgetPermissionLauncher: ActivityResultLauncher<Intent>
     private var widgetResultCallback: ((Int, Int, Intent?) -> Unit)? = null
+    private var widgetConfigCallback: ((Int, Int) -> Unit)? = null
+    private var widgetHost: AppWidgetHost? = null
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         return when (keyCode) {
@@ -555,6 +560,35 @@ class MainActivity : BaseActivity() {
     fun launchWidgetPermission(intent: Intent, callback: (Int, Int, Intent?) -> Unit) {
         widgetResultCallback = callback
         widgetPermissionLauncher.launch(intent)
+    }
+
+    fun launchWidgetConfiguration(host: AppWidgetHost, widgetId: Int, callback: (Int, Int) -> Unit) {
+        widgetHost = host
+        widgetConfigCallback = callback
+        try {
+            host.startAppWidgetConfigureActivityForResult(
+                this,
+                widgetId,
+                0,
+                Constants.REQUEST_CONFIGURE_APPWIDGET,
+                null
+            )
+        } catch (e: Exception) {
+            AppLogger.e("MainActivity", "❌ Failed to launch widget configuration: ${e.message}")
+            widgetConfigCallback?.invoke(RESULT_CANCELED, widgetId)
+            widgetConfigCallback = null
+            widgetHost = null
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == Constants.REQUEST_CONFIGURE_APPWIDGET) {
+            val widgetId = data?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1) ?: -1
+            widgetConfigCallback?.invoke(resultCode, widgetId)
+            widgetConfigCallback = null
+            widgetHost = null
+        }
     }
 
 }

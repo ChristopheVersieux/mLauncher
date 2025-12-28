@@ -81,7 +81,7 @@ class Mlauncher : Application() {
             val fontPath = prefs.launcherFont
             val context = getContext()
 
-            globalTypeface = if (fontPath == "system") {
+            globalTypeface = if (fontPath.equals("system", ignoreCase = true)) {
                 Typeface.DEFAULT
             } else {
                 try {

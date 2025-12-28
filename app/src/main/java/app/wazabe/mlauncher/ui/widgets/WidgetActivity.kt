@@ -1,5 +1,6 @@
 ﻿package app.wazabe.mlauncher.ui.widgets
 
+import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.Intent
@@ -12,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.github.droidworksstudio.common.AppLogger
 import app.wazabe.mlauncher.R
+import app.wazabe.mlauncher.data.Constants
 import app.wazabe.mlauncher.data.Prefs
 import app.wazabe.mlauncher.databinding.ActivityWidgetBinding
 import app.wazabe.mlauncher.helper.getHexForOpacity
@@ -28,6 +30,8 @@ class WidgetActivity : AppCompatActivity() {
 
     private lateinit var widgetPermissionLauncher: ActivityResultLauncher<Intent>
     private var widgetResultCallback: ((Int, Int, Intent?) -> Unit)? = null
+    private var widgetConfigCallback: ((Int, Int) -> Unit)? = null
+    private var widgetHost: AppWidgetHost? = null
     private val pendingWidgets = mutableListOf<Pair<AppWidgetProviderInfo, Int>>()
 
     // ───────────────────────────────────────────────
@@ -186,5 +190,34 @@ class WidgetActivity : AppCompatActivity() {
         fragment.postPendingWidgets(pendingWidgets.toList())
         pendingWidgets.clear()
         AppLogger.d(TAG, "🔴 Pending widgets cleared after posting")
+    }
+
+    fun launchWidgetConfiguration(host: AppWidgetHost, widgetId: Int, callback: (Int, Int) -> Unit) {
+        widgetHost = host
+        widgetConfigCallback = callback
+        try {
+            host.startAppWidgetConfigureActivityForResult(
+                this,
+                widgetId,
+                0,
+                Constants.REQUEST_CONFIGURE_APPWIDGET,
+                null
+            )
+        } catch (e: Exception) {
+            AppLogger.e(TAG, "❌ Failed to launch widget configuration: ${e.message}")
+            widgetConfigCallback?.invoke(RESULT_CANCELED, widgetId)
+            widgetConfigCallback = null
+            widgetHost = null
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == Constants.REQUEST_CONFIGURE_APPWIDGET) {
+            val widgetId = data?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1) ?: -1
+            widgetConfigCallback?.invoke(resultCode, widgetId)
+            widgetConfigCallback = null
+            widgetHost = null
+        }
     }
 }

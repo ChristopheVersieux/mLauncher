@@ -14,6 +14,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
+import android.view.ContextThemeWrapper
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
@@ -1704,9 +1705,10 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     // --- Widget Logic ---
 
     private fun initWidgetHost() {
-        widgetDao = WidgetDatabase.getDatabase(requireContext()).widgetDao()
-        appWidgetManager = AppWidgetManager.getInstance(requireContext())
-        appWidgetHost = AppWidgetHost(requireContext(), APP_WIDGET_HOST_ID)
+        val appContext = requireContext().applicationContext
+        widgetDao = WidgetDatabase.getDatabase(appContext).widgetDao()
+        appWidgetManager = AppWidgetManager.getInstance(appContext)
+        appWidgetHost = AppWidgetHost(appContext, APP_WIDGET_HOST_ID)
         appWidgetHost.startListening()
 
         binding.homeWidgetGrid.apply {
@@ -1867,11 +1869,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     private fun maybeConfigureOrCreate(widgetInfo: AppWidgetProviderInfo, widgetId: Int) {
         if (widgetInfo.configure != null) {
-            val intent = Intent().apply {
-                component = widgetInfo.configure
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-            }
-            (requireActivity() as MainActivity).launchWidgetPermission(intent) { resultCode, returnedId, _ ->
+            (requireActivity() as MainActivity).launchWidgetConfiguration(appWidgetHost, widgetId) { resultCode, returnedId ->
                 if (resultCode == Activity.RESULT_OK) {
                     createWidgetWrapperSafe(widgetInfo, returnedId)
                 } else {
@@ -1890,9 +1888,11 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
     private fun createWidgetWrapper(widgetInfo: AppWidgetProviderInfo, appWidgetId: Int) {
+        val appContext = requireContext().applicationContext
         val hostView = try {
-            appWidgetHost.createView(requireContext(), appWidgetId, widgetInfo)
+            appWidgetHost.createView(appContext, appWidgetId, widgetInfo)
         } catch (e: Exception) {
+            AppLogger.e("CVE", "❌ Failed to create widgetId=$appWidgetId: ${e.message}")
             appWidgetHost.deleteAppWidgetId(appWidgetId)
             return
         }
@@ -1996,8 +1996,12 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 savedWidgets.forEach { saved ->
                     val info = appWidgetManager.getAppWidgetInfo(saved.appWidgetId) ?: return@forEach
                     val hostView = try {
-                        appWidgetHost.createView(requireContext(), saved.appWidgetId, info)
-                    } catch (e: Exception) { return@forEach }
+                        val appContext = requireContext().applicationContext
+                        appWidgetHost.createView(appContext, saved.appWidgetId, info)
+                    } catch (e: Exception) {
+                        AppLogger.e("CVE", "❌ Failed to restore widgetId=${saved.appWidgetId}: ${e.message}")
+                        return@forEach
+                    }
 
                     val wrapper = ResizableWidgetWrapper(
                         requireContext(), hostView, info, appWidgetHost,
