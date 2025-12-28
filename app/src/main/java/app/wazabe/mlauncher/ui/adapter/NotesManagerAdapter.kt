@@ -26,6 +26,7 @@ import com.github.droidworksstudio.common.getCurrentTimestamp
 import com.github.droidworksstudio.common.getLocalizedString
 import com.github.droidworksstudio.common.getLocalizedStringArray
 import com.github.droidworksstudio.common.share.ShareUtils
+import com.github.droidworksstudio.common.AnalyticsHelper
 import app.wazabe.mlauncher.R
 import app.wazabe.mlauncher.data.Constants
 import app.wazabe.mlauncher.data.Message
@@ -194,7 +195,7 @@ class NotesManagerAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     private fun onDeleteClick(position: Int) {
-        CrashHandler.Companion.logUserAction("Notes onDeleteClick")
+        AnalyticsHelper.logUserAction("Notes onDeleteClick")
         MaterialAlertDialogBuilder(context)
             .setTitle(getLocalizedString(R.string.confirm_delete_title))
             .setMessage(getLocalizedString(R.string.confirm_delete_message))
@@ -206,7 +207,7 @@ class NotesManagerAdapter(
                 doubleExpandedPositions.remove(position)
                 notifyDataSetChanged()
                 onMessageUpdated()
-                CrashHandler.Companion.logUserAction("Note Deleted")
+                AnalyticsHelper.logUserAction("Note Deleted")
             }
             .setNegativeButton(getLocalizedString(R.string.cancel), null)
             .show()
@@ -216,12 +217,12 @@ class NotesManagerAdapter(
         // Dismiss existing dialog if any
         shareUtils.shareDialog?.dismiss()
 
-        CrashHandler.Companion.logUserAction("Notes onShareClick")
+        AnalyticsHelper.logUserAction("Notes onShareClick")
         shareUtils.showMaterialShareDialog(context, getLocalizedString(R.string.share_note), messages[position].text)
     }
 
     private fun onEditClick(position: Int) {
-        CrashHandler.Companion.logUserAction("Notes onEditClick")
+        AnalyticsHelper.logUserAction("Notes onEditClick")
         showEditDialog(position)
     }
 
@@ -287,7 +288,7 @@ class NotesManagerAdapter(
             )
             notifyDataSetChanged()
             onMessageUpdated()
-            CrashHandler.Companion.logUserAction("Note Updated")
+            AnalyticsHelper.logUserAction("Note Updated")
         }
 
         builder.setNegativeButton(getLocalizedString(R.string.cancel), null)

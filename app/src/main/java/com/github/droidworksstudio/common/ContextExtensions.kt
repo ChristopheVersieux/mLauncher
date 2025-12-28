@@ -109,7 +109,7 @@ fun Context.launchCalendar() {
             AppLogger.d("openCalendar", e.toString())
         }
     }
-    CrashHandler.logUserAction("Calendar App Launched")
+    AnalyticsHelper.logUserAction("Calendar App Launched")
 }
 
 fun Context.openDialerApp() {
@@ -121,7 +121,7 @@ fun Context.openDialerApp() {
     } catch (e: Exception) {
         AppLogger.d("openDialerApp", e.toString())
     }
-    CrashHandler.logUserAction("Dialer App Launched")
+    AnalyticsHelper.logUserAction("Dialer App Launched")
 }
 
 fun Context.openTextMessagesApp() {
@@ -134,7 +134,7 @@ fun Context.openTextMessagesApp() {
     } catch (e: Exception) {
         AppLogger.d("openTextMessagesApp", e.toString())
     }
-    CrashHandler.logUserAction("Text Messages App Launched")
+    AnalyticsHelper.logUserAction("Text Messages App Launched")
 }
 
 fun Context.openAlarmApp() {
@@ -146,7 +146,7 @@ fun Context.openAlarmApp() {
     } catch (e: java.lang.Exception) {
         AppLogger.d("openAlarmApp", e.toString())
     }
-    CrashHandler.logUserAction("Alarm App Launched")
+    AnalyticsHelper.logUserAction("Alarm App Launched")
 }
 
 fun Context.openCameraApp() {
@@ -158,7 +158,7 @@ fun Context.openCameraApp() {
     } catch (e: java.lang.Exception) {
         AppLogger.d("openCameraApp", e.toString())
     }
-    CrashHandler.logUserAction("Camera App Launched")
+    AnalyticsHelper.logUserAction("Camera App Launched")
 }
 
 fun Context.openPhotosApp() {
@@ -171,7 +171,7 @@ fun Context.openPhotosApp() {
     } catch (e: Exception) {
         AppLogger.d("openPhotosApp", e.toString())
     }
-    CrashHandler.logUserAction("Photos App Launched")
+    AnalyticsHelper.logUserAction("Photos App Launched")
 }
 
 fun Context.openDeviceSettings() {
@@ -183,7 +183,7 @@ fun Context.openDeviceSettings() {
     } catch (e: Exception) {
         AppLogger.d("openDeviceSettings", e.toString())
     }
-    CrashHandler.logUserAction("Device Settings Opened")
+    AnalyticsHelper.logUserAction("Device Settings Opened")
 }
 
 fun Context.openWebBrowser() {
@@ -203,7 +203,7 @@ fun Context.openWebBrowser() {
     } catch (e: Exception) {
         AppLogger.d("openDefaultBrowserApp", e.toString())
     }
-    CrashHandler.logUserAction("Default Browser App Launched")
+    AnalyticsHelper.logUserAction("Default Browser App Launched")
 }
 
 
@@ -223,7 +223,7 @@ fun Context.openBatteryManager() {
     } catch (_: ActivityNotFoundException) {
         showLongToast("Battery manager settings are not available on this device.")
     }
-    CrashHandler.logUserAction("Battery Manager Launched")
+    AnalyticsHelper.logUserAction("Battery Manager Launched")
 }
 
 fun Context.openDigitalWellbeing() {
@@ -247,7 +247,7 @@ fun Context.openDigitalWellbeing() {
 
         try {
             startActivity(intent)
-            CrashHandler.logUserAction("Digital Wellbeing Launched")
+            AnalyticsHelper.logUserAction("Digital Wellbeing Launched")
         } catch (_: ActivityNotFoundException) {
             showLongToast("Unable to launch Digital Wellbeing.")
         }
@@ -269,7 +269,7 @@ fun Context.searchOnPlayStore(query: String? = null): Boolean {
             playStoreIntent.data = "${Constants.URL_GOOGLE_PLAY_STORE}=$query".toUri()
             startActivity(playStoreIntent)
         }
-        CrashHandler.logUserAction("Play Store Launched")
+        AnalyticsHelper.logUserAction("Play Store Launched")
         true
     } catch (e: Exception) {
         e.printStackTrace()
@@ -279,7 +279,7 @@ fun Context.searchOnPlayStore(query: String? = null): Boolean {
 
 fun Context.searchCustomSearchEngine(searchQuery: String? = null, prefs: Prefs): Boolean {
     val searchUrl = prefs.searchEngines.getURL()
-    CrashHandler.logUserAction("${prefs.searchEngines} Search")
+    AnalyticsHelper.logUserAction("${prefs.searchEngines} Search")
     val encodedQuery = Uri.encode(searchQuery)
     val fullUrl = "$searchUrl$encodedQuery"
     AppLogger.d("fullUrl", fullUrl)
@@ -350,7 +350,7 @@ fun Context.openAccessibilitySettings() {
         putExtra(":settings:show_fragment_args", bundle)
     }
     this.startActivity(intent)
-    CrashHandler.logUserAction("Accessibility Settings Opened")
+    AnalyticsHelper.logUserAction("Accessibility Settings Opened")
 }
 
 fun Context.requestUsagePermission() {
@@ -360,7 +360,7 @@ fun Context.requestUsagePermission() {
             data = "package:${context.packageName}".toUri()  // Open settings for YOUR app only
         }
         context.startActivity(intent)
-        CrashHandler.logUserAction("Usage Permission Settings Opened")
+        AnalyticsHelper.logUserAction("Usage Permission Settings Opened")
     } catch (e: Exception) {
         e.printStackTrace()
     }
@@ -377,7 +377,7 @@ fun Context.requestRuntimePermission(
             permissions,
             requestCode
         )
-        CrashHandler.logUserAction("$actionDescription Permission Requested")
+        AnalyticsHelper.logUserAction("$actionDescription Permission Requested")
     } else {
         AppLogger.e("Permission", "Context is not an Activity. Cannot request permissions.")
     }

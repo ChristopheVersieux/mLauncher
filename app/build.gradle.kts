@@ -187,6 +187,8 @@ dependencies {
     implementation(libs.moshi)
     implementation(libs.moshi.ktx)
     implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.common)
     ksp(libs.moshi.codegen)
 
     // Room

@@ -40,37 +40,31 @@ class ActionService : AccessibilityService() {
 
     fun lockScreen(): Boolean {
         if (!canPerformAction()) return false
-        CrashHandler.logUserAction("Lock Screen")
         return performGlobalAction(GLOBAL_ACTION_LOCK_SCREEN)
     }
 
     fun showRecents(): Boolean {
         if (!canPerformAction()) return false
-        CrashHandler.logUserAction("Show Recents")
         return performGlobalAction(GLOBAL_ACTION_RECENTS)
     }
 
     fun openNotifications(): Boolean {
         if (!canPerformAction()) return false
-        CrashHandler.logUserAction("Open Notifications")
         return performGlobalAction(GLOBAL_ACTION_NOTIFICATIONS)
     }
 
     fun openQuickSettings(): Boolean {
         if (!canPerformAction()) return false
-        CrashHandler.logUserAction("Open Quick Settings")
         return performGlobalAction(GLOBAL_ACTION_QUICK_SETTINGS)
     }
 
     fun openPowerDialog(): Boolean {
         if (!canPerformAction()) return false
-        CrashHandler.logUserAction("Open Power Dialog")
         return performGlobalAction(GLOBAL_ACTION_POWER_DIALOG)
     }
 
     fun takeScreenShot(): Boolean {
         if (!canPerformAction()) return false
-        CrashHandler.logUserAction("Take Screen Shot")
         return performGlobalAction(GLOBAL_ACTION_TAKE_SCREENSHOT)
     }
 

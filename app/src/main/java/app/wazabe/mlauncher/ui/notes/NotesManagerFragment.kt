@@ -23,6 +23,7 @@ import com.github.droidworksstudio.common.share.ShareUtils
 import app.wazabe.mlauncher.MainViewModel
 import app.wazabe.mlauncher.R
 import app.wazabe.mlauncher.data.Message
+import com.github.droidworksstudio.common.AnalyticsHelper
 import app.wazabe.mlauncher.data.Prefs
 import app.wazabe.mlauncher.databinding.FragmentNotesManagerBinding
 import app.wazabe.mlauncher.helper.sortMessages
@@ -220,7 +221,7 @@ class NotesManagerFragment : BaseFragment() {
                         hideButtons()
                     }, 500)
                 }
-                CrashHandler.logUserAction("Notes sendButton Clicked")
+                AnalyticsHelper.logUserAction("Notes sendButton Clicked")
             }
         }
     }

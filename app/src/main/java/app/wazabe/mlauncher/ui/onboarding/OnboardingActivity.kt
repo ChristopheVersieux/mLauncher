@@ -9,9 +9,6 @@ class OnboardingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Initialize com.github.droidworksstudio.common.CrashHandler to catch uncaught exceptions
-        Thread.setDefaultUncaughtExceptionHandler(CrashHandler(applicationContext))
-
         setContentView(R.layout.activity_onboarding)
 
         // Load the OnboardingFragment dynamically

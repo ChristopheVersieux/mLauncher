@@ -57,6 +57,8 @@ moshi = "1.15.2"
 room = "2.8.4"
 ksp = "2.3.3"
 firebaseCrashlytics = "20.0.3"
+firebaseAnalytics = "22.2.0"
+firebaseCommon = "21.0.0"
 googleGmsGoogleServices = "4.4.4"
 googleFirebaseCrashlytics = "3.0.6"
 
@@ -121,6 +123,8 @@ fragment-testing = { group = "androidx.fragment", name = "fragment-testing", ver
 ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "ui-test-junit4" }
 ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "ui-test-manifest" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebaseCrashlytics" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
+firebase-common = { group = "com.google.firebase", name = "firebase-common-ktx", version.ref = "firebaseCommon" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
