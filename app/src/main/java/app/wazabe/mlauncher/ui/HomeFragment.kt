@@ -121,6 +121,7 @@ import com.github.droidworksstudio.common.openWebBrowser
 import com.github.droidworksstudio.common.showShortToast
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.absoluteValue
@@ -137,6 +138,11 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     private lateinit var deviceManager: DevicePolicyManager
     private lateinit var batteryReceiver: BatteryReceiver
     private lateinit var biometricHelper: BiometricHelper
+    private lateinit var appUsageMonitor: AppUsageMonitor
+    private val handler = Handler(Looper.getMainLooper())
+    
+    // Flag to prevent drawer from opening during initialization
+    private var isDrawerInitializing = true
     private lateinit var weatherHelper: WeatherHelper
     private lateinit var privateSpaceReceiver: PrivateSpaceReceiver
     private lateinit var vibrator: Vibrator
@@ -630,7 +636,11 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         appsAdapter.flag = flag
         appsAdapter.location = n
         AnalyticsHelper.logUserAction("Display App List")
-        drawerBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        
+        // Don't expand drawer if we're still initializing
+        if (!isDrawerInitializing) {
+            drawerBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
     }
 
     private fun showNotesManager() {
@@ -1333,6 +1343,11 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
 
     private fun trySettings() {
+        // Hide first run tips immediately on first settings access
+        if (prefs.firstSettingsOpen) {
+            binding.firstRunTips.isVisible = false
+        }
+        
         lifecycleScope.launch(Dispatchers.Main) {
             if (prefs.settingsLocked) {
                 biometricHelper.startBiometricSettingsAuth(object :
@@ -1632,6 +1647,15 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 drawerBinding.drawerHeader.layoutParams = headerParams
             }
         })
+
+        // Set initial state to collapsed to prevent auto-opening
+        drawerBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        
+        // Allow drawer to be opened after initialization period
+        lifecycleScope.launch {
+            delay(2000) // 2 second grace period
+            isDrawerInitializing = false
+        }
 
         drawerBinding.drawerFabAction.setOnClickListener(this)
         drawerBinding.drawerFabSettings.setOnClickListener(this)

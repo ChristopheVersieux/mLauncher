@@ -1,58 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="style/Widget.Material3.BottomSheet"
     android:id="@+id/mainLayout"
+    style="style/Widget.Material3.BottomSheet"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
     android:background="@drawable/bottom_sheet_background"
     android:clickable="true"
+    android:fitsSystemWindows="true"
     android:focusable="true">
 
-    <!-- Centered Drag Handle (Pill) -->
-    <View
-        android:id="@+id/dragPill"
-        android:layout_width="48dp"
-        android:layout_height="4dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/bottom_sheet_handle" />
-
     <!-- Header with Icons (Visible in Peek) -->
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/drawerHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/dragPill"
-        android:paddingTop="8dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="24dp"
-        android:paddingBottom="12dp">
-
-        <ImageView
-            android:id="@+id/drawerFabAction"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:contentDescription="@string/show"
-            android:src="@drawable/app_launcher"
-            app:tint="?attr/primaryColor" />
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="24dp"
+        android:paddingTop="8dp">
 
         <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:id="@+id/dragPill"
+            android:layout_width="48dp"
+            android:layout_height="4dp"
+            android:background="@drawable/bottom_sheet_handle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/drawerFabSettings"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+        <ImageButton
+            android:id="@+id/drawerFabAction"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/app_launcher"
             android:contentDescription="@string/show"
+            android:scaleType="fitCenter"
+            android:padding="8dp"
+            app:tint="?attr/primaryColor"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:backgroundTint="@android:color/transparent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <ImageButton
+            android:id="@+id/drawerFabSettings"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:src="@drawable/ic_settings"
-            app:tint="?attr/primaryColor" />
-    </LinearLayout>
+            android:contentDescription="@string/show"
+            android:scaleType="fitCenter"
+            android:padding="8dp"
+            app:tint="?attr/primaryColor"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:backgroundTint="@android:color/transparent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search"
