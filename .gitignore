@@ -11,3 +11,5 @@ app/build
 app/debug
 diff.*
 local.properties
+app/google-services.json
+local.properties
