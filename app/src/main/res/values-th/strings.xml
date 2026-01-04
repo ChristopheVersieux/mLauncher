@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base Settings -->
+    <string name="select_app">เลือกแอป</string>
+    <string name="show_apps">ค้นหาแอป</string>
+    <string name="show_private_apps">ค้นหาแอปส่วนตัว</string>
+    <string name="show_work_apps">ค้นหาแอปสำหรับการทำงาน</string>
+    <string name="show_contacts">ค้นหาผู้ติดต่อ</string>
+    <string name="welcome_to_launcher">ยินดีต้อนรับสู่ %1$s</string>
+    <string name="continue_by_you_agree">เมื่อดำเนินการต่อ คุณยอมรับที่จะ %1$s</string>
+    <string name="usage_access_permission">การอนุญาตการเข้าถึงการใช้งาน</string>
+    <string name="location_access_permission">การอนุญาตการเข้าถึงตำแหน่งที่ตั้ง</string>
+    <string name="accessibility_access_permission">การอนุญาตการเข้าถึง</string>
+    <string name="grant_permission">การอนุญาต</string>
+    <string name="grant_usage_permission">หากต้องการดำเนินการต่อ โปรดให้สิทธิ์การเข้าถึงการใช้งาน</string>
+    <string name="reason_usage_permission">แอปนี้ต้องการการเข้าถึงการใช้งานเพื่อแสดงแอปที่คุณใช้มากที่สุด ติดตามเวลาหน้าจอ และปรับปรุงประสบการณ์ของคุณ เราไม่รวบรวมหรือแบ่งปันข้อมูลส่วนบุคคลใดๆ</string>
+    <string name="grant_location_permission">หากต้องการดำเนินการต่อ โปรดให้สิทธิ์การเข้าถึงตำแหน่ง</string>
+    <string name="reason_location_permission">แอปนี้จำเป็นต้องมีการเข้าถึงตำแหน่งเพื่อให้ข้อมูลอัปเดตสภาพอากาศที่แม่นยำตามตำแหน่งปัจจุบันของคุณ เราจะไม่รวบรวมหรือแบ่งปันข้อมูลส่วนบุคคลใดๆ</string>
+    <string name="grant_accessibility_permission">หากต้องการดำเนินการต่อ โปรดให้สิทธิ์การเข้าถึง</string>
+    <string name="reason_accessibility_permission">MultiLauncher ต้องได้รับอนุญาตการเข้าถึงเพื่อให้มีฟีเจอร์ขั้นสูง เช่น การล็อกหน้าจอและการเปิดการตั้งค่าด่วน ฟังก์ชันเหล่านี้จะช่วยปรับปรุงการใช้งาน เราไม่รวบรวมหรือแบ่งปันข้อมูลใดๆ</string>
+    <string name="permission_granted">ได้รับอนุญาตแล้ว! คุณสามารถดำเนินการต่อได้</string>
+    <string name="this_can_be_disabled_later">* สิทธิ์นี้อาจถูกปิดใช้งานในภายหลัง</string>
+    <!-- Strings used for settings menus -->
+    <string name="settings_name">การตั้งค่า MultiLauncher</string>
+    <string name="settings_features_title">คุณสมบัติ</string>
+    <string name="settings_features_description">ปรับปรุงประสิทธิภาพการทำงานของคุณ</string>
+    <string name="settings_look_feel_title">มอง &amp; รู้สึก</string>
+    <string name="settings_look_feel_description">เพิ่มความเป็นส่วนตัวให้กับหน้าจอหลักของคุณ</string>
+    <string name="settings_gestures_title">ท่าทาง</string>
+    <string name="settings_gestures_description">ปรับแต่งท่าทางเพื่อการนำทางที่รวดเร็วและง่ายดาย</string>
+    <string name="settings_notes_title">หมายเหตุ</string>
+    <string name="settings_notes_description">ปรับแต่งบันทึกของคุณให้ตรงกับสไตล์ของคุณ</string>
+    <!-- Favorite Apps -->
+    <!-- Favorite Apps -->
+    <string name="settings_favorite_apps_title">แอปพลิเคชั่นที่ชื่นชอบ</string>
+    <string name="settings_favorite_apps_description">เรียงลำดับแอปที่คุณชื่นชอบใหม่เพื่อการเข้าถึงอย่างรวดเร็วจากหน้าจอหลัก</string>
+    <!-- Hidden Apps -->
+    <string name="settings_hidden_apps_title">แอพที่ซ่อนอยู่</string>
+    <string name="settings_hidden_apps_description">จัดการแอพที่ซ่อนไว้ — ยกเลิกการซ่อนแอพใดๆ จากรายการนี้เมื่อจำเป็น</string>
+    <string name="settings_advanced_title">การตั้งค่าขั้นสูง</string>
+    <string name="settings_advanced_description">เข้าถึงข้อมูลแอป ตัวเปิดใช้เริ่มต้น เครื่องมือสำรองข้อมูล และอื่นๆ อีกมากมาย</string>
+    <string name="settings_expert_title">ผู้เชี่ยวชาญ</string>
+    <string name="settings_expert_description">ปลดล็อคตัวเลือกที่ซ่อนอยู่และการปรับแต่งขั้นสูง</string>
+    <string name="settings_exit_mlauncher_title">ออกจาก MultiLauncher</string>
+    <string name="settings_exit_mlauncher_description">สลับไปใช้ตัวเปิดใช้เริ่มต้นของคุณชั่วคราว</string>
+    <string name="settings_exit_mlauncher_dialog">เลือกตัวเรียกใช้งาน</string>
+    <!-- Strings used for features settings -->
+    <string name="features_settings_title">คุณสมบัติ</string>
+    <string name="personalization">การปรับแต่งส่วนบุคคล</string>
+    <string name="theme_mode">โหมดธีม</string>
+    <string name="app_language">ภาษาอินเทอร์เฟซ</string>
+    <string name="font_family">ครอบครัวแบบอักษร</string>
+    <string name="search_and_app_list">ค้นหา &amp; รายการแอป</string>
+    <string name="hide_search_view">ซ่อนมุมมองการค้นหา</string>
+    <string name="show_floating_button">แสดงปุ่มทางลัด</string>
+    <string name="lock_orientation">ทิศทางการล็อค</string>
+    <string name="haptic_feedback">การตอบสนองแบบสัมผัส</string>
+    <string name="search">ค้นหา</string>
+    <string name="search_engine">เครื่องมือค้นหา</string>
+    <string name="show_az_sidebar">แสดงแถบด้านข้าง AZ</string>
+    <string name="auto_show_keyboard">แป้นพิมพ์แสดงอัตโนมัติ</string>
+    <string name="search_from_start">ค้นหาแอปตั้งแต่เริ่มต้น</string>
+    <string name="home_management">หน้าแรก &amp; การจัดการแอพ</string>
+    <string name="auto_open_apps">เปิดแอปอัตโนมัติ</string>
+    <string name="open_apps_on_enter">เปิดแอปบน Enter</string>
+    <string name="lock_home_apps">ล็อคแอพ</string>
+    <string name="lock_settings">ล็อคการตั้งค่า</string>
+    <string name="apps_on_home_screen">จำนวนแอปพลิเคชั่นภายในบ้าน</string>
+    <string name="pages_on_home_screen">เลขหน้า</string>
+    <string name="enable_home_pager">เปิดใช้งานโฮมเพจเจอร์</string>
+    <string name="enable_app_timer">เปิดใช้งานตัวจับเวลาแอป</string>
+    <string name="force_colored_wallpaper">วอลเปเปอร์สีแรง</string>
+    <string name="info_tiles">กระเบื้องข้อมูล</string>
+    <string name="show_clock">แสดงนาฬิกา</string>
+    <string name="show_clock_format">รูปแบบการแสดง (AM/PM)</string>
+    <string name="show_date">แสดงวันที่</string>
+    <string name="show_alarm">แสดงสัญญาณเตือน</string>
+    <string name="show_daily_word">แสดงคำศัพท์ประจำวัน</string>
+    <string name="show_battery">แสดงแบตเตอรี่</string>
+    <string name="show_battery_icon">แสดงไอคอนแบตเตอรี่</string>
+    <string name="weather">สภาพอากาศ</string>
+    <string name="show_weather">แสดงสภาพอากาศ</string>
+    <string name="gps_location">ตำแหน่ง GPS</string>
+    <string name="temp_unit">หน่วยอุณหภูมิ</string>
+    <string name="manual_location">ตั้งค่าตำแหน่งด้วยตนเอง</string>
+    <string name="icon_packs">ไอคอนแพ็ค</string>
+    <!-- Strings used for look & feel settings -->
+    <string name="look_feel_settings_title">รูปลักษณ์และความรู้สึก</string>
+    <string name="system">ระบบ</string>
+    <string name="wallpaper_and_styles">วอลเปเปอร์และสไตล์</string>
+    <string name="text_size_adjustments">ข้อความ &amp; ปรับขนาด</string>
+    <string name="app_text_size">ขนาดข้อความของแอป</string>
+    <string name="date_text_size">ขนาดข้อความวันที่</string>
+    <string name="clock_text_size">ขนาดข้อความนาฬิกา</string>
+    <string name="alarm_text_size">ขนาดข้อความแจ้งเตือน</string>
+    <string name="daily_word_text_size">ขนาดข้อความคำรายวัน</string>
+    <string name="battery_text_size">ขนาดข้อความแบตเตอรี่</string>
+    <string name="layout_positioning">เค้าโครง &amp; การจัดตำแหน่ง</string>
+    <string name="app_padding_size">ขนาดช่องว่างภายใน</string>
+    <string name="extend_home_apps_area">ขยายพื้นที่ที่สามารถคลิกได้</string>
+    <string name="alignment_to_bottom">จัดตำแหน่งให้ตรงกับด้านล่าง</string>
+    <string name="visibility_display">การมองเห็น &amp; การแสดงผล</string>
+    <string name="show_status_bar">แสดงแถบสถานะ</string>
+    <string name="show_navigation_bar">แสดงแถบนำทาง</string>
+    <string name="show_recent_apps">แสดงแอปล่าสุด</string>
+    <string name="number_of_recents">จำนวนแอปล่าสุด</string>
+    <string name="show_app_usage_stats">แสดงสถิติการใช้งานแอป</string>
+    <string name="select_home_icons">เลือกชุดไอคอนโฮม</string>
+    <string name="select_app_list_icons">เลือกชุดไอคอนรายการแอป</string>
+    <string name="enable_filter_strength">เปิดใช้งาน Fuzzy Finder</string>
+    <string name="filter_strength">ความแข็งแกร่งของ Fuzzy Finder</string>
+    <string name="show_background">แสดงพื้นหลัง</string>
+    <string name="background_opacity">ความโปร่งใสของพื้นหลัง</string>
+    <string name="total_screen_time">แสดงเวลาหน้าจอทั้งหมด</string>
+    <string name="element_alignment">การจัดเรียงองค์ประกอบ</string>
+    <string name="date_alignment">วันที่</string>
+    <string name="clock_alignment">นาฬิกา</string>
+    <string name="alarm_alignment">เตือน</string>
+    <string name="daily_word_alignment">คำศัพท์ประจำวัน</string>
+    <string name="home_alignment">แอปพลิเคชั่นสำหรับบ้าน</string>
+    <string name="drawer_alignment">แอปลิ้นชัก</string>
+    <string name="element_colors">สีธาตุ</string>
+    <string name="background_color">พื้นหลัง</string>
+    <string name="app_color">แอปพลิเคชั่น</string>
+    <string name="clock_color">นาฬิกา</string>
+    <string name="date_color">วันที่</string>
+    <string name="alarm_color">เตือน</string>
+    <string name="daily_word_color">คำศัพท์ประจำวัน</string>
+    <string name="battery_color">แบตเตอรี่</string>
+    <string name="rainbow_shortcuts">ทางลัดสายรุ้ง</string>
+    <string name="shortcuts_color">ทางลัด</string>
+    <!-- Strings used for gestures settings -->
+    <string name="gestures_settings_title">ท่าทาง</string>
+    <string name="tap_click_actions">การแตะ/คลิกการกระทำ</string>
+    <string name="double_tap">แตะสองครั้ง</string>
+    <string name="clock_click_app">คลิกที่นาฬิกา</string>
+    <string name="date_click_app">คลิกที่วันที่</string>
+    <string name="usage_click_app">คลิกที่การใช้งานทั้งหมด</string>
+    <string name="floating_click_app">คลิกที่โลโก้</string>
+    <string name="swipe_movement">การเคลื่อนไหวด้วยการปัด</string>
+    <string name="short_swipe_up_app">ปัดขึ้น</string>
+    <string name="short_swipe_down_app">เลื่อนลง</string>
+    <string name="short_swipe_left_app">ปัดไปทางซ้าย</string>
+    <string name="short_swipe_right_app">ปัดไปทางขวา</string>
+    <string name="long_swipe_up_app">กดแบบยาวปัดขึ้น</string>
+    <string name="long_swipe_down_app">กดค้างปัดลง</string>
+    <string name="long_swipe_left_app">กดค้าง ปัดไปทางซ้าย</string>
+    <string name="long_swipe_right_app">กดค้าง ปัดไปทางขวา</string>
+    <string name="open_app">เปิดแอพ</string>
+    <string name="lock_screen">ล็อกหน้าจอ</string>
+    <string name="private_space">พื้นที่ส่วนตัว (%1$s)</string>
+    <string name="show_notifications">แสดงการแจ้งเตือน</string>
+    <string name="show_app_list">แสดงรายการแอพ</string>
+    <string name="show_widget_page">แสดงหน้าวิดเจ็ต</string>
+    <string name="show_notes_manager">ผู้จัดการแสดงบันทึก</string>
+    <string name="show_digital_wellbeing">แสดงความเป็นอยู่ที่ดีทางดิจิทัล</string>
+    <string name="open_quick_settings">การตั้งค่าด่วน</string>
+    <string name="show_recents">แสดงล่าสุด</string>
+    <string name="open_power_dialog">กล่องโต้ตอบพลังงาน</string>
+    <string name="take_a_screenshot">ถ่ายภาพหน้าจอ</string>
+    <string name="previous_page">ไปที่หน้าซ้าย</string>
+    <string name="next_page">ไปที่หน้าขวา</string>
+    <!-- Strings used for notes settings -->
+    <string name="notes_settings_title">หมายเหตุ</string>
+    <string name="display_options">ตัวเลือกการแสดงผล</string>
+    <string name="auto_expand_notes">ขยายหมายเหตุอัตโนมัติ</string>
+    <string name="click_to_edit_delete">คลิกเพื่อแก้ไข/ลบ</string>
+    <string name="notes_colors">หมายเหตุ สี</string>
+    <string name="notes_background_color">หมายเหตุพื้นหลัง</string>
+    <string name="bubble_background_color">พื้นหลังฟองสบู่</string>
+    <string name="bubble_message_color">ข้อความฟองสบู่</string>
+    <string name="bubble_date_time_color">วันที่/เวลาฟองสบู่</string>
+    <string name="bubble_category_color">หมวดหมู่บับเบิ้ล</string>
+    <string name="input_colors">สีอินพุต</string>
+    <string name="message_input_color">การป้อนข้อความ</string>
+    <string name="message_input_hint_color">คำแนะนำการป้อนข้อความ</string>
+    <!-- Strings used for advanced settings -->
+    <string name="advanced_settings_title">การตั้งค่าขั้นสูง</string>
+    <string name="advanced_settings_app_info_title">ข้อมูลแอป</string>
+    <string name="advanced_settings_app_info_description">%1$s</string>
+    <string name="advanced_settings_set_as_default_launcher">ตั้งเป็นตัวเรียกใช้งานเริ่มต้น</string>
+    <string name="advanced_settings_set_as_default_launcher_description">ตั้ง Multi Launcher ให้เป็นแอปหลักเริ่มต้นของคุณ</string>
+    <string name="advanced_settings_change_default_launcher">เปลี่ยนตัวเรียกใช้งานเริ่มต้น</string>
+    <string name="advanced_settings_change_default_launcher_description">เลือกตัวเปิดใช้อื่นเป็นค่าเริ่มต้นของคุณ</string>
+    <string name="advanced_settings_restart_title">รีสตาร์ทตัวเรียกใช้งาน</string>
+    <string name="advanced_settings_restart_description">คุณได้ลองเปิดและปิดมันแล้วหรือยัง?</string>
+    <string name="advanced_settings_backup_restore_title">การสำรองข้อมูล/กู้คืน</string>
+    <string name="advanced_settings_backup_restore_description">โปรดระวังสิ่งที่คุณปรารถนา?</string>
+    <string name="advanced_settings_backup_restore_backup">สำรองข้อมูล</string>
+    <string name="advanced_settings_backup_restore_restore">คืนค่า</string>
+    <string name="advanced_settings_backup_restore_clear">ล้างข้อมูลทั้งหมด</string>
+    <string name="advanced_settings_theme_title">การสร้างสรรค์ธีม</string>
+    <string name="advanced_settings_theme_description">ปรับแต่งธีมให้เหมาะกับคุณ</string>
+    <string name="advanced_settings_wotd_title">คำศัพท์แห่งวัน</string>
+    <string name="advanced_settings_wotd_description">นำเข้ารายการคำศัพท์แห่งวันที่กำหนดเอง</string>
+    <string name="advanced_settings_theme_download">ดาวน์โหลด</string>
+    <string name="advanced_settings_theme_export">ส่งออก</string>
+    <string name="advanced_settings_theme_import">การนำเข้า</string>
+    <string name="advanced_settings_wotd_download">ดาวน์โหลด</string>
+    <string name="advanced_settings_wotd_import">การนำเข้า</string>
+    <string name="advanced_settings_backup_restore_clear_title">ล้างการตั้งค่า</string>
+    <string name="advanced_settings_backup_restore_clear_description">คุณแน่ใจว่าต้องการทำเช่นนี้หรือไม่?</string>
+    <string name="advanced_settings_backup_restore_clear_yes">ใช่</string>
+    <string name="advanced_settings_backup_restore_clear_no">เลขที่</string>
+    <string name="advanced_settings_help_feedback_title">ช่วยเหลือ &amp; ข้อเสนอแนะ</string>
+    <string name="advanced_settings_community_support_title">การสนับสนุนชุมชน</string>
+    <string name="advanced_settings_share_application_title">แอปพลิเคชั่นแบ่งปัน</string>
+    <string name="advanced_settings_share_application_description">ยกระดับประสบการณ์ของคุณด้วย %1$s!</string>
+    <string name="advanced_settings_share_application_description_addon">รับเลยตอนนี้ที่ %1$s และดูว่าทุกคนกำลังพูดถึงอะไร! %2$s\n</string>
+    <!-- Strings used for about settings -->
+    <string name="about_settings_title">เกี่ยวกับ %1$s</string>
+    <!-- Strings used for expert settings -->
+    <string name="expert_settings_title">ผู้เชี่ยวชาญ</string>
+    <string name="toggleable_items">รายการที่สามารถสลับได้</string>
+    <string name="threshold">เกณฑ์</string>
+    <string name="expert_options_display">แสดงตัวเลือกผู้เชี่ยวชาญ</string>
+    <string name="expert_options_unlocked">ปลดล็อคตัวเลือกผู้เชี่ยวชาญ!</string>
+    <string name="expert_options_tap_hint">%1$d แตะอีกครั้งเพื่อปลดล็อค</string>
+    <string name="settings_text_size">ขนาดตัวอักษรการตั้งค่า</string>
+    <string name="settings_short_threshold">เกณฑ์การปัดสั้น</string>
+    <string name="settings_long_threshold">เกณฑ์การปัดยาว</string>
+    <!-- App Page Strings -->
+    <string name="hidden_apps">แอพที่ซ่อนอยู่</string>
+    <string name="favorite_apps">แอปพลิเคชั่นที่ชื่นชอบ</string>
+    <string name="clear_home_app">เคลียร์โฮมแอพ</string>
+    <!-- Accessibility/Help Strings -->
+    <string name="accessibility_service_name">บริการการดำเนินการ MultiLauncher</string>
+    <string name="accessibility_service_why_we_need">เหตุใดเราจึงต้องได้รับอนุญาตการเข้าถึง</string>
+    <string name="accessibility_service_description">บริการการเข้าถึงนี้ช่วยให้ MultiLauncher สามารถดำเนินการบางอย่างได้ เช่น ล็อกหน้าจอหรือเปิดการตั้งค่าด่วน บริการการเข้าถึงของเราไม่รวบรวมหรือแบ่งปันข้อมูลใดๆ</string>
+    <string name="accessibility_service_more_info">    MultiLauncher ต้องเข้าถึง Accessibility Service เพื่อเปิดใช้คุณสมบัติต่างๆ เช่น:\n\n
+    • การล็อกหน้าจอด้วยท่าทางหรือปุ่มลัด\n
+    • การเปิดแผงการตั้งค่าด่วนอย่างรวดเร็ว\n\n
+    การอนุญาตนี้ช่วยให้ MultiLauncher สามารถดำเนินการเหล่านี้ในนามของคุณได้ แต่เราจะไม่รวบรวม จัดเก็บ หรือแบ่งปันข้อมูลส่วนบุคคลหรือข้อมูลละเอียดอ่อนใดๆ ผ่านบริการนี้\n\n
+    คุณสามารถปิดการใช้งานการเข้าถึงนี้ได้ตลอดเวลาจากการตั้งค่าอุปกรณ์ของคุณ
+    </string>
+    <string name="can_not_delete_system_apps">ไม่สามารถลบแอประบบได้</string>
+    <string name="please_select_app">โปรดเลือกแอป</string>
+    <string name="drawer_list_empty_hint">ไม่พบแอป</string>
+    <string name="long_press_for_settings">กดที่ใดก็ได้ค้างไว้เพื่อตั้งค่า</string>
+    <string name="long_press_to_select_app">กดยาวเพื่อเลือกแอป</string>
+    <string name="long_press_to_select_app_locked">ปลดล็อคแอปหน้าแรกเพื่อเลือกแอป</string>
+    <string name="tap_button_for_notes">แตะโลโก้ตัวเปิดใช้สำหรับบันทึก</string>
+    <string name="swipe_up_for_apps">ปัดขึ้นสำหรับแอปทั้งหมด</string>
+    <string name="app_drawer_tips">เคล็ดลับ: ปัดลงเพื่อปิด เลื่อนเพื่อซ่อนแป้นพิมพ์</string>
+    <!-- PinCode Strings -->
+    <string name="text_authentication_cancel">ยกเลิกการรับรองความถูกต้อง</string>
+    <string name="text_authentication_error">ข้อผิดพลาดในการตรวจสอบสิทธิ์:%1$s(รหัส %2$d)</string>
+    <string name="text_authentication_failed">รับรองความถูกต้องล้มเหลว.</string>
+    <string name="text_biometric_login">การเข้าสู่ระบบไบโอเมตริกซ์ การตั้งค่า MultiLauncher</string>
+    <string name="text_biometric_login_app">การเข้าสู่ระบบไบโอเมตริกซ์สำหรับ %1$s</string>
+    <string name="text_biometric_login_sub">เข้าสู่ระบบโดยใช้ข้อมูลประจำตัวไบโอเมตริกซ์ของคุณ</string>
+    <!-- Crash Strings -->
+    <string name="acra_crash">ชน</string>
+    <string name="acra_dialog_text">ขออภัย %1$s พบปัญหาที่ไม่คาดคิดและจำเป็นต้องปิด โปรดช่วยเราปรับปรุงโดยการส่งรายงานข้อขัดข้อง\n\n%1$s ให้ความสำคัญกับความเป็นส่วนตัวของคุณ และข้อมูลที่รวบรวมจะถูกนำมาใช้เพื่อปรับปรุงเสถียรภาพของแอปเท่านั้น ไม่มีการเก็บรวบรวมข้อมูลส่วนบุคคล ขอบคุณสำหรับการสนับสนุนของคุณ!</string>
+    <string name="acra_send_report">ส่งรายงาน</string>
+    <string name="acra_dont_send">อย่าส่ง</string>
+    <!-- Share Strings -->
+    <string name="share_application">แอปพลิเคชั่นแบ่งปัน</string>
+    <string name="share_note">แบ่งปันบันทึก</string>
+    <!-- Icon Pack Strings -->
+    <string name="choose_icon_pack">เลือกไอคอนแพ็ค</string>
+    <string name="apply_icon_pack">ใช้ไอคอนแพ็ค</string>
+    <string name="applying_icon_pack">ให้ไอคอนของคุณดูสดใหม่…</string>
+    <string name="apply_icon_pack_are_you_sure">คุณแน่ใจหรือไม่ว่าต้องการใช้แพ็คไอคอนนี้\n\n%1$s</string>
+    <string name="apply_to_home">สมัครเข้าบ้าน</string>
+    <string name="apply_to_app_list">สมัครเข้ารายการแอพพลิเคชั่น</string>
+    <string name="default_icon_not_found">ไม่พบไอคอนแอปเริ่มต้นที่สามารถวาดได้</string>
+    <!-- Settings Strings -->
+    <string name="left">ซ้าย</string>
+    <string name="right">ถูกต้อง</string>
+    <string name="center">ศูนย์กลาง</string>
+    <string name="dark">มืด</string>
+    <string name="light">แสงสว่าง</string>
+    <string name="system_default">ระบบ</string>
+    <string name="system_custom">กำหนดเอง</string>
+    <string name="system_custom_plus">กำหนดเอง (%1$s)</string>
+    <string name="restart_launcher">รีสตาร์ทตัวเรียกใช้งาน</string>
+    <string name="delete">ลบ</string>
+    <string name="hide">ซ่อน</string>
+    <string name="show">แสดง</string>
+    <string name="lock">ล็อค</string>
+    <string name="unlock">ปลดล็อค</string>
+    <string name="locked">ล็อค</string>
+    <string name="unlocked">ปลดล็อคแล้ว</string>
+    <string name="pin">เข็มหมุด</string>
+    <string name="unpin">ปลดหมุด</string>
+    <string name="rename">เปลี่ยนชื่อ</string>
+    <string name="tag">แท็ก</string>
+    <string name="info">ข้อมูล</string>
+    <string name="okay">ตกลง</string>
+    <string name="apply">นำมาใช้</string>
+    <string name="reset">รีเซ็ต</string>
+    <string name="cancel">ยกเลิก</string>
+    <string name="save">บันทึก</string>
+    <string name="disabled">พิการ</string>
+    <string name="open">เปิด</string>
+    <string name="close">ปิด</string>
+    <string name="next">ต่อไป</string>
+    <string name="start">เริ่ม</string>
+    <string name="copy">สำเนา</string>
+    <string name="celsius">เซลเซียส</string>
+    <string name="fahrenheit">ฟาเรนไฮต์</string>
+    <string name="home_button_phone">โทรศัพท์</string>
+    <string name="home_button_messages">ข้อความ</string>
+    <string name="home_button_camera">กล้อง</string>
+    <string name="home_button_photos">ภาพถ่าย</string>
+    <string name="home_button_web">เว็บไซต์</string>
+    <string name="home_button_settings">การตั้งค่า</string>
+    <string name="home_button_logo">โลโก้</string>
+    <string name="applist_button_web">เว็บไซต์</string>
+    <string name="applist_button_contacts">ติดต่อเรา</string>
+    <string name="allow">อนุญาต</string>
+    <string name="deny">ปฏิเสธ</string>
+    <string name="send">ส่ง</string>
+    <string name="message_hint">ใส่ข้อความ…</string>
+    <string name="message_category">หมวดหมู่: %1$s</string>
+    <!-- Permissions Strings -->
+    <string name="permission_required">ต้องได้รับอนุญาต</string>
+    <string name="access_usage_data_permission">หากต้องการดำเนินการต่อ โปรดเปิดสิทธิ์การเข้าถึงข้อมูลการใช้งานในการตั้งค่าอุปกรณ์ของคุณ</string>
+    <string name="goto_settings">ไปที่การตั้งค่า</string>
+    <!-- Widget Stings -->
+    <string name="widgets_select_widget">เลือกวิดเจ็ต</string>
+    <string name="widgets_add_widget">เพิ่มวิดเจ็ต</string>
+    <string name="widgets_edit_widget">แก้ไขวิดเจ็ต</string>
+    <string name="widgets_stop_editing_widget">หยุดการแก้ไขวิดเจ็ต</string>
+    <string name="widgets_reset_widget">รีเซ็ตวิดเจ็ตทั้งหมด</string>
+    <string name="widgets_remove_widget">ลบวิดเจ็ตทั้งหมด</string>
+    <string name="widgets_resize">ปรับขนาด</string>
+    <string name="widgets_exit_resize">ออกปรับขนาด</string>
+    <string name="widgets_remove">ลบวิดเจ็ต</string>
+    <string name="widgets_open">เปิดแอป</string>
+    <string name="widgets_view_in_store">ดูแอปในร้านค้า</string>
+    <string name="widgets_settings">การตั้งค่าวิดเจ็ต</string>
+    <string name="widgets_not_added">ยังไม่มีการเพิ่มวิดเจ็ต กดค้างไว้เพื่อเพิ่มวิดเจ็ต</string>
+    <!-- Private Spaces Strings -->
+    <string name="alert_requires_android_v">ฟังก์ชันนี้ต้องใช้ Android 15 ขึ้นไป</string>
+    <string name="toast_private_space_default_home_screen">MultiLauncher จะต้องเป็นหน้าจอหลักเริ่มต้นเพื่อเข้าถึงพื้นที่ส่วนตัว</string>
+    <string name="toast_private_space_locked">พื้นที่ส่วนตัวถูกล็อค</string>
+    <string name="toast_private_space_unlocked">พื้นที่ส่วนตัวปลดล็อค</string>
+    <string name="toast_private_space_not_available">พื้นที่ส่วนตัวไม่สามารถใช้งานได้</string>
+    <string name="notes_list_empty_hint">เริ่มต้นบันทึกแรกของคุณด้านล่างนี้</string>
+    <string name="confirm_delete_title">ลบหมายเหตุ</string>
+    <string name="confirm_delete_message">คุณแน่ใจว่าต้องการลบบันทึกนี้หรือไม่?</string>
+    <string name="edit_note">แก้ไขหมายเหตุ</string>
+    <string name="category">หมวดหมู่</string>
+    <string name="priority">ลำดับความสำคัญ</string>
+    <string name="settings_context_menu_title">เมนูบริบท</string>
+    <string name="settings_context_menu_option">เลือกสินค้าที่จะแสดง</string>
+    <string name="settings_home_buttons_title">ปุ่มโฮม</string>
+    <string name="settings_home_buttons_option">เลือกสินค้าที่จะแสดง</string>
+    <string name="settings_applist_buttons_title">ปุ่มรายการแอป</string>
+    <string name="settings_applist_buttons_option">เลือกสินค้าที่จะแสดง</string>
+    <string name="settings_source_code">รหัสต้นฉบับ</string>
+    <string name="settings_donations">การบริจาค</string>
+    <string name="settings_credits">เครดิต</string>
+    <string-array name="priorities">
+        <item>ต่ำ</item>
+        <item>ปานกลาง</item>
+        <item>สูง</item>
+    </string-array>
+    <string-array name="categories">
+        <item>ไม่มี</item>
+        <item>วันครบรอบ</item>
+        <item>การนัดหมาย</item>
+        <item>วันเกิด</item>
+        <item>งานบ้าน</item>
+        <item>ความคิดสร้างสรรค์</item>
+        <item>ความบันเทิง</item>
+        <item>การทำธุระ</item>
+        <item>การเงิน</item>
+        <item>ฟิตเนส</item>
+        <item>เป้าหมาย</item>
+        <item>สุขภาพ</item>
+        <item>งานอดิเรก</item>
+        <item>บ้าน</item>
+        <item>การเรียนรู้</item>
+        <item>ส่วนตัว</item>
+        <item>โครงการ</item>
+        <item>ช้อปปิ้ง</item>
+        <item>ทางสังคม</item>
+        <item>ศึกษา</item>
+        <item>การท่องเที่ยว</item>
+        <item>งาน</item>
+    </string-array>
+</resources>

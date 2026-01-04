@@ -34,6 +34,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.mLauncher"
+        android:localeConfig="@xml/locales_config"
         tools:targetApi="tiramisu">
         <activity
             android:name=".ui.widgets.WidgetActivity"

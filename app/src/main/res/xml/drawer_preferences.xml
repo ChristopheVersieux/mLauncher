@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="@string/search">
+        <SwitchPreferenceCompat
+            android:key="hide_search_view"
+            android:title="@string/hide_search_view"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="auto_show_keyboard"
+            android:title="@string/auto_show_keyboard"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/layout_positioning">
+        <ListPreference
+            android:key="drawer_alignment"
+            android:title="@string/drawer_alignment"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

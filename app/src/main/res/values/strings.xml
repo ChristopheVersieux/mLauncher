@@ -41,6 +41,23 @@
     <string name="settings_notes_title">Notes</string>
     <string name="settings_notes_description">Personalize your notes to match your style.</string>
 
+    <!-- New Settings Categories -->
+    <string name="settings_general_title">General</string>
+    <string name="settings_general_description">Language, theme, app behavior</string>
+
+    <string name="settings_widget_title">Widgets</string>
+    <string name="settings_widget_description">Add and configure home screen widgets</string>
+
+    <string name="settings_home_title">Home</string>
+    <string name="settings_home_description">Customize your home screen layout</string>
+
+    <string name="settings_drawer_title">Drawer</string>
+    <string name="settings_drawer_description">App list, search, and shortcuts</string>
+
+    <string name="settings_about_description">Version, licenses, and credits</string>
+
+    <string name="app_language_description">Open system language settings</string>
+
     <!-- Favorite Apps -->
     <!-- Favorite Apps -->
     <string name="settings_favorite_apps_title">Favorite Apps</string>
@@ -137,6 +154,9 @@
     <string name="alignment_to_bottom">Align to Bottom</string>
 
     <string name="visibility_display">Visibility &amp; Display</string>
+
+    <string name="auto_text_color">Auto Text Color</string>
+    <string name="auto_text_color_description">Automatically adjust text color based on wallpaper brightness</string>
 
     <string name="show_status_bar">Show Status bar</string>
     <string name="show_navigation_bar">Show Navigation bar</string>

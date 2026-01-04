@@ -41,7 +41,7 @@ import app.wazabe.mlauncher.data.AppListItem
 import app.wazabe.mlauncher.data.Constants
 import app.wazabe.mlauncher.data.Constants.AppDrawerFlag
 import app.wazabe.mlauncher.data.Prefs
-import app.wazabe.mlauncher.databinding.AdapterAppDrawerBinding
+
 import app.wazabe.mlauncher.helper.IconCacheTarget
 import app.wazabe.mlauncher.helper.IconPackHelper.getSafeAppIcon
 import app.wazabe.mlauncher.helper.dp2px
@@ -71,12 +71,11 @@ class AppDrawerAdapter(
     private val appInfoListener: (AppListItem) -> Unit
 ) : RecyclerView.Adapter<AppDrawerAdapter.ViewHolder>(), Filterable {
 
-    private lateinit var prefs: Prefs
+    private var prefs = Prefs(fragment.requireContext())
     private var appFilter = createAppFilter()
     var location: Int = 0
     var appsList: MutableList<AppListItem> = mutableListOf()
     var appFilteredList: MutableList<AppListItem> = mutableListOf()
-    private lateinit var binding: AdapterAppDrawerBinding
     private lateinit var biometricHelper: BiometricHelper
 
     // Add icon cache
@@ -86,16 +85,16 @@ class AppDrawerAdapter(
     private var isBangSearch = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        binding = AdapterAppDrawerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        prefs = Prefs(parent.context)
+        val prefs = Prefs(parent.context)
+        val layoutRes = when (prefs.drawerAlignment) {
+            Constants.Gravity.Left -> R.layout.adapter_app_drawer_left
+            Constants.Gravity.Center -> R.layout.adapter_app_drawer_center
+            Constants.Gravity.Right -> R.layout.adapter_app_drawer_right
+        }
+        val view = LayoutInflater.from(parent.context).inflate(layoutRes, parent, false)
+        
         biometricHelper = BiometricHelper(fragment.requireActivity())
-        val fontColor = prefs.appColor
-        binding.appTitle.setTextColor(fontColor)
-
-        binding.appTitle.textSize = prefs.appSize.toFloat()
-        val padding: Int = prefs.textPaddingSize
-        binding.appTitle.setPadding(0, padding, 0, padding)
-        return ViewHolder(binding)
+        return ViewHolder(view)
     }
 
     fun getItemAt(position: Int): AppListItem? {
@@ -415,26 +414,27 @@ class AppDrawerAdapter(
     }
 
     class ViewHolder(
-        itemView: AdapterAppDrawerBinding
-    ) : RecyclerView.ViewHolder(itemView.root) {
-        val appHide: TextView = itemView.appHide
-        val appLock: TextView = itemView.appLock
-        val appRenameEdit: EditText = itemView.appRenameEdit
-        val appSaveRename: TextView = itemView.appSaveRename
-        val appTagEdit: EditText = itemView.appTagEdit
-        val appSaveTag: TextView = itemView.appSaveTag
+        view: View
+    ) : RecyclerView.ViewHolder(view) {
+        val appHide: TextView = view.findViewById(R.id.appHide)
+        val appLock: TextView = view.findViewById(R.id.appLock)
+        val appRenameEdit: EditText = view.findViewById(R.id.appRenameEdit)
+        val appSaveRename: TextView = view.findViewById(R.id.appSaveRename)
+        val appTagEdit: EditText = view.findViewById(R.id.appTagEdit)
+        val appSaveTag: TextView = view.findViewById(R.id.appSaveTag)
 
-        val appHideLayout: LinearLayout = itemView.appHideLayout
-        val appRenameLayout: LinearLayout = itemView.appRenameLayout
-        val appTagLayout: LinearLayout = itemView.appTagLayout
-        private val appRename: TextView = itemView.appRename
-        private val appTag: TextView = itemView.appTag
-        val appPin: TextView = itemView.appPin
-        val appTitle: TextView = itemView.appTitle
-        val appTitleFrame: FrameLayout = itemView.appTitleFrame
-        private val appClose: TextView = itemView.appClose
-        private val appInfo: TextView = itemView.appInfo
-        private val appDelete: TextView = itemView.appDelete
+        val appHideLayout: LinearLayout = view.findViewById(R.id.appHideLayout)
+        val appRenameLayout: LinearLayout = view.findViewById(R.id.appRenameLayout)
+        val appTagLayout: LinearLayout = view.findViewById(R.id.appTagLayout)
+        private val appRename: TextView = view.findViewById(R.id.appRename)
+        private val appTag: TextView = view.findViewById(R.id.appTag)
+        val appPin: TextView = view.findViewById(R.id.appPin)
+        val appTitle: TextView = view.findViewById(R.id.appTitle)
+        val appTitleFrame: LinearLayout = view.findViewById(R.id.appTitleFrame)
+        private val appClose: TextView = view.findViewById(R.id.appClose)
+        private val appInfo: TextView = view.findViewById(R.id.appInfo)
+        private val appDelete: TextView = view.findViewById(R.id.appDelete)
+        private val appIcon: android.widget.ImageView = view.findViewById(R.id.appIcon)
 
         @SuppressLint("RtlHardcoded", "NewApi")
         fun bind(
@@ -447,7 +447,10 @@ class AppDrawerAdapter(
             iconCache: ConcurrentHashMap<String, Drawable?>,
             iconLoadingScope: CoroutineScope,
             prefs: Prefs
-        ) = with(itemView) {
+        ) {
+            val context = itemView.context
+            val resources = itemView.resources
+            val label = appListItem.label
 
             val contextMenuFlags = prefs.getMenuFlags("CONTEXT_MENU_FLAGS", "0011111")
 
@@ -561,16 +564,17 @@ class AppDrawerAdapter(
             // ----------------------------
             // 5️⃣ App title
             appTitle.text = appListItem.label
+            appTitle.setTextColor(prefs.appColor)
+            appTitle.textSize = prefs.appSize.toFloat()
 
             if (app.wazabe.mlauncher.Mlauncher.prefs.launcherFont != "system") {
                 appTitle.typeface = app.wazabe.mlauncher.Mlauncher.globalTypeface
             }
 
-            val params = appTitle.layoutParams as FrameLayout.LayoutParams
-            params.gravity = appLabelGravity
-            appTitle.layoutParams = params
-            val padding = dp2px(resources, 24)
-            appTitle.updatePadding(left = padding, right = padding)
+            // Programmatic gravity and padding removed: now handled by XML layouts
+            // (adapter_app_drawer_left/right/center.xml)
+            val padding: Int = prefs.textPaddingSize
+            appTitleFrame.updatePadding(top = padding, bottom = padding)
 
             // ----------------------------
             // 6️⃣ Icon loading off main thread
@@ -618,38 +622,19 @@ class AppDrawerAdapter(
         }
 
 
-        // Helper to set icon on appTitle with correct size and alignment
+        // Helper to set icon on appIcon ImageView
         private fun setAppTitleIcon(appTitle: TextView, icon: Drawable?, prefs: Prefs) {
             if (icon == null || prefs.iconPackAppList == Constants.IconPacks.Disabled) {
-                appTitle.setCompoundDrawables(null, null, null, null)
+                appIcon.visibility = android.view.View.GONE
                 return
             }
-            val iconSize = (prefs.appSize * 1.4).toInt()
-            val iconPadding = (iconSize / 1.2).toInt()
-            icon.setBounds(
-                0,
-                0,
-                ((iconSize * 1.6).toInt()),
-                ((iconSize * 1.6).toInt())
-            )
-            when (prefs.drawerAlignment) {
-                Constants.Gravity.Left -> {
-                    appTitle.setCompoundDrawables(icon, null, null, null)
-                    appTitle.compoundDrawablePadding = iconPadding
-                }
-
-                Constants.Gravity.Right -> {
-                    appTitle.setCompoundDrawables(null, null, icon, null)
-                    appTitle.compoundDrawablePadding = iconPadding
-                }
-
-                else -> appTitle.setCompoundDrawables(null, null, null, null)
-            }
+            appIcon.visibility = android.view.View.VISIBLE
+            appIcon.setImageDrawable(icon)
         }
 
         // Clear icon when view is recycled
         fun clearIcon() {
-            appTitle.setCompoundDrawables(null, null, null, null)
+            appIcon.setImageDrawable(null)
         }
     }
 }

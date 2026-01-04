@@ -45,5 +45,10 @@
         android:label="appLocationSearchFragment"
         tools:layout="@layout/fragment_location_search" />
 
+    <fragment
+        android:id="@+id/appListFragment"
+        android:name="app.wazabe.mlauncher.ui.AppDrawerFragment"
+        android:label="@string/settings_hidden_apps_title"
+        tools:layout="@layout/fragment_app_drawer" />
 
 </navigation>

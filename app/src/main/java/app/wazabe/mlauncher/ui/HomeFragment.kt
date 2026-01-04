@@ -1418,8 +1418,16 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
             // On garde uniquement la logique du bas ici
             val basePeekHeight = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 30f, resources.displayMetrics
+                TypedValue.COMPLEX_UNIT_DIP, 24f, resources.displayMetrics
             ).toInt()
+            
+            // Push search down prevents it from being visible in peek area (Nav Bar + 24dp Buffer)
+            // We use a spacer view instead of margin on searchview to avoid layout issues
+            val spacerParams = drawerBinding.peekSpacer.layoutParams
+            val buffer = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60f, resources.displayMetrics).toInt()
+            spacerParams.height = systemBars.bottom + buffer
+            drawerBinding.peekSpacer.layoutParams = spacerParams
+            
             drawerBehavior.peekHeight = basePeekHeight + systemBars.bottom
             insets
         }
@@ -1436,12 +1444,14 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 // Si fermé (0.0) -> marge = 0
                 // Si ouvert (1.0) -> marge = statusBarSize
                 headerParams.topMargin = (slideOffset * statusBarSize).toInt()
-
                 drawerBinding.drawerHeader.layoutParams = headerParams
                 
-                // Hide search bar when collapsed
-                drawerBinding.search.alpha = slideOffset
-                drawerBinding.search.isVisible = slideOffset > 0.1f
+                // Animate peekSpacer: full height when collapsed (0), minimal when expanded (1)
+                val maxSpacerHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 120f, resources.displayMetrics).toInt()
+                val minSpacerHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, resources.displayMetrics).toInt()
+                val spacerParams = drawerBinding.peekSpacer.layoutParams
+                spacerParams.height = (maxSpacerHeight - (slideOffset * (maxSpacerHeight - minSpacerHeight))).toInt()
+                drawerBinding.peekSpacer.layoutParams = spacerParams
             }
         })
 

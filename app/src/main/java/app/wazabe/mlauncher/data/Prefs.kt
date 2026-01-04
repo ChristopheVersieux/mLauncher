@@ -199,6 +199,10 @@ class Prefs(val context: Context) {
         get() = getSetting(FORCE_COLORED_WALLPAPER, false)
         set(value) = prefsNormal.edit { putBoolean(FORCE_COLORED_WALLPAPER, value) }
 
+    var autoTextColor: Boolean
+        get() = getSetting(AUTO_TEXT_COLOR, true)
+        set(value) = prefsNormal.edit { putBoolean(AUTO_TEXT_COLOR, value) }
+
     var openAppOnEnter: Boolean
         get() = getSetting(OPEN_APP_ON_ENTER, false)
         set(value) = prefsNormal.edit { putBoolean(OPEN_APP_ON_ENTER, value) }

@@ -88,7 +88,7 @@
         android:layout_height="match_parent"
         android:background="@android:color/transparent"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="60dp"
+        app:behavior_peekHeight="24dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <include

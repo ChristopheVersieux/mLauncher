@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.RecyclerView
@@ -152,7 +153,7 @@ class ContactDrawerAdapter(
         itemView: AdapterAppDrawerBinding,
     ) : RecyclerView.ViewHolder(itemView.root) {
         private val appTitle: TextView = itemView.appTitle
-        private val appTitleFrame: FrameLayout = itemView.appTitleFrame
+        private val appTitleFrame: LinearLayout = itemView.appTitleFrame
 
         fun bind(
             contactLabelGravity: Int,

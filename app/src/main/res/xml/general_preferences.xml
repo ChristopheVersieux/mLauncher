@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="@string/personalization">
+        <ListPreference
+            android:key="APP_THEME"
+            android:title="@string/theme_mode"
+            android:entries="@array/theme_mode_entries"
+            android:entryValues="@array/theme_mode_values"
+            android:defaultValue="System"
+            app:useSimpleSummaryProvider="true" />
+
+        <Preference
+            android:key="pref_app_language"
+            android:title="@string/app_language"
+            android:summary="@string/app_language_description" />
+
+        <ListPreference
+            android:key="LAUNCHER_FONT"
+            android:title="@string/font_family"
+            android:defaultValue="system"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/haptic_feedback">
+        <SwitchPreferenceCompat
+            android:key="HAPTIC_FEEDBACK"
+            android:title="@string/haptic_feedback"
+            android:defaultValue="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/visibility_display">
+        <SwitchPreferenceCompat
+            android:key="AUTO_TEXT_COLOR"
+            android:title="@string/auto_text_color"
+            android:summary="@string/auto_text_color_description"
+            android:defaultValue="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

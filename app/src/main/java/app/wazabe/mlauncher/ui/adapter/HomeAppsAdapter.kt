@@ -38,7 +38,14 @@ class HomeAppsAdapter(
 
         // Application du style (taille, couleur) depuis les prefs
         holder.textView.textSize = prefs.appSize.toFloat()
-        holder.textView.setTextColor(prefs.appColor)
+        
+        // Auto text color based on wallpaper brightness
+        val textColor = if (prefs.autoTextColor) {
+            app.wazabe.mlauncher.helper.utils.WallpaperColorAnalyzer.getRecommendedTextColor(holder.itemView.context)
+        } else {
+            prefs.appColor
+        }
+        holder.textView.setTextColor(textColor)
 
         // Gestion de l'icône (Compound Drawable)
         val appModel = prefs.getHomeAppModel(position)
