@@ -8,6 +8,10 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.LayerDrawable
+import androidx.core.graphics.ColorUtils
+import android.graphics.PorterDuff
 import android.os.UserHandle
 import android.text.Editable
 import android.text.TextWatcher
@@ -21,6 +25,7 @@ import android.widget.Filterable
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.view.Gravity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.biometric.BiometricPrompt
 import androidx.core.view.isVisible
@@ -28,6 +33,7 @@ import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.github.droidworksstudio.common.AppLogger
+import com.github.droidworksstudio.common.ColorIconsExtensions
 
 import com.github.droidworksstudio.fuzzywuzzy.FuzzyFinder
 import app.wazabe.mlauncher.R
@@ -175,6 +181,120 @@ class AppDrawerAdapter(
         }
 
         autoLaunch(position)
+
+        holder.appTitleFrame.setOnLongClickListener {
+             val openApp = flag == AppDrawerFlag.LaunchApp || flag == AppDrawerFlag.HiddenApps
+             if (!openApp) return@setOnLongClickListener true
+
+             val popup = androidx.appcompat.widget.PopupMenu(holder.itemView.context, holder.appTitle, Gravity.START)
+             val menu = popup.menu
+             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                 menu.setGroupDividerEnabled(true)
+             }
+
+             try {
+                val field = popup.javaClass.getDeclaredField("mPopup")
+                field.isAccessible = true
+                val menuPopupHelper = field.get(popup)
+                val classPopupHelper = Class.forName(menuPopupHelper.javaClass.name)
+                val setForceIcons = classPopupHelper.getMethod("setForceShowIcon", Boolean::class.javaPrimitiveType)
+                setForceIcons.invoke(menuPopupHelper, true)
+             } catch (e: Exception) { e.printStackTrace() }
+
+             val cachedIcon = iconCache[appModel.activityPackage]
+             val extractedColor = if (cachedIcon != null) {
+                 try {
+                     ColorIconsExtensions.getDominantColor(cachedIcon)
+                 } catch (e: Exception) {
+                     prefs.appColor
+                 }
+             } else {
+                 prefs.appColor
+             }
+
+             fun getLayeredIcon(resId: Int): Drawable? {
+                 val ctx = holder.itemView.context
+                 val icon = AppCompatResources.getDrawable(ctx, resId)?.mutate() ?: return null
+                 icon.setColorFilter(extractedColor, PorterDuff.Mode.SRC_IN)
+
+                 val background = GradientDrawable().apply {
+                     shape = GradientDrawable.OVAL
+                     setColor(ColorUtils.setAlphaComponent(extractedColor, 40))
+                 }
+
+                 val layerDrawable = LayerDrawable(arrayOf(background, icon))
+                 val density = ctx.resources.displayMetrics.density
+                 val inset = (6 * density).toInt()
+                 layerDrawable.setLayerInset(1, inset, inset, inset, inset)
+                 return layerDrawable
+             }
+             
+             // ...
+             val pkg = appModel.activityPackage
+             val isLocked = prefs.lockedApps.contains(pkg)
+             val isPinned = prefs.pinnedApps.contains(pkg)
+             val isHidden = (flag == AppDrawerFlag.HiddenApps)
+             val contextMenuFlags = prefs.getMenuFlags("CONTEXT_MENU_FLAGS", "0011111")
+
+             if (contextMenuFlags[1]) {
+                  val title = if (isLocked) holder.itemView.context.getString(R.string.unlock) else holder.itemView.context.getString(R.string.lock)
+                  val icon = if (isLocked) R.drawable.padlock_off else R.drawable.padlock
+                  menu.add(0, 1, 0, title).icon = getLayeredIcon(icon)
+             }
+             if (contextMenuFlags[0]) {
+                  val title = if (isPinned) holder.itemView.context.getString(R.string.unpin) else holder.itemView.context.getString(R.string.pin)
+                  val icon = if (isPinned) R.drawable.pin_off else R.drawable.pin
+                  menu.add(0, 2, 1, title).icon = getLayeredIcon(icon)
+             }
+             if (contextMenuFlags[2]) {
+                  val title = if (isHidden) holder.itemView.context.getString(R.string.show) else holder.itemView.context.getString(R.string.hide)
+                  val icon = if (isHidden) R.drawable.visibility else R.drawable.visibility_off
+                  menu.add(0, 3, 2, title).icon = getLayeredIcon(icon)
+             }
+
+             if (contextMenuFlags[3]) {
+                  menu.add(1, 4, 3, holder.itemView.context.getString(R.string.rename)).icon = getLayeredIcon(R.drawable.ic_rename)
+             }
+             if (contextMenuFlags[4]) {
+                  menu.add(1, 5, 4, holder.itemView.context.getString(R.string.tag)).icon = getLayeredIcon(R.drawable.ic_tag)
+             }
+             menu.add(1, 6, 5, "App Info").icon = getLayeredIcon(R.drawable.ic_info)
+             
+             menu.add(2, 7, 6, "Uninstall").icon = getLayeredIcon(R.drawable.ic_delete)
+
+             popup.setOnMenuItemClickListener { item ->
+                 when(item.itemId) {
+                     1 -> holder.appLock.performClick()
+                     2 -> holder.appPin.performClick()
+                     3 -> holder.appHide.performClick()
+                     4 -> {
+                         holder.appRenameEdit.hint = appModel.activityLabel
+                         holder.appRenameLayout.isVisible = true
+                         holder.appHideLayout.isVisible = false
+                         holder.appRenameEdit.showKeyboard()
+                         holder.appRenameEdit.imeOptions = EditorInfo.IME_ACTION_DONE
+                         val act = holder.itemView.context as? Activity
+                         act?.findViewById<View>(R.id.sidebar_container)?.isVisible = false
+                         visibleHideLayouts.add(holder.absoluteAdapterPosition)
+                     }
+                     5 -> {
+                         holder.appTagEdit.hint = appModel.activityLabel
+                         holder.appTagLayout.isVisible = true
+                         holder.appHideLayout.isVisible = false
+                         holder.appTagEdit.showKeyboard()
+                         holder.appTagEdit.imeOptions = EditorInfo.IME_ACTION_DONE
+                         val act = holder.itemView.context as? Activity
+                         act?.findViewById<View>(R.id.sidebar_container)?.isVisible = false
+                         visibleHideLayouts.add(holder.absoluteAdapterPosition)
+                     }
+                     6 -> appInfoListener(appModel)
+                     7 -> appDeleteListener(appModel)
+                 }
+                 true
+             }
+             popup.show()
+             true
+        }
     }
 
     override fun getItemCount(): Int = appFilteredList.size
@@ -307,14 +427,14 @@ class AppDrawerAdapter(
         val appTagEdit: EditText = itemView.appTagEdit
         val appSaveTag: TextView = itemView.appSaveTag
 
-        private val appHideLayout: LinearLayout = itemView.appHideLayout
-        private val appRenameLayout: LinearLayout = itemView.appRenameLayout
-        private val appTagLayout: LinearLayout = itemView.appTagLayout
+        val appHideLayout: LinearLayout = itemView.appHideLayout
+        val appRenameLayout: LinearLayout = itemView.appRenameLayout
+        val appTagLayout: LinearLayout = itemView.appTagLayout
         private val appRename: TextView = itemView.appRename
         private val appTag: TextView = itemView.appTag
-        private val appPin: TextView = itemView.appPin
-        private val appTitle: TextView = itemView.appTitle
-        private val appTitleFrame: FrameLayout = itemView.appTitleFrame
+        val appPin: TextView = itemView.appPin
+        val appTitle: TextView = itemView.appTitle
+        val appTitleFrame: FrameLayout = itemView.appTitleFrame
         private val appClose: TextView = itemView.appClose
         private val appInfo: TextView = itemView.appInfo
         private val appDelete: TextView = itemView.appDelete
@@ -481,22 +601,7 @@ class AppDrawerAdapter(
             // ----------------------------
             // 7️⃣ Click listeners
             val sidebarContainer = (context as? Activity)?.findViewById<View>(R.id.sidebar_container)
-            appTitleFrame.apply {
-                setOnClickListener { appClickListener(appListItem) }
-                setOnLongClickListener {
-                    val openApp = flag == AppDrawerFlag.LaunchApp || flag == AppDrawerFlag.HiddenApps
-                    if (openApp) {
-                        try {
-                            appDelete.alpha = if (context.isSystemApp(packageName)) 0.3f else 1f
-                            appHideLayout.isVisible = true
-                            sidebarContainer?.isVisible = false
-                            visibleHideLayouts.add(absoluteAdapterPosition)
-                        } catch (_: Exception) {
-                        }
-                    }
-                    true
-                }
-            }
+            appTitleFrame.setOnClickListener { appClickListener(appListItem) }
 
             appInfo.setOnClickListener { appInfoListener(appListItem) }
             appDelete.setOnClickListener { appDeleteListener(appListItem) }

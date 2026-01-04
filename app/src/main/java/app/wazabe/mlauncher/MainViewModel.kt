@@ -107,6 +107,33 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private val launcherAppsCallback = object : LauncherApps.Callback() {
+        override fun onPackageAdded(packageName: String, user: UserHandle) {
+            AppLogger.d("MainViewModel", "Package added: $packageName")
+            getAppList()
+        }
+
+        override fun onPackageRemoved(packageName: String, user: UserHandle) {
+            AppLogger.d("MainViewModel", "Package removed: $packageName")
+            getAppList()
+        }
+
+        override fun onPackageChanged(packageName: String, user: UserHandle) {
+            AppLogger.d("MainViewModel", "Package changed: $packageName")
+            getAppList()
+        }
+
+        override fun onPackagesAvailable(packageNames: Array<out String>?, user: UserHandle?, replacing: Boolean) {
+            AppLogger.d("MainViewModel", "Packages available")
+            getAppList()
+        }
+
+        override fun onPackagesUnavailable(packageNames: Array<out String>?, user: UserHandle?, replacing: Boolean) {
+            AppLogger.d("MainViewModel", "Packages unavailable")
+            getAppList()
+        }
+    }
+
     init {
         prefsNormal.registerOnSharedPreferenceChangeListener(pinnedAppsListener)
 
@@ -124,6 +151,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         // Fast immediate load from cache, then background refresh
         getAppList()
         getContactList()
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            val launcherApps = appContext.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
+            launcherApps.registerCallback(launcherAppsCallback)
+        }
     }
 
     fun selectedApp(fragment: Fragment, app: AppListItem, flag: AppDrawerFlag, n: Int = 0) {
@@ -392,6 +424,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             appContext.contentResolver.unregisterContentObserver(contactsObserver)
         } catch (t: Throwable) {
             AppLogger.e("MainViewModel", "Failed to unregister contacts observer: ${t.message}", t)
+        }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            val launcherApps = appContext.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
+            launcherApps.unregisterCallback(launcherAppsCallback)
         }
     }
 

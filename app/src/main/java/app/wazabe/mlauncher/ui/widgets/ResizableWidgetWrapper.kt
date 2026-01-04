@@ -33,8 +33,10 @@ class ResizableWidgetWrapper(
     val hostView: AppWidgetHostView,
     val widgetInfo: AppWidgetProviderInfo,
     val appWidgetHost: AppWidgetHost,
+    val appWidgetId: Int,
     val onUpdate: () -> Unit,
     val onDelete: () -> Unit,
+    val onLongPress: () -> Unit = {},
     val isEditingProvider: () -> Boolean,
     private val gridColumns: Int,
     private val cellMargin: Int,
@@ -70,9 +72,6 @@ class ResizableWidgetWrapper(
     private var ghostView: View? = null
 
     init {
-
-        AppLogger.d(TAG, "🧩 Initializing wrapper for widget: ${widgetInfo.provider.packageName}")
-
         // Calculate pixel width/height from cells
         post {
             val parentFrame = parent as? FrameLayout
@@ -87,7 +86,6 @@ class ResizableWidgetWrapper(
             val heightPx = (defaultCellsH * (cellHeight + cellMargin)) - cellMargin
 
             layoutParams = LayoutParams(widthPx, heightPx)
-            AppLogger.d(TAG, "📐 layoutParams set to ${widthPx}x${heightPx} for ${defaultCellsW}x${defaultCellsH} cells")
 
             // ✅ Ensure hostView fills wrapper and updates provider with current size
             fillHostView(widthPx, heightPx)
@@ -99,7 +97,6 @@ class ResizableWidgetWrapper(
                 LayoutParams.MATCH_PARENT
             )
         )
-        AppLogger.d(TAG, "✅ HostView added to wrapper")
 
         topHandle.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, handleSize).apply { gravity = Gravity.TOP }
         bottomHandle.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, handleSize).apply { gravity = Gravity.BOTTOM }
@@ -136,9 +133,20 @@ class ResizableWidgetWrapper(
         setHandlesVisible(false)
         attachResizeAndDragHandlers()
     }
-
+    
+    // Intercept long press at the wrapper level to show menu  
+    private val longPressDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+        override fun onLongPress(e: MotionEvent) {
+            AppLogger.d(TAG, "longPressDetector.onLongPress triggered, isEditingProvider=${isEditingProvider()}")
+            if (!isEditingProvider()) {
+                performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+                AppLogger.d(TAG, "Calling showWidgetMenu from longPressDetector")
+                showWidgetMenu()
+            }
+        }
+    })
+    
     private fun fillHostView(parentWidth: Int = width, parentHeight: Int = height) {
-        AppLogger.d(TAG, "fillHostView($parentWidth x $parentHeight) called")
         // 1. Force hostView to fill THIS wrapper
         hostView.layoutParams = LayoutParams(
             LayoutParams.MATCH_PARENT,
@@ -148,10 +156,7 @@ class ResizableWidgetWrapper(
 
         // 2. Use parent’s width/height for widget sizing
         post {
-            if (parentWidth <= 0 || parentHeight <= 0) {
-                AppLogger.w(TAG, "⚠️ Skipping fillHostView — invalid size ($parentWidth x $parentHeight)")
-                return@post
-            }
+            if (parentWidth <= 0 || parentHeight <= 0) return@post
 
             try {
                 val options = Bundle().apply {
@@ -163,11 +168,7 @@ class ResizableWidgetWrapper(
 
                 val appWidgetManager = AppWidgetManager.getInstance(context)
                 appWidgetManager.updateAppWidgetOptions(hostView.appWidgetId, options)
-
-                AppLogger.i(TAG, "✅ fillHostView: using parent size width=$parentWidth, height=$parentHeight")
-            } catch (e: Exception) {
-                AppLogger.e(TAG, "❌ Failed to update widget options: ${e.message}")
-            }
+            } catch (_: Exception) { }
         }
     }
 
@@ -182,7 +183,6 @@ class ResizableWidgetWrapper(
     }
 
     fun setHandlesVisible(visible: Boolean) {
-        AppLogger.d(TAG, "setHandlesVisible($visible)")
         val state = if (visible) VISIBLE else GONE
         topHandle.visibility = state
         bottomHandle.visibility = state
@@ -367,6 +367,7 @@ class ResizableWidgetWrapper(
             // Attach long-press menu and drag to this view
             val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
                 override fun onLongPress(e: MotionEvent) {
+                    AppLogger.d(TAG, "attachDrag.onLongPress triggered, isEditingProvider=${isEditingProvider()}, isResizeMode=$isResizeMode")
                     if (isEditingProvider()) {
                         if (!isResizeMode) {
                             isResizeMode = true
@@ -375,6 +376,11 @@ class ResizableWidgetWrapper(
                         } else {
                             showWidgetMenu()
                         }
+                    } else {
+                        // Not in edit mode - show widget specific menu
+                        view.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+                        AppLogger.d(TAG, "Calling showWidgetMenu from attachDrag")
+                        showWidgetMenu()
                     }
                 }
             })
@@ -384,11 +390,16 @@ class ResizableWidgetWrapper(
             view.setOnTouchListener { v, event ->
                 // Skip handles
                 if (v in skipViews) return@setOnTouchListener false
-                gestureDetector.onTouchEvent(event)
+                
+                // Always pass events to gesture detector for long press detection
+                val gestureResult = gestureDetector.onTouchEvent(event)
+                AppLogger.d(TAG, "Touch event: action=${event.actionMasked}, gestureResult=$gestureResult, isResizeMode=$isResizeMode, isEditingProvider=${isEditingProvider()}")
+                
                 if (isResizeMode) return@setOnTouchListener false
 
-                // 🟡 If not in global edit mode, don't consume — allow normal widget touch behavior
-                if (!isEditingProvider()) return@setOnTouchListener false
+                // 🟡 If not in global edit mode, still return true to allow gesture detector to work
+                // But don't consume the event (return gestureResult) to allow widget interaction
+                if (!isEditingProvider()) return@setOnTouchListener true // Changed from false to allow long press detection
 
                 when (event.actionMasked) {
                     MotionEvent.ACTION_DOWN -> {

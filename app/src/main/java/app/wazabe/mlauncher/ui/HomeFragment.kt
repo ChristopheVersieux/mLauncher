@@ -4,20 +4,19 @@ import HomeAppsAdapter
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.admin.DevicePolicyManager
-import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.ComponentName
 import android.content.Context
 import android.content.Context.VIBRATOR_SERVICE
 import android.content.Intent
-import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
-import android.view.ContextThemeWrapper
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -25,14 +24,15 @@ import android.os.Vibrator
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
-import android.text.format.DateFormat
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
 import android.text.style.SuperscriptSpan
 import android.util.TypedValue
+import android.view.GestureDetector
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -47,6 +47,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.biometric.BiometricPrompt
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
@@ -59,6 +60,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import app.wazabe.mlauncher.MainActivity
 import app.wazabe.mlauncher.MainViewModel
 import app.wazabe.mlauncher.R
+import app.wazabe.mlauncher.data.AppListItem
 import app.wazabe.mlauncher.data.Constants
 import app.wazabe.mlauncher.data.Constants.Action
 import app.wazabe.mlauncher.data.Constants.AppDrawerFlag
@@ -70,20 +72,14 @@ import app.wazabe.mlauncher.databinding.FragmentAppDrawerBottomSheetBinding
 import app.wazabe.mlauncher.databinding.FragmentHomeBinding
 import app.wazabe.mlauncher.helper.IconCacheTarget
 import app.wazabe.mlauncher.helper.IconPackHelper.getSafeAppIcon
-import app.wazabe.mlauncher.helper.WeatherHelper
 import app.wazabe.mlauncher.helper.analytics.AppUsageMonitor
 import app.wazabe.mlauncher.helper.formatMillisToHMS
 import app.wazabe.mlauncher.helper.getHexForOpacity
-import app.wazabe.mlauncher.helper.getNextAlarm
 import app.wazabe.mlauncher.helper.getSystemIcons
 import app.wazabe.mlauncher.helper.hasUsageAccessPermission
 import app.wazabe.mlauncher.helper.initActionService
-import app.wazabe.mlauncher.helper.ismlauncherDefault
 import app.wazabe.mlauncher.helper.openAppInfo
-import app.wazabe.mlauncher.helper.openFirstWeatherApp
-import app.wazabe.mlauncher.helper.receivers.BatteryReceiver
 import app.wazabe.mlauncher.helper.receivers.DeviceAdmin
-import app.wazabe.mlauncher.helper.receivers.PrivateSpaceReceiver
 import app.wazabe.mlauncher.helper.setTopPadding
 import app.wazabe.mlauncher.helper.showPermissionDialog
 import app.wazabe.mlauncher.helper.utils.AppReloader
@@ -91,43 +87,45 @@ import app.wazabe.mlauncher.helper.utils.BiometricHelper
 import app.wazabe.mlauncher.helper.utils.PrivateSpaceManager
 import app.wazabe.mlauncher.helper.wordOfTheDay
 import app.wazabe.mlauncher.listener.GestureAdapter
+import app.wazabe.mlauncher.listener.GestureManager
 import app.wazabe.mlauncher.listener.NotificationDotManager
 import app.wazabe.mlauncher.services.ActionService
 import app.wazabe.mlauncher.ui.adapter.AppDrawerAdapter
 import app.wazabe.mlauncher.ui.adapter.ContactDrawerAdapter
 import app.wazabe.mlauncher.ui.components.DialogManager
 import app.wazabe.mlauncher.ui.widgets.AppWidgetGroup
+import app.wazabe.mlauncher.ui.widgets.LauncherAppWidgetHost
 import app.wazabe.mlauncher.ui.widgets.ResizableWidgetWrapper
 import app.wazabe.mlauncher.ui.widgets.WidgetActivity
 import com.github.creativecodecat.components.views.FontBottomSheetDialogLocked
 import com.github.droidworksstudio.common.AnalyticsHelper
 import com.github.droidworksstudio.common.AppLogger
 import com.github.droidworksstudio.common.ColorIconsExtensions
-import com.github.droidworksstudio.common.ColorManager
 import com.github.droidworksstudio.common.attachGestureManager
-
-import com.github.droidworksstudio.common.isGestureNavigationEnabled
 import com.github.droidworksstudio.common.isSystemApp
 import com.github.droidworksstudio.common.launchCalendar
 import com.github.droidworksstudio.common.openAlarmApp
-import com.github.droidworksstudio.common.openBatteryManager
-import com.github.droidworksstudio.common.openCameraApp
 import com.github.droidworksstudio.common.openDeviceSettings
 import com.github.droidworksstudio.common.openDialerApp
 import com.github.droidworksstudio.common.openDigitalWellbeing
-import com.github.droidworksstudio.common.openPhotosApp
-import com.github.droidworksstudio.common.openTextMessagesApp
-import com.github.droidworksstudio.common.openWebBrowser
 import com.github.droidworksstudio.common.showShortToast
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.absoluteValue
 import kotlin.math.ceil
 
-class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListener, android.content.SharedPreferences.OnSharedPreferenceChangeListener {
+class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListener, SharedPreferences.OnSharedPreferenceChangeListener{
+
+    companion object {
+        private const val TAG = "HomeFragment"
+        private val APP_WIDGET_HOST_ID = "CascadeLauncher".hashCode().absoluteValue
+        private const val GRID_COLUMNS = 14
+        private const val CELL_MARGIN = 16
+        private const val MIN_CELL_W = 2
+        private const val MIN_CELL_H = 1
+    }
 
     private lateinit var prefs: Prefs
     private lateinit var viewModel: MainViewModel
@@ -136,21 +134,16 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     private lateinit var contactsAdapter: ContactDrawerAdapter
     private lateinit var dialogBuilder: DialogManager
     private lateinit var deviceManager: DevicePolicyManager
-    private lateinit var batteryReceiver: BatteryReceiver
+
+
     private lateinit var biometricHelper: BiometricHelper
-    private lateinit var appUsageMonitor: AppUsageMonitor
-    private val handler = Handler(Looper.getMainLooper())
-    
-    // Flag to prevent drawer from opening during initialization
-    private var isDrawerInitializing = true
-    private lateinit var weatherHelper: WeatherHelper
-    private lateinit var privateSpaceReceiver: PrivateSpaceReceiver
+
     private lateinit var vibrator: Vibrator
     private lateinit var homeAppsAdapter: HomeAppsAdapter
 
     private lateinit var widgetDao: WidgetDao
     private lateinit var appWidgetManager: AppWidgetManager
-    private lateinit var appWidgetHost: AppWidgetHost
+    private lateinit var appWidgetHost: LauncherAppWidgetHost
     private val widgetWrappers = mutableListOf<ResizableWidgetWrapper>()
     private var isEditingWidgets: Boolean = false
     private var activeGridDialog: FontBottomSheetDialogLocked? = null
@@ -169,11 +162,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
         val view = binding.root
         prefs = Prefs(requireContext())
-        batteryReceiver = BatteryReceiver()
         dialogBuilder = DialogManager(requireContext(), requireActivity())
-        if (PrivateSpaceManager(requireContext()).isPrivateSpaceSupported()) {
-            privateSpaceReceiver = PrivateSpaceReceiver()
-        }
+
 
         longPressToSelectApp = if (prefs.homeLocked) {
             R.string.long_press_to_select_app_locked
@@ -226,7 +216,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             prefs,
             onClick = { location -> homeAppClicked(location) },
             onLongClick = { location ->
-                showAppList(AppDrawerFlag.SetHomeApp, includeHiddenApps = true, includeRecentApps = false, location)
+                showHomeAppMenu(location)
             }
         )
 
@@ -248,148 +238,72 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         // Handle status bar once per view creation
         setTopPadding(binding.mainLayout)
 
-        weatherHelper = WeatherHelper(
-            requireContext(),
-            viewLifecycleOwner
-        ) { weatherText ->
-            binding.weather.textSize = prefs.batterySize.toFloat()
-            binding.weather.setTextColor(prefs.batteryColor)
-            binding.weather.text = weatherText
-            binding.weather.isVisible = true
-        }
-
-        // Weather updates
-        if (prefs.showWeather) {
-            weatherHelper.getWeather()
-        } else {
-            binding.weather.isVisible = false
-        }
-
         // Update dynamic UI elements
         updateTimeAndInfo()
 
         // Register battery receiver
         context?.let { ctx ->
-            batteryReceiver = BatteryReceiver()
-            ctx.registerReceiver(batteryReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
 
-            // Register private space receiver if supported
-            if (PrivateSpaceManager(ctx).isPrivateSpaceSupported()) {
-                privateSpaceReceiver = PrivateSpaceReceiver()
-                ctx.registerReceiver(privateSpaceReceiver, IntentFilter(Intent.ACTION_PROFILE_AVAILABLE))
-            }
 
             prefs.prefsNormal.registerOnSharedPreferenceChangeListener(this)
         }
-        
-        restoreWidgets()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::appWidgetHost.isInitialized) {
+            appWidgetHost.startListening()
+            restoreWidgets()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (::appWidgetHost.isInitialized) {
+            appWidgetHost.stopListening()
+        }
     }
 
     override fun onStop() {
         super.onStop()
-
         context?.let { ctx ->
-            try {
-                batteryReceiver.let { ctx.unregisterReceiver(it) }
-                if (PrivateSpaceManager(requireContext()).isPrivateSpaceSupported()) {
-                    privateSpaceReceiver.let { ctx.unregisterReceiver(it) }
-                }
-            } catch (e: IllegalArgumentException) {
-                // Receiver not registered — safe to ignore
-                e.printStackTrace()
-            }
             prefs.prefsNormal.unregisterOnSharedPreferenceChangeListener(this)
         }
-
-        appWidgetHost.stopListening()
         dismissDialogs()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 
     private fun updateUIFromPreferences() {
-        AppLogger.e(message="HERE")
-        val locale = prefs.appLanguage.locale()
-        val is24HourFormat = DateFormat.is24HourFormat(requireContext())
-
-        updateTimeAndInfo()
-
         binding.apply {
-            val best12Raw = DateFormat.getBestDateTimePattern(locale, "hm") // 12-hour with AM/PM
-            val best12 = if (prefs.showClockFormat) {
-                best12Raw // keep AM/PM
-            } else {
-                best12Raw.replace("a", "").trim() // strip AM/PM
-            }
-
-            val best24 = DateFormat.getBestDateTimePattern(locale, "Hm") // 24-hour
-
-            val timePattern = if (is24HourFormat) best24 else best12
-
-            clock.format12Hour = timePattern
-            clock.format24Hour = timePattern
-
-            // Date format
-            val datePattern = DateFormat.getBestDateTimePattern(locale, "EEEddMMM")
-            date.format12Hour = datePattern
-            date.format24Hour = datePattern
-
             // Static UI setup
-            date.textSize = prefs.dateSize.toFloat()
-            clock.textSize = prefs.clockSize.toFloat()
-            alarm.textSize = prefs.alarmSize.toFloat()
             dailyWord.textSize = prefs.dailyWordSize.toFloat()
-            battery.textSize = prefs.batterySize.toFloat()
             homeScreenPager.textSize = prefs.appSize.toFloat()
 
-            clock.isVisible = prefs.showClock
-            date.isVisible = prefs.showDate
-            alarm.isVisible = prefs.showAlarm && alarm.text.toString().isNotBlank() && alarm.text.toString() != "No alarm is set."
             dailyWord.isVisible = prefs.showDailyWord && dailyWord.text.toString().isNotBlank()
-            battery.isVisible = prefs.showBattery
-            weather.isVisible = prefs.showWeather
-            totalScreenTime.isVisible = prefs.appUsageStats
-            mainLayout.setBackgroundColor(getHexForOpacity(prefs))
-
-            date.setTextColor(prefs.dateColor)
-            clock.setTextColor(prefs.clockColor)
-            alarm.setTextColor(prefs.alarmClockColor)
             dailyWord.setTextColor(prefs.dailyWordColor)
-            battery.setTextColor(prefs.batteryColor)
-            totalScreenTime.setTextColor(prefs.appColor)
-            setDefaultLauncher.setTextColor(prefs.appColor)
+            
+            // Rounded corners for drawer
+            val radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 28f, resources.displayMetrics)
+            
+            // Drawer must be opaque to cover widgets
+            val bgColor = prefs.backgroundColor
+            val opaqueColor = android.graphics.Color.argb(255, 
+                android.graphics.Color.red(bgColor),
+                android.graphics.Color.green(bgColor),
+                android.graphics.Color.blue(bgColor)
+            )
 
-            val fabList = listOf(fabPhone, fabMessages, fabCamera, fabPhotos, fabBrowser)
-            // fabSettings and fabAction are now in the drawer header
-            fabSettings.isVisible = false
-            fabAction.isVisible = false
-            val fabFlags = prefs.getMenuFlags("HOME_BUTTON_FLAGS", "0000011") // Might return list of wrong size
-            val colors = ColorManager.getRandomHueColors(prefs.shortcutIconsColor, fabList.size)
-
-            for (i in fabList.indices) {
-                val fab = fabList[i]
-
-                val isVisible = if (i < fabFlags.size) fabFlags[i] else false
-                val color = colors[i]
-
-                fab.isVisible = isVisible
-
-                // Skip recoloring for fabAction
-                if (fab != fabAction) {
-                    fab.setColorFilter(
-                        if (prefs.iconRainbowColors) color else prefs.shortcutIconsColor
-                    )
-                }
+            val backgroundDrawable = GradientDrawable().apply {
+                setColor(opaqueColor)
+                cornerRadii = floatArrayOf(radius, radius, radius, radius, 0f, 0f, 0f, 0f)
             }
-
-            // Alignments
-            clock.gravity = prefs.clockAlignment.value()
-            (clock.layoutParams as LinearLayout.LayoutParams).gravity = prefs.clockAlignment.value()
-
-            date.gravity = prefs.dateAlignment.value()
-            (date.layoutParams as LinearLayout.LayoutParams).gravity = prefs.dateAlignment.value()
-
-            alarm.gravity = prefs.alarmAlignment.value()
-            (alarm.layoutParams as LinearLayout.LayoutParams).gravity = prefs.alarmAlignment.value()
+            appDrawerLayout.root.background = backgroundDrawable
+            mainLayout.setBackgroundColor(getHexForOpacity(prefs))
 
             dailyWord.gravity = prefs.dailyWordAlignment.value()
             (dailyWord.layoutParams as LinearLayout.LayoutParams).gravity = prefs.dailyWordAlignment.value()
@@ -401,123 +315,18 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
     private fun updateTimeAndInfo() {
-        val locale = prefs.appLanguage.locale()
-        val is24HourFormat = DateFormat.is24HourFormat(requireContext())
-
         binding.apply {
-
-            val best12Raw = DateFormat.getBestDateTimePattern(locale, "hm") // 12-hour with AM/PM
-            val best12 = if (prefs.showClockFormat) {
-                best12Raw // keep AM/PM
-            } else {
-                best12Raw.replace("a", "").trim() // strip AM/PM
-            }
-
-            val best24 = DateFormat.getBestDateTimePattern(locale, "Hm") // 24-hour
-
-            val timePattern = if (is24HourFormat) best24 else best12
-
-            clock.format12Hour = timePattern
-            clock.format24Hour = timePattern
-
-            // Date format
-            val datePattern = DateFormat.getBestDateTimePattern(locale, "EEEddMMM")
-            date.format12Hour = datePattern
-            date.format24Hour = datePattern
-
-            alarm.text = getNextAlarm(requireContext(), prefs)
             dailyWord.text = wordOfTheDay(requireContext(), prefs)
         }
     }
 
 
     override fun onClick(view: View) {
-        when (view.id) {
-            R.id.clock -> {
-                when (val action = prefs.clickClockAction) {
-                    Action.OpenApp -> openClickClockApp()
-                    else -> handleOtherAction(action)
-                }
-                AnalyticsHelper.logUserAction("Clock Clicked")
-            }
-
-            R.id.date -> {
-                when (val action = prefs.clickDateAction) {
-                    Action.OpenApp -> openClickDateApp()
-                    else -> handleOtherAction(action)
-                }
-                AnalyticsHelper.logUserAction("Date Clicked")
-            }
-
-            R.id.totalScreenTime -> {
-                when (val action = prefs.clickAppUsageAction) {
-                    Action.OpenApp -> openClickUsageApp()
-                    else -> handleOtherAction(action)
-                }
-                AnalyticsHelper.logUserAction("TotalScreenTime Clicked")
-            }
-
-            R.id.setDefaultLauncher -> {
-                viewModel.resetDefaultLauncherApp(requireContext())
-                AnalyticsHelper.logUserAction("SetDefaultLauncher Clicked")
-            }
-
-            R.id.battery -> {
-                context?.openBatteryManager()
-                AnalyticsHelper.logUserAction("Battery Clicked")
-            }
-
-            R.id.weather -> {
-                context?.openFirstWeatherApp()
-                AnalyticsHelper.logUserAction("Weather Clicked")
-            }
-
-            R.id.fabPhone -> {
-                context?.openDialerApp()
-                AnalyticsHelper.logUserAction("fabPhone Clicked")
-            }
-
-            R.id.fabMessages -> {
-                context?.openTextMessagesApp()
-                AnalyticsHelper.logUserAction("fabMessages Clicked")
-            }
-
-            R.id.fabCamera -> {
-                context?.openCameraApp()
-                AnalyticsHelper.logUserAction("fabCamera Clicked")
-            }
-
-            R.id.fabPhotos -> {
-                context?.openPhotosApp()
-                AnalyticsHelper.logUserAction("fabPhotos Clicked")
-            }
-
-            R.id.fabBrowser -> {
-                context?.openWebBrowser()
-                AnalyticsHelper.logUserAction("fabBrowser Clicked")
-            }
-
-            R.id.fabSettings, R.id.drawerFabSettings -> {
-                trySettings()
-                AnalyticsHelper.logUserAction("Settings Clicked")
-            }
-
-            R.id.fabAction, R.id.drawerFabAction -> {
-                when (val action = prefs.clickFloatingAction) {
-                    Action.OpenApp -> openFabActionApp()
-                    else -> handleOtherAction(action)
-                }
-                AnalyticsHelper.logUserAction("Action Clicked")
-            }
-
-            else -> {
-                try { // Launch app
-                    val appLocation = view.id
-                    homeAppClicked(appLocation)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
+        try { // Launch app
+            val appLocation = view.id
+            homeAppClicked(appLocation)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -532,7 +341,97 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initSwipeTouchListener() {
-        binding.touchArea.getHomeScreenGestureListener()
+        // Modified: Check if touch lands on widget grid, if so, don't consume
+        val gestureManager = GestureManager(requireContext(), object : GestureAdapter() {
+            override fun onShortSwipeLeft() {
+                when (val action = prefs.shortSwipeLeftAction) {
+                    Action.OpenApp -> openSwipeLeftApp()
+                    else -> handleOtherAction(action)
+                }
+            }
+            override fun onLongSwipeLeft() {
+                when (val action = prefs.longSwipeLeftAction) {
+                    Action.OpenApp -> openLongSwipeLeftApp()
+                    else -> handleOtherAction(action)
+                }
+            }
+            override fun onShortSwipeRight() {
+                when (val action = prefs.shortSwipeRightAction) {
+                    Action.OpenApp -> openSwipeRightApp()
+                    else -> handleOtherAction(action)
+                }
+            }
+            override fun onLongSwipeRight() {
+                when (val action = prefs.longSwipeRightAction) {
+                    Action.OpenApp -> openLongSwipeRightApp()
+                    else -> handleOtherAction(action)
+                }
+            }
+            override fun onShortSwipeUp() {
+                when (val action = prefs.shortSwipeUpAction) {
+                    Action.OpenApp -> openSwipeUpApp()
+                    else -> handleOtherAction(action)
+                }
+            }
+            override fun onLongSwipeUp() {
+                when (val action = prefs.longSwipeUpAction) {
+                    Action.OpenApp -> openLongSwipeUpApp()
+                    else -> handleOtherAction(action)
+                }
+            }
+            override fun onShortSwipeDown() {
+                when (val action = prefs.shortSwipeDownAction) {
+                    Action.OpenApp -> openSwipeDownApp()
+                    else -> handleOtherAction(action)
+                }
+            }
+            override fun onLongSwipeDown() {
+                when (val action = prefs.longSwipeDownAction) {
+                    Action.OpenApp -> openLongSwipeDownApp()
+                    else -> handleOtherAction(action)
+                }
+            }
+            override fun onLongPress() {
+                AppLogger.d(TAG, "touchArea.onLongPress - opening settings")
+                trySettings()
+            }
+            override fun onDoubleTap() {
+                when (val action = prefs.doubleTapAction) {
+                    Action.OpenApp -> openDoubleTapApp()
+                    else -> handleOtherAction(action)
+                }
+            }
+        })
+        
+        binding.touchArea.setOnTouchListener { _, event ->
+            AppLogger.d(TAG, "touchArea.onTouch: action=${event.actionMasked}, raw=(${event.rawX},${event.rawY})")
+            
+            // Check if touch lands on widget grid - if so, pass through to widgets
+            val widgetGrid = binding.homeWidgetGrid
+            val location = IntArray(2)
+            widgetGrid.getLocationOnScreen(location)
+            val gridLeft = location[0]
+            val gridTop = location[1]
+            val gridRight = gridLeft + widgetGrid.width
+            val gridBottom = gridTop + widgetGrid.height
+            
+            val x = event.rawX
+            val y = event.rawY
+            val touchOnWidgetGrid = x >= gridLeft && x <= gridRight && y >= gridTop && y <= gridBottom && widgetGrid.childCount > 1 // >1 because placeholder is also a child
+            
+            if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+                AppLogger.d(TAG, "touchArea: ACTION_DOWN at ($x, $y), widgetGrid bounds=($gridLeft,$gridTop,$gridRight,$gridBottom), touchOnWidgetGrid=$touchOnWidgetGrid, childCount=${widgetGrid.childCount}")
+            }
+            
+            if (touchOnWidgetGrid) {
+                AppLogger.d(TAG, "touchArea: Touch on widget grid, passing through")
+                return@setOnTouchListener false  // Don't consume, let widgets handle
+            }
+            
+            val result = gestureManager.onTouchEvent(event)
+            AppLogger.d(TAG, "touchArea protocol: gestureManager.onTouchEvent result=$result")
+            result
+        }
     }
 
     private fun initPermissionCheck() {
@@ -549,46 +448,50 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initClickListeners() {
-        binding.apply {
-            clock.setOnClickListener(this@HomeFragment)
-            date.setOnClickListener(this@HomeFragment)
-            totalScreenTime.setOnClickListener(this@HomeFragment)
-            setDefaultLauncher.setOnClickListener(this@HomeFragment)
-            battery.setOnClickListener(this@HomeFragment)
-            weather.setOnClickListener(this@HomeFragment)
+        // Long press anywhere on home screen (grid, touch area, or likely the apps list background) opens settings
+        val openSettingsAction = View.OnLongClickListener { 
+            AppLogger.d(TAG, "General LongClick triggered on ${it.id}")
+            trySettings()
+            true
+        }
 
-            // fabPhone, fabMessages, etc. remain for now
-            fabPhone.setOnClickListener(this@HomeFragment)
-            fabMessages.setOnClickListener(this@HomeFragment)
-            fabCamera.setOnClickListener(this@HomeFragment)
-            fabPhotos.setOnClickListener(this@HomeFragment)
-            fabBrowser.setOnClickListener(this@HomeFragment)
-            // fabAction and fabSettings removed from here
+        binding.homeWidgetGrid.setOnLongClickListener(openSettingsAction)
+        binding.touchArea.setOnLongClickListener(openSettingsAction)
+        
+        val gestureDetector = GestureDetector(requireContext(), object : GestureDetector.SimpleOnGestureListener() {
+            override fun onLongPress(e: MotionEvent) {
+                val child = binding.homeAppsRecyclerView.findChildViewUnder(e.x, e.y)
+                if (child == null) {
+                    trySettings()
+                }
+            }
+        })
+
+        binding.homeAppsRecyclerView.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
+            false
+        }
+
+        binding.mainLayout.setOnLongClickListener(openSettingsAction)
+        binding.coordinatorLayout.setOnLongClickListener(openSettingsAction)
+        
+        binding.appDrawerLayout.search.setOnClickListener {
+            // Focus on search view
+            binding.appDrawerLayout.search.isIconified = false
         }
     }
 
 
     private fun initAppObservers() {
-        binding.apply {
-            firstRunTips.isVisible = prefs.firstSettingsOpen
-
-            setDefaultLauncher.isVisible = !ismlauncherDefault(requireContext())
-
-            val changeLauncherText = if (ismlauncherDefault(requireContext())) {
-                R.string.advanced_settings_change_default_launcher
-            } else {
-                R.string.advanced_settings_set_as_default_launcher
-            }
-
-            setDefaultLauncher.text = getString(changeLauncherText)
-        }
+        // No remaining views to observe
     }
 
     private fun initObservers() {
         with(viewModel) {
             launcherDefault.observe(viewLifecycleOwner) { isDefault ->
-                binding.setDefaultLauncher.isVisible = isDefault == true
+               // default launcher check visual removed
             }
 
             homeAppsNum.observe(viewLifecycleOwner) { num ->
@@ -602,7 +505,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         }
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: android.content.SharedPreferences?, key: String?) {
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
             "showDate", "showClock", "showAlarm", "showDailyWord", "showBattery",
             "dateSize", "clockSize", "alarmSize", "dailyWordSize", "batterySize", "appSize",
@@ -635,12 +538,9 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         viewModel.getAppList(includeHiddenApps, includeRecentApps)
         appsAdapter.flag = flag
         appsAdapter.location = n
+        appsAdapter.notifyDataSetChanged()
         AnalyticsHelper.logUserAction("Display App List")
-        
-        // Don't expand drawer if we're still initializing
-        if (!isDrawerInitializing) {
-            drawerBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
+        drawerBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     private fun showNotesManager() {
@@ -944,109 +844,9 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             //binding.homeAppsLayout.removeViews(oldAppsNum + diff, -diff)
         }
 
-        // Create a new TextView instance
-        val totalText = getString(R.string.total_screen_time)
-        val totalTime = appUsageMonitor.getTotalScreenTime(requireContext())
-        val totalScreenTime = formatMillisToHMS(totalTime, true)
-        AppLogger.d("totalScreenTime", totalScreenTime)
-        val totalScreenTimeJoin = "$totalText: $totalScreenTime"
-        // Set properties for the TextView (optional)
-        binding.totalScreenTime.apply {
-            text = totalScreenTimeJoin
-            if (totalTime > 300L) { // Checking if totalTime is greater than 5 minutes (300,000 milliseconds)
-                isVisible = true
-            }
-        }
 
         // Update the total number of pages and calculate maximum apps per page
         updatePagesAndAppsPerPage(prefs.homeAppsNum, prefs.homePagesNum)
-        adjustTextViewMargins()
-    }
-
-    private fun adjustTextViewMargins() {
-        binding.apply {
-
-            privateLayout.apply {
-                // Set visibility
-                isVisible = PrivateSpaceManager(requireContext()).isPrivateSpaceSetUp()
-
-                // Initial icon
-                fun updatePrivateFabIcon() {
-                    val isLocked = PrivateSpaceManager(requireContext()).isPrivateSpaceLocked()
-                    val iconRes = if (isLocked) R.drawable.private_profile_on
-                    else R.drawable.private_profile_off
-                    privateFab.setImageResource(iconRes)
-                }
-
-                updatePrivateFabIcon() // set initial icon
-
-                privateFab.setOnClickListener {
-                    // Toggle lock
-                    PrivateSpaceManager(requireContext()).togglePrivateSpaceLock(
-                        showToast = false,
-                        launchSettings = false
-                    )
-                    // Update icon after toggle
-                    updatePrivateFabIcon()
-                }
-            }
-
-            val views = listOf(
-                setDefaultLauncher,
-                totalScreenTime,
-                homeScreenPager,
-                fabLayout,
-                //homeAppsLayout,
-                privateLayout
-            )
-
-            // Check if device is using gesture navigation or 3-button navigation
-            val isGestureNav = isGestureNavigationEnabled(requireContext())
-
-            val numOfElements = 6
-            val incrementBy = 35
-            // Set margins based on navigation mode
-            val margins = if (isGestureNav) {
-                val startAt = resources.getDimensionPixelSize(R.dimen.bottom_margin_gesture_nav)
-                List(numOfElements) { index -> startAt + (index * incrementBy) } // Adjusted margins for gesture navigation
-            } else {
-                val startAt = resources.getDimensionPixelSize(R.dimen.bottom_margin_3_button_nav)
-                List(numOfElements) { index -> startAt + (index * incrementBy) } // Adjusted margins for 3-button navigation
-            }
-
-            val visibleViews = views.filter { it.isVisible }
-            val visibleMargins =
-                margins.take(visibleViews.size) // Trim margins list to match visible views
-
-            // Reset margins for all views
-            views.forEach { view ->
-                val params = view.layoutParams as ViewGroup.MarginLayoutParams
-                params.bottomMargin = 0
-                view.layoutParams = params
-            }
-
-            // Apply correct spacing for visible views
-            visibleViews.forEachIndexed { index, view ->
-                val params = view.layoutParams as ViewGroup.MarginLayoutParams
-                var bottomMargin = visibleMargins.getOrElse(index) { 0 }
-
-                // Add extra space above fabLayout if it's visible
-                if (prefs.homeAlignmentBottom) {
-                    if (visibleViews.contains(fabLayout)) {
-                        if (view == homeAppsRecyclerView) {
-                            bottomMargin += 65
-                        }
-                    }
-                }
-
-                if (view == homeScreenPager) {
-                    bottomMargin += 10
-                }
-
-                params.bottomMargin = bottomMargin
-                view.layoutParams = params
-            }
-        }
     }
 
 
@@ -1222,7 +1022,6 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
         // Update the total number of pages and calculate maximum apps per page
         updatePagesAndAppsPerPage(prefs.homeAppsNum, prefs.homePagesNum)
-        adjustTextViewMargins()
     }
 
 
@@ -1298,7 +1097,6 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
         binding.homeScreenPager.text = spannable
         if (prefs.homePagesNum > 1 && prefs.homePager) binding.homeScreenPager.isVisible = true
-        if (prefs.showFloating) binding.fabLayout.isVisible = true
     }
 
     private fun navigateToPreviousPage() {
@@ -1343,11 +1141,6 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
 
     private fun trySettings() {
-        // Hide first run tips immediately on first settings access
-        if (prefs.firstSettingsOpen) {
-            binding.firstRunTips.isVisible = false
-        }
-        
         lifecycleScope.launch(Dispatchers.Main) {
             if (prefs.settingsLocked) {
                 biometricHelper.startBiometricSettingsAuth(object :
@@ -1648,18 +1441,6 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             }
         })
 
-        // Set initial state to collapsed to prevent auto-opening
-        drawerBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        
-        // Allow drawer to be opened after initialization period
-        lifecycleScope.launch {
-            delay(2000) // 2 second grace period
-            isDrawerInitializing = false
-        }
-
-        drawerBinding.drawerFabAction.setOnClickListener(this)
-        drawerBinding.drawerFabSettings.setOnClickListener(this)
-
         drawerBinding.appsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         drawerBinding.contactsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         drawerBinding.appsRecyclerView.adapter = appsAdapter
@@ -1676,15 +1457,25 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 val mergedList = listOf("SYSTEM", "PRIVATE", "WORK", "USER").flatMap { profile ->
                     appsByProfile[profile].orEmpty()
                 }
-                drawerBinding.listEmptyHint.isVisible = mergedList.isEmpty()
-                drawerBinding.sidebarContainer.isVisible = prefs.showAZSidebar
+                
+                // Fix: mutually exclusive visibility
+                val isEmpty = mergedList.isEmpty()
+                if (drawerBinding.menuView.displayedChild == 0) { // Apps view
+                    drawerBinding.listEmptyHint.isVisible = isEmpty
+                    drawerBinding.appsRecyclerView.isVisible = !isEmpty
+                    drawerBinding.sidebarContainer.isVisible = prefs.showAZSidebar && !isEmpty
+                }
                 appsAdapter.setAppList(mergedList.toMutableList())
             }
         }
 
         viewModel.contactList.observe(viewLifecycleOwner) { newList ->
             newList?.let {
-                drawerBinding.listEmptyHint.isVisible = it.isEmpty()
+                val isEmpty = it.isEmpty()
+                if (drawerBinding.menuView.displayedChild == 1) { // Contacts view
+                     drawerBinding.listEmptyHint.isVisible = isEmpty
+                     drawerBinding.contactsRecyclerView.isVisible = !isEmpty
+                }
                 contactsAdapter.setContactList(it.toMutableList())
             }
         }
@@ -1733,8 +1524,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         val appContext = requireContext().applicationContext
         widgetDao = WidgetDatabase.getDatabase(appContext).widgetDao()
         appWidgetManager = AppWidgetManager.getInstance(appContext)
-        appWidgetHost = AppWidgetHost(appContext, APP_WIDGET_HOST_ID)
-        appWidgetHost.startListening()
+        appWidgetHost = LauncherAppWidgetHost(appContext, APP_WIDGET_HOST_ID)
+        // Don't start listening here - will be done in onResume()
 
         binding.homeWidgetGrid.apply {
             setOnLongClickListener {
@@ -1845,10 +1636,44 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
             group.widgets.forEach { widgetInfo ->
                 val widgetLabel = widgetInfo.loadLabel(pm)
-                val widgetRow = TextView(requireContext()).apply {
-                    text = widgetLabel
-                    textSize = 16f
-                    setPadding(120, 24, 16, 24)
+                val previewDrawable = widgetInfo.loadPreviewImage(requireContext(), 0)
+                    ?: widgetInfo.loadIcon(requireContext(), 0)
+                
+                val widgetRow = LinearLayout(requireContext()).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    setPadding(48, 16, 16, 16)
+                    gravity = Gravity.CENTER_VERTICAL
+                    
+                    // Preview image
+                    val previewView = ImageView(requireContext()).apply {
+                        setImageDrawable(previewDrawable)
+                        layoutParams = LinearLayout.LayoutParams(260, 260).apply {
+                            marginEnd = 16
+                        }
+                        scaleType = ImageView.ScaleType.FIT_CENTER
+                    }
+                    addView(previewView)
+                    
+                    // Label and size info
+                    val infoContainer = LinearLayout(requireContext()).apply {
+                        orientation = LinearLayout.VERTICAL
+                        layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+                        
+                        val labelText = TextView(requireContext()).apply {
+                            text = widgetLabel
+                            textSize = 15f
+                        }
+                        addView(labelText)
+                        
+                        val sizeText = TextView(requireContext()).apply {
+                            text = "${widgetInfo.minWidth}x${widgetInfo.minHeight}"
+                            textSize = 12f
+                            alpha = 0.6f
+                        }
+                        addView(sizeText)
+                    }
+                    addView(infoContainer)
+                    
                     setOnClickListener {
                         addWidget(widgetInfo)
                         bottomSheetDialog.dismiss()
@@ -1930,8 +1755,10 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
         val wrapper = ResizableWidgetWrapper(
             requireContext(), hostView, widgetInfo, appWidgetHost,
+            appWidgetId,
             onUpdate = { saveWidgets() },
             onDelete = { deleteWidget(appWidgetId) },
+            onLongPress = { showGridMenu() },
             isEditingProvider = { isEditingWidgets },
             GRID_COLUMNS, CELL_MARGIN, cellsW, cellsH
         )
@@ -1992,18 +1819,27 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         updateEmptyPlaceholder()
     }
 
+    private fun clearAllWidgets() {
+        widgetWrappers.forEach { binding.homeWidgetGrid.removeView(it) }
+        widgetWrappers.clear()
+    }
+
     private fun saveWidgets() {
         val parentWidth = binding.homeWidgetGrid.width.coerceAtLeast(1)
         val cellWidth = (parentWidth - CELL_MARGIN * (GRID_COLUMNS - 1)) / GRID_COLUMNS
         val cellHeight = cellWidth
 
-        val savedList = widgetWrappers.map { wrapper ->
+        val savedList = widgetWrappers.mapNotNull { wrapper ->
+            val widgetId = wrapper.appWidgetId
+            if (widgetId < 0) return@mapNotNull null
             val col = ((wrapper.translationX + cellWidth / 2) / (cellWidth + CELL_MARGIN)).toInt().coerceIn(0, GRID_COLUMNS - 1)
             val row = ((wrapper.translationY + cellHeight / 2) / (cellHeight + CELL_MARGIN)).toInt().coerceAtLeast(0)
             val cellsW = ((wrapper.width + CELL_MARGIN) / (cellWidth + CELL_MARGIN))
             val cellsH = ((wrapper.height + CELL_MARGIN) / (cellHeight + CELL_MARGIN))
-            SavedWidgetEntity(wrapper.hostView.appWidgetId, col, row, wrapper.width, wrapper.height, cellsW, cellsH)
+            SavedWidgetEntity(widgetId, col, row, wrapper.width, wrapper.height, cellsW, cellsH)
         }
+
+        if (savedList.isEmpty()) return
 
         lifecycleScope.launch(Dispatchers.IO) {
             widgetDao.insertAll(savedList)
@@ -2011,6 +1847,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
     private fun restoreWidgets() {
+        clearAllWidgets()
+        
         lifecycleScope.launch {
             val savedWidgets = withContext(Dispatchers.IO) { widgetDao.getAll() }
             binding.homeWidgetGrid.post {
@@ -2019,7 +1857,19 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 val cellHeight = cellWidth
 
                 savedWidgets.forEach { saved ->
-                    val info = appWidgetManager.getAppWidgetInfo(saved.appWidgetId) ?: return@forEach
+                    // Skip invalid widget IDs and clean up the database
+                    if (saved.appWidgetId < 0) {
+                        lifecycleScope.launch(Dispatchers.IO) { widgetDao.deleteById(saved.appWidgetId) }
+                        return@forEach
+                    }
+                    
+                    val info = appWidgetManager.getAppWidgetInfo(saved.appWidgetId)
+                    if (info == null) {
+                        // Widget no longer exists, clean up
+                        lifecycleScope.launch(Dispatchers.IO) { widgetDao.deleteById(saved.appWidgetId) }
+                        return@forEach
+                    }
+                    
                     val hostView = try {
                         val appContext = requireContext().applicationContext
                         appWidgetHost.createView(appContext, saved.appWidgetId, info)
@@ -2030,8 +1880,10 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
                     val wrapper = ResizableWidgetWrapper(
                         requireContext(), hostView, info, appWidgetHost,
+                        saved.appWidgetId,
                         onUpdate = { saveWidgets() },
                         onDelete = { deleteWidget(saved.appWidgetId) },
+                        onLongPress = { showGridMenu() },
                         isEditingProvider = { isEditingWidgets },
                         GRID_COLUMNS, CELL_MARGIN, saved.cellsW, saved.cellsH
                     )
@@ -2052,12 +1904,109 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         binding.widgetEmptyPlaceholder.visibility = if (widgetWrappers.isEmpty()) View.VISIBLE else View.GONE
     }
 
-    companion object {
-        private val APP_WIDGET_HOST_ID = "CascadeLauncher".hashCode().absoluteValue
-        private const val GRID_COLUMNS = 14
-        private const val CELL_MARGIN = 16
-        private const val MIN_CELL_W = 2
-        private const val MIN_CELL_H = 1
+
+
+    private fun removeHomeApp(position: Int) {
+        val emptyApp = AppListItem(
+            activityLabel = "",
+            activityPackage = "",
+            activityClass = "",
+            user = android.os.Process.myUserHandle(),
+            customLabel = "",
+            customTag = ""
+        )
+        prefs.setHomeAppModel(position, emptyApp)
+        homeAppsAdapter.notifyItemChanged(position)
     }
 
+    @SuppressLint("SetTextI18n", "RestrictedApi")
+    private fun showHomeAppMenu(position: Int) {
+        val appModel = prefs.getHomeAppModel(position)
+        val isEmpty = appModel.activityPackage.isEmpty()
+
+        val viewHolder = binding.homeAppsRecyclerView.findViewHolderForAdapterPosition(position) ?: return
+        val anchorView = viewHolder.itemView.findViewById<View>(R.id.appIconLeft) ?: viewHolder.itemView
+
+        val popup = androidx.appcompat.widget.PopupMenu(requireContext(), anchorView)
+        val menu = popup.menu
+
+        // Enable dividers
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            menu.setGroupDividerEnabled(true)
+        }
+
+        // Force icons to show
+        try {
+            val field = popup.javaClass.getDeclaredField("mPopup")
+            field.isAccessible = true
+            val menuPopupHelper = field.get(popup)
+            val classPopupHelper = Class.forName(menuPopupHelper.javaClass.name)
+            val setForceIcons = classPopupHelper.getMethod("setForceShowIcon", Boolean::class.javaPrimitiveType)
+            setForceIcons.invoke(menuPopupHelper, true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        // Helper to get layered icon with colored circle background
+        fun getLayeredIcon(resId: Int, color: Int): Drawable? {
+            val context = requireContext()
+            val icon = ContextCompat.getDrawable(context, resId)?.mutate() ?: return null
+            icon.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+
+            val background = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(ColorUtils.setAlphaComponent(color, 40)) // ~15% opacity
+            }
+
+            val layerDrawable = LayerDrawable(arrayOf(background, icon))
+            
+            // Add padding to icon (layer 1)
+            val density = context.resources.displayMetrics.density
+            val inset = (6 * density).toInt()
+            layerDrawable.setLayerInset(1, inset, inset, inset, inset)
+            
+            return layerDrawable
+        }
+
+        // Colors
+        val colorRemove = android.graphics.Color.parseColor("#E91E63") // Pink
+        val colorChange = android.graphics.Color.parseColor("#4CAF50") // Green
+        val colorInfo = android.graphics.Color.parseColor("#2196F3") // Blue
+        val colorSettings = android.graphics.Color.parseColor("#FF9800") // Orange
+
+        // Group 0: App Actions
+        if (!isEmpty) {
+            menu.add(0, 1, 0, "Remove").icon = getLayeredIcon(R.drawable.ic_close, colorRemove)
+        }
+        
+        menu.add(0, 2, 1, "Change").icon = getLayeredIcon(R.drawable.ic_restart, colorChange)
+        
+        if (!isEmpty) {
+            menu.add(0, 3, 2, "App Info").icon = getLayeredIcon(R.drawable.ic_info, colorInfo)
+        }
+        
+        // Group 1: Settings (Separated)
+        menu.add(1, 4, 3, "Cascade Settings").icon = getLayeredIcon(R.drawable.ic_settings, colorSettings)
+
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                1 -> removeHomeApp(position)
+                2 -> showAppList(AppDrawerFlag.SetHomeApp, includeHiddenApps = true, includeRecentApps = false, position)
+                3 -> openAppInfo(requireContext(), appModel.user, appModel.activityPackage)
+                4 -> trySettings()
+            }
+            true
+        }
+        
+        popup.show()
+    }
+    
+    private fun getSelectableBackground(): Drawable {
+        val attrs = intArrayOf(android.R.attr.selectableItemBackground)
+        val typedArray = requireContext().obtainStyledAttributes(attrs)
+        val drawable = typedArray.getDrawable(0)
+        typedArray.recycle()
+        return drawable ?: GradientDrawable()
+    }
 }
+

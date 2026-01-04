@@ -51,7 +51,14 @@ open class BaseActivity : AppCompatActivity() {
         } else {
             androidx.core.os.LocaleListCompat.create(locale)
         }
-        androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(localeList)
+        
+        // Launcher apps (activityType=home) cannot change locales after initialization
+        // This is an Android platform limitation, so we catch and ignore the exception
+        try {
+            androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(localeList)
+        } catch (e: IllegalStateException) {
+            // Silently ignore - launcher apps have restrictions on locale changes
+        }
 
 
         super.onCreate(savedInstanceState)

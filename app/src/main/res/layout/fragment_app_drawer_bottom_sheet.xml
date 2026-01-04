@@ -1,63 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/mainLayout"
     style="style/Widget.Material3.BottomSheet"
+    android:id="@+id/drawerRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    android:background="@drawable/bottom_sheet_background"
-    android:clickable="true"
-    android:fitsSystemWindows="true"
-    android:focusable="true">
-
-    <!-- Header with Icons (Visible in Peek) -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    android:animateLayoutChanges="true">
+    <!-- Drag Handle at the very top -->
+    <!-- Header Container (Visible in Peek) -->
+    <LinearLayout
         android:id="@+id/drawerHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp"
-        android:paddingBottom="24dp"
-        android:paddingTop="8dp">
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:paddingTop="12dp"
+        android:paddingBottom="8dp">
 
+        <!-- Drag Handle -->
         <View
-            android:id="@+id/dragPill"
-            android:layout_width="48dp"
+            android:id="@+id/drag_handle"
+            android:layout_width="32dp"
             android:layout_height="4dp"
+            android:layout_gravity="center"
             android:background="@drawable/bottom_sheet_handle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:backgroundTint="?attr/primaryColor" />
+    </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/drawerFabAction"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/app_launcher"
-            android:contentDescription="@string/show"
-            android:scaleType="fitCenter"
-            android:padding="8dp"
-            app:tint="?attr/primaryColor"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:backgroundTint="@android:color/transparent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
 
-        <ImageButton
-            android:id="@+id/drawerFabSettings"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_settings"
-            android:contentDescription="@string/show"
-            android:scaleType="fitCenter"
-            android:padding="8dp"
-            app:tint="?attr/primaryColor"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:backgroundTint="@android:color/transparent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search"

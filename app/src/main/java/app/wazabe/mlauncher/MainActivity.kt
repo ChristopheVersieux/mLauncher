@@ -562,9 +562,12 @@ class MainActivity : BaseActivity() {
         widgetPermissionLauncher.launch(intent)
     }
 
+    private var pendingWidgetId: Int = -1 // Store the original widget ID
+
     fun launchWidgetConfiguration(host: AppWidgetHost, widgetId: Int, callback: (Int, Int) -> Unit) {
         widgetHost = host
         widgetConfigCallback = callback
+        pendingWidgetId = widgetId // Store the ID for later
         try {
             host.startAppWidgetConfigureActivityForResult(
                 this,
@@ -578,16 +581,18 @@ class MainActivity : BaseActivity() {
             widgetConfigCallback?.invoke(RESULT_CANCELED, widgetId)
             widgetConfigCallback = null
             widgetHost = null
+            pendingWidgetId = -1
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == Constants.REQUEST_CONFIGURE_APPWIDGET) {
-            val widgetId = data?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1) ?: -1
+            val widgetId = data?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, pendingWidgetId) ?: pendingWidgetId
             widgetConfigCallback?.invoke(resultCode, widgetId)
             widgetConfigCallback = null
             widgetHost = null
+            pendingWidgetId = -1
         }
     }
 
