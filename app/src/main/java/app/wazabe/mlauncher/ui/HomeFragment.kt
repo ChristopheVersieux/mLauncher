@@ -1418,7 +1418,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
             // On garde uniquement la logique du bas ici
             val basePeekHeight = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 60f, resources.displayMetrics
+                TypedValue.COMPLEX_UNIT_DIP, 30f, resources.displayMetrics
             ).toInt()
             drawerBehavior.peekHeight = basePeekHeight + systemBars.bottom
             insets
@@ -1438,6 +1438,10 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 headerParams.topMargin = (slideOffset * statusBarSize).toInt()
 
                 drawerBinding.drawerHeader.layoutParams = headerParams
+                
+                // Hide search bar when collapsed
+                drawerBinding.search.alpha = slideOffset
+                drawerBinding.search.isVisible = slideOffset > 0.1f
             }
         })
 
@@ -1970,19 +1974,19 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
         // Colors
         val colorRemove = android.graphics.Color.parseColor("#E91E63") // Pink
-        val colorChange = android.graphics.Color.parseColor("#4CAF50") // Green
+        val colorChange = android.graphics.Color.parseColor("#FFC107") // Yellow/Amber
+        val colorAdd = android.graphics.Color.parseColor("#4CAF50") // Green
         val colorInfo = android.graphics.Color.parseColor("#2196F3") // Blue
-        val colorSettings = android.graphics.Color.parseColor("#FF9800") // Orange
+        val colorSettings = android.graphics.Color.parseColor("#9E9E9E") // Grey
 
         // Group 0: App Actions
         if (!isEmpty) {
             menu.add(0, 1, 0, "Remove").icon = getLayeredIcon(R.drawable.ic_close, colorRemove)
-        }
-        
-        menu.add(0, 2, 1, "Change").icon = getLayeredIcon(R.drawable.ic_restart, colorChange)
-        
-        if (!isEmpty) {
+            menu.add(0, 2, 1, "Change").icon = getLayeredIcon(R.drawable.ic_restart, colorChange)
             menu.add(0, 3, 2, "App Info").icon = getLayeredIcon(R.drawable.ic_info, colorInfo)
+        } else {
+             // Empty slot -> Add
+             menu.add(0, 2, 1, "Add").icon = getLayeredIcon(R.drawable.ic_add, colorAdd)
         }
         
         // Group 1: Settings (Separated)

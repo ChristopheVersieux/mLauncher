@@ -201,25 +201,14 @@ class AppDrawerAdapter(
                 setForceIcons.invoke(menuPopupHelper, true)
              } catch (e: Exception) { e.printStackTrace() }
 
-             val cachedIcon = iconCache[appModel.activityPackage]
-             val extractedColor = if (cachedIcon != null) {
-                 try {
-                     ColorIconsExtensions.getDominantColor(cachedIcon)
-                 } catch (e: Exception) {
-                     prefs.appColor
-                 }
-             } else {
-                 prefs.appColor
-             }
-
-             fun getLayeredIcon(resId: Int): Drawable? {
+             fun getLayeredIcon(resId: Int, color: Int): Drawable? {
                  val ctx = holder.itemView.context
                  val icon = AppCompatResources.getDrawable(ctx, resId)?.mutate() ?: return null
-                 icon.setColorFilter(extractedColor, PorterDuff.Mode.SRC_IN)
+                 icon.setColorFilter(color, PorterDuff.Mode.SRC_IN)
 
                  val background = GradientDrawable().apply {
                      shape = GradientDrawable.OVAL
-                     setColor(ColorUtils.setAlphaComponent(extractedColor, 40))
+                     setColor(ColorUtils.setAlphaComponent(color, 40))
                  }
 
                  val layerDrawable = LayerDrawable(arrayOf(background, icon))
@@ -229,7 +218,15 @@ class AppDrawerAdapter(
                  return layerDrawable
              }
              
-             // ...
+             // Creative Colors
+             val colorLock = android.graphics.Color.parseColor("#9C27B0") // Purple
+             val colorPin = android.graphics.Color.parseColor("#009688") // Teal
+             val colorHide = android.graphics.Color.parseColor("#607D8B") // Blue Grey
+             val colorRename = android.graphics.Color.parseColor("#4CAF50") // Green
+             val colorTag = android.graphics.Color.parseColor("#FFC107") // Amber
+             val colorInfo = android.graphics.Color.parseColor("#2196F3") // Blue
+             val colorUninstall = android.graphics.Color.parseColor("#E91E63") // Pink
+
              val pkg = appModel.activityPackage
              val isLocked = prefs.lockedApps.contains(pkg)
              val isPinned = prefs.pinnedApps.contains(pkg)
@@ -239,28 +236,28 @@ class AppDrawerAdapter(
              if (contextMenuFlags[1]) {
                   val title = if (isLocked) holder.itemView.context.getString(R.string.unlock) else holder.itemView.context.getString(R.string.lock)
                   val icon = if (isLocked) R.drawable.padlock_off else R.drawable.padlock
-                  menu.add(0, 1, 0, title).icon = getLayeredIcon(icon)
+                  menu.add(0, 1, 0, title).icon = getLayeredIcon(icon, colorLock)
              }
              if (contextMenuFlags[0]) {
                   val title = if (isPinned) holder.itemView.context.getString(R.string.unpin) else holder.itemView.context.getString(R.string.pin)
                   val icon = if (isPinned) R.drawable.pin_off else R.drawable.pin
-                  menu.add(0, 2, 1, title).icon = getLayeredIcon(icon)
+                  menu.add(0, 2, 1, title).icon = getLayeredIcon(icon, colorPin)
              }
              if (contextMenuFlags[2]) {
                   val title = if (isHidden) holder.itemView.context.getString(R.string.show) else holder.itemView.context.getString(R.string.hide)
                   val icon = if (isHidden) R.drawable.visibility else R.drawable.visibility_off
-                  menu.add(0, 3, 2, title).icon = getLayeredIcon(icon)
+                  menu.add(0, 3, 2, title).icon = getLayeredIcon(icon, colorHide)
              }
 
              if (contextMenuFlags[3]) {
-                  menu.add(1, 4, 3, holder.itemView.context.getString(R.string.rename)).icon = getLayeredIcon(R.drawable.ic_rename)
+                  menu.add(1, 4, 3, holder.itemView.context.getString(R.string.rename)).icon = getLayeredIcon(R.drawable.ic_rename, colorRename)
              }
              if (contextMenuFlags[4]) {
-                  menu.add(1, 5, 4, holder.itemView.context.getString(R.string.tag)).icon = getLayeredIcon(R.drawable.ic_tag)
+                  menu.add(1, 5, 4, holder.itemView.context.getString(R.string.tag)).icon = getLayeredIcon(R.drawable.ic_tag, colorTag)
              }
-             menu.add(1, 6, 5, "App Info").icon = getLayeredIcon(R.drawable.ic_info)
+             menu.add(1, 6, 5, "App Info").icon = getLayeredIcon(R.drawable.ic_info, colorInfo)
              
-             menu.add(2, 7, 6, "Uninstall").icon = getLayeredIcon(R.drawable.ic_delete)
+             menu.add(2, 7, 6, "Uninstall").icon = getLayeredIcon(R.drawable.ic_delete, colorUninstall)
 
              popup.setOnMenuItemClickListener { item ->
                  when(item.itemId) {
