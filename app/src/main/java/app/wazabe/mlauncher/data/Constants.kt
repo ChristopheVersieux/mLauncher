@@ -408,6 +408,26 @@ object Constants {
         }
     }
 
+    enum class DrawerType : EnumOption {
+        Alphabetical,
+        MostUsed;
+
+        @Composable
+        override fun string(): String {
+             return when (this) {
+                Alphabetical -> stringResource(R.string.alphabetical)
+                MostUsed -> stringResource(R.string.most_used)
+            }
+        }
+        
+        fun getString(context: Context): String {
+            return when (this) {
+                Alphabetical -> context.getString(R.string.alphabetical)
+                MostUsed -> context.getString(R.string.most_used)
+            }
+        }
+    }
+
 
     enum class FontFamily : EnumOption {
         System,

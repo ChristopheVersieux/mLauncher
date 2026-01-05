@@ -97,11 +97,30 @@
             android:layout_height="0dp" />
     </LinearLayout>
 
+    <HorizontalScrollView
+        android:id="@+id/filterBarContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/searchContainer"
+        android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="8dp"
+        android:clipToPadding="false"
+        android:scrollbars="none"
+        android:visibility="gone">
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/filterToggleGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:singleSelection="true"
+            app:selectionRequired="true" />
+    </HorizontalScrollView>
+
     <com.github.creativecodecat.components.views.FontAppCompatTextView
         android:id="@+id/clearHomeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/searchContainer"
+        android:layout_below="@id/filterBarContainer"
         android:layout_alignParentEnd="true"
         android:paddingHorizontal="18dp"
         android:paddingVertical="4dp"
@@ -179,13 +198,31 @@
     </FrameLayout>
 
 
-    <!-- List Empty Hint, center aligned -->
-    <com.github.creativecodecat.components.views.FontAppCompatTextView
-        android:id="@+id/listEmptyHint"
+    <!-- List Empty Container, center aligned -->
+    <LinearLayout
+        android:id="@+id/emptyStateContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="@string/drawer_list_empty_hint"
-        android:textSize="20sp" />
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.github.creativecodecat.components.views.FontAppCompatTextView
+            android:id="@+id/listEmptyHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/drawer_list_empty_hint"
+            android:textSize="20sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/clearFiltersButton"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Clear all filters"
+            app:icon="@drawable/ic_restart" />
+    </LinearLayout>
 
 </RelativeLayout>

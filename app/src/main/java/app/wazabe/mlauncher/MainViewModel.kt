@@ -294,6 +294,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         fun tryLaunch(user: UserHandle): Boolean {
             return try {
                 appUsageTracker.updateLastUsedTimestamp(packageName)
+                incrementAppUsage(packageName, component.className, user)
                 launcher.startMainActivity(component, user, null, null)
                 true
             } catch (_: Exception) {
@@ -339,6 +340,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
+    }
+
+    fun clearAppCache() {
+        appsMemoryCache = null
     }
 
     /**
@@ -608,10 +613,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 category = raw.category
             )
         }
-            // 🔹 Sort pinned apps first, then regular/recent alphabetically
+            // 🔹 Sort pinned apps first, then based on DrawerType
             .sortedWith(
-                compareByDescending<AppListItem> { it.category == AppCategory.PINNED }
-                    .thenBy { normalizeForSort(it.label) }
+                when (prefs.drawerType) {
+                    Constants.DrawerType.MostUsed -> {
+                         val usageCounts = prefs.appUsageCounts
+                         compareByDescending<AppListItem> { it.category == AppCategory.PINNED }
+                            .thenByDescending { 
+                                val key = "${it.activityPackage}|${it.activityClass}|${it.user.hashCode()}"
+                                usageCounts[key] ?: 0 
+                            }
+                            .thenBy { normalizeForSort(it.label) }
+                    }
+                    else -> {
+                        compareByDescending<AppListItem> { it.category == AppCategory.PINNED }
+                            .thenBy { normalizeForSort(it.label) }
+                    }
+                }
             )
             .toMutableList()
 
@@ -889,6 +907,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         } catch (t: Throwable) {
             AppLogger.e("MainViewModel", "Failed to load contacts cache: ${t.message}", t)
             return null
+        }
+    }
+
+    private fun incrementAppUsage(pkg: String, cls: String, user: UserHandle) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val key = "$pkg|$cls|${user.hashCode()}"
+            val counts = prefs.appUsageCounts.toMutableMap()
+            val current = counts[key] ?: 0
+            counts[key] = current + 1
+            prefs.appUsageCounts = counts
         }
     }
 }

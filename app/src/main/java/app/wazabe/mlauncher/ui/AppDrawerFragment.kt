@@ -21,8 +21,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
+import android.content.SharedPreferences
+import android.widget.HorizontalScrollView
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
+import android.util.TypedValue
 import android.widget.TextView
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonToggleGroup
+import android.content.res.ColorStateList
+import android.graphics.Color
+import androidx.core.content.ContextCompat
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
 import androidx.core.net.toUri
@@ -60,14 +69,18 @@ import app.wazabe.mlauncher.helper.utils.PrivateSpaceManager
 import app.wazabe.mlauncher.ui.adapter.AppDrawerAdapter
 import app.wazabe.mlauncher.ui.adapter.ContactDrawerAdapter
 
-class AppDrawerFragment : BaseFragment() {
+class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private lateinit var prefs: Prefs
+    private lateinit var viewModel: MainViewModel
     private lateinit var appsAdapter: AppDrawerAdapter
     private lateinit var contactsAdapter: ContactDrawerAdapter
+    private var selectedTag: String? = null
+    private var currentProfileFilter: String? = null
 
     private var _binding: FragmentAppDrawerBinding? = null
     private val binding get() = _binding!!
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,6 +91,131 @@ class AppDrawerFragment : BaseFragment() {
         prefs = Prefs(requireContext())
         return binding.root
     }
+
+    private fun setupFilterChips(list: List<AppListItem>, onFilterChanged: () -> Unit) {
+        val drawerType = prefs.drawerType
+        val tags = list.flatMap { it.customTag.split(",").map { t -> t.trim() } }
+            .filter { it.isNotBlank() }
+            .distinct()
+            .sorted()
+
+        val shouldShowTags = tags.isNotEmpty()
+        val shouldShowProfiles = false // Placeholder for future work profile logic
+
+        if (!shouldShowTags && !shouldShowProfiles) {
+            binding.filterBarContainer.isVisible = false
+            if (selectedTag != null || currentProfileFilter != null) {
+                selectedTag = null
+                currentProfileFilter = null
+                view?.post { onFilterChanged() }
+            }
+            return
+        }
+
+        // Reset selectedTag if it no longer exists
+        if (selectedTag != null && !tags.contains(selectedTag)) {
+            selectedTag = null
+            view?.post { onFilterChanged() }
+        }
+
+        binding.filterBarContainer.isVisible = true
+        val toggleGroup = binding.filterToggleGroup
+
+        val listener = MaterialButtonToggleGroup.OnButtonCheckedListener { group, checkedId, isChecked ->
+            if (isChecked) {
+                val button = group.findViewById<MaterialButton>(checkedId)
+                val newTag = if (button.text == "All") null else button.text.toString()
+                if (selectedTag != newTag) {
+                    selectedTag = newTag
+                    view?.post { onFilterChanged() }
+                }
+            }
+        }
+        toggleGroup.clearOnButtonCheckedListeners()
+        toggleGroup.removeAllViews()
+
+        val buttonStyle = com.google.android.material.R.attr.materialButtonOutlinedStyle
+        
+        fun createSegmentButton(id: Int, title: String, isSelected: Boolean): MaterialButton {
+            return MaterialButton(requireContext(), null, buttonStyle).apply {
+                this.id = id
+                this.text = title
+                this.isCheckable = true
+                this.isChecked = isSelected
+                this.setPadding(32, 0, 32, 0)
+                this.cornerRadius = (20 * resources.displayMetrics.density).toInt()
+                this.minHeight = (40 * resources.displayMetrics.density).toInt()
+                this.layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    marginEnd = (8 * resources.displayMetrics.density).toInt()
+                }
+                
+                val states = arrayOf(
+                    intArrayOf(android.R.attr.state_checked),
+                    intArrayOf(-android.R.attr.state_checked)
+                )
+                
+                val backgroundColors = intArrayOf(
+                    ContextCompat.getColor(context, R.color.colorPrimary),
+                    Color.TRANSPARENT
+                )
+                this.backgroundTintList = ColorStateList(states, backgroundColors)
+                
+                val typedValue = TypedValue()
+                context.theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
+                val colorOnSurface = if (typedValue.resourceId != 0) {
+                    ContextCompat.getColor(context, typedValue.resourceId)
+                } else {
+                    typedValue.data
+                }
+                
+                val textColors = intArrayOf(Color.WHITE, colorOnSurface)
+                this.setTextColor(ColorStateList(states, textColors))
+                
+                val strokeColors = intArrayOf(
+                    Color.TRANSPARENT,
+                    ContextCompat.getColor(context, R.color.light_gray_medium)
+                )
+                this.strokeColor = ColorStateList(states, strokeColors)
+            }
+        }
+
+        if (shouldShowProfiles) {
+            val profiles = mutableListOf<String>()
+            if (prefs.getProfileCounter("SYSTEM") > 0) profiles.add("SYSTEM")
+            if (prefs.getProfileCounter("WORK") > 0) profiles.add("WORK")
+            if (prefs.getProfileCounter("PRIVATE") > 0 && !PrivateSpaceManager(requireContext()).isPrivateSpaceLocked()) profiles.add("PRIVATE")
+
+            toggleGroup.addView(createSegmentButton(View.generateViewId(), "All", currentProfileFilter == null))
+
+            profiles.forEach { profile ->
+                val label = when(profile) {
+                    "SYSTEM" -> "Personal"
+                    "WORK" -> "Work"
+                    "PRIVATE" -> "Private"
+                    else -> profile
+                }
+                val btn = createSegmentButton(View.generateViewId(), label, profile == currentProfileFilter)
+                btn.tag = profile
+                toggleGroup.addView(btn)
+            }
+            toggleGroup.addOnButtonCheckedListener(listener)
+        } else if (shouldShowTags) {
+            toggleGroup.addView(createSegmentButton(View.generateViewId(), "All", selectedTag == null))
+
+            tags.forEach { tag ->
+                toggleGroup.addView(createSegmentButton(View.generateViewId(), tag, tag == selectedTag))
+            }
+            toggleGroup.addOnButtonCheckedListener(listener)
+        }
+        
+        binding.root.requestLayout()
+    }
+
+
+
 
 
     @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
@@ -204,7 +342,7 @@ class AppDrawerFragment : BaseFragment() {
 
         }
 
-        val viewModel = activity?.run {
+        viewModel = activity?.run {
             ViewModelProvider(this)[MainViewModel::class.java]
         } ?: throw Exception("Invalid Activity")
 
@@ -459,6 +597,15 @@ class AppDrawerFragment : BaseFragment() {
         }
 
         binding.listEmptyHint.text = applyTextColor(getString(R.string.drawer_list_empty_hint), prefs.appColor)
+        
+        binding.clearFiltersButton.setOnClickListener {
+            binding.search.setQuery("", false)
+            selectedTag = null
+            currentProfileFilter = null
+            viewModel.clearAppCache()
+            viewModel.getAppList()
+            updateSearchVisibility()
+        }
 
         binding.search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -521,6 +668,7 @@ class AppDrawerFragment : BaseFragment() {
     private fun updateSearchVisibility() {
         if (_binding == null) return
         val hide = prefs.hideSearchView
+        android.widget.Toast.makeText(requireContext(), "Search view visible: ${!hide}", android.widget.Toast.LENGTH_SHORT).show()
         binding.searchContainer.isVisible = !hide
         binding.search.isVisible = !hide
         if (hide) {
@@ -561,9 +709,8 @@ class AppDrawerFragment : BaseFragment() {
 
         fun onProfileClicked(newType: String) {
             binding.menuView.displayedChild = 0
-            if (appAdapter != null && contactAdapter != null) {
-                initViewModel(flag, viewModel, appAdapter, contactAdapter, newType)
-            }
+            currentProfileFilter = newType
+            viewModel.appList.value = viewModel.appList.value // Trigger refresh
             setAppViewDetails()
             updateProfileUI(newType)
         }
@@ -663,8 +810,10 @@ class AppDrawerFragment : BaseFragment() {
         viewModel: MainViewModel,
         appAdapter: AppDrawerAdapter,
         contactAdapter: ContactDrawerAdapter,
-        profileFilter: String? = null // "PRIVATE", "WORK", "SYSTEM", "USER", or null for all
+        profileFilter: String? = null // Initial filter
     ) {
+        currentProfileFilter = profileFilter
+        
         fun <T> observeList(
             liveData: LiveData<List<T>?>,
             currentList: List<T>,
@@ -674,7 +823,7 @@ class AppDrawerFragment : BaseFragment() {
             liveData.observe(viewLifecycleOwner) { newList ->
                 if (skipCondition() || newList == currentList) return@observe
                 newList?.let {
-                    binding.listEmptyHint.isVisible = it.isEmpty()
+                    binding.emptyStateContainer.isVisible = it.isEmpty()
                     binding.sidebarContainer.isVisible = prefs.showAZSidebar
                     onPopulate(it)
                 }
@@ -698,10 +847,16 @@ class AppDrawerFragment : BaseFragment() {
         // 🔹 Observe apps
         viewModel.appList.observe(viewLifecycleOwner) { rawAppList ->
             if (flag == AppDrawerFlag.HiddenApps) return@observe
-            if (rawAppList == appAdapter.appsList || binding.menuView.displayedChild != 0) return@observe
+            if (binding.menuView.displayedChild != 0) return@observe
 
             AppLogger.d("Apps", "Loaded ${rawAppList?.size ?: 0} raw apps")
             rawAppList?.let { list ->
+                
+                setupFilterChips(list) {
+                    // Refresh when filter changed
+                    viewModel.appList.value = viewModel.appList.value
+                }
+
                 val appsByProfile = list.groupBy { it.profileType }
                 val allProfiles = listOf("SYSTEM", "PRIVATE", "WORK", "USER")
 
@@ -710,20 +865,40 @@ class AppDrawerFragment : BaseFragment() {
                     prefs.setProfileCounter(profile, appsByProfile[profile]?.size ?: 0)
                 }
 
-                // Merge apps based on filter
+                // Update profile icons visibility based on new counts
+                val isWorkProfileAvailable = prefs.getProfileCounter("WORK") > 0 && currentProfileFilter != "WORK"
+                val isPrivateProfileAvailable = prefs.getProfileCounter("PRIVATE") > 0 && 
+                        currentProfileFilter != "PRIVATE" && 
+                        !PrivateSpaceManager(requireContext()).isPrivateSpaceLocked()
+                val isSystemProfileAvailable = prefs.getProfileCounter("SYSTEM") > 0 && currentProfileFilter != "SYSTEM"
+
+                binding.workApps.isVisible = isWorkProfileAvailable
+                binding.privateApps.isVisible = isPrivateProfileAvailable
+                binding.systemApps.isVisible = isSystemProfileAvailable
+
+                // Merge apps based on profile filter
                 val mergedList = allProfiles.flatMap { profile ->
                     val apps = appsByProfile[profile].orEmpty()
-                    if (apps.isNotEmpty() && (profileFilter == null || profileFilter.equals(profile, true))) {
+                    if (apps.isNotEmpty() && (currentProfileFilter == null || currentProfileFilter.equals(profile, true))) {
                         AppLogger.d("AppMerge", "Adding ${apps.size} $profile apps")
                         apps
                     } else emptyList()
                 }
 
-                AppLogger.d("AppMerge", "Final merged list (${mergedList.size} apps)")
+                // Filter by Tag if needed
+                val finalFilteredList = if (selectedTag != null) {
+                    mergedList.filter { 
+                        it.customTag.split(",").map { t -> t.trim() }.contains(selectedTag)
+                    }
+                } else {
+                    mergedList
+                }
 
-                binding.listEmptyHint.isVisible = mergedList.isEmpty()
-                binding.sidebarContainer.isVisible = prefs.showAZSidebar
-                populateAppList(mergedList, appAdapter)
+                AppLogger.d("AppMerge", "Final list (${finalFilteredList.size} apps)")
+
+                binding.emptyStateContainer.isVisible = finalFilteredList.isEmpty()
+                binding.sidebarContainer.isVisible = prefs.showAZSidebar && prefs.drawerType == Constants.DrawerType.Alphabetical
+                populateAppList(finalFilteredList, appAdapter)
             }
         }
 
@@ -741,10 +916,30 @@ class AppDrawerFragment : BaseFragment() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        prefs.prefsNormal.registerOnSharedPreferenceChangeListener(this)
+        updateSearchVisibility()
+    }
+
     override fun onStop() {
         super.onStop()
+        prefs.prefsNormal.unregisterOnSharedPreferenceChangeListener(this)
         if (requireContext().hasSoftKeyboard()) {
             binding.search.hideKeyboard()
+        }
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key == "DRAWER_TYPE" || key == "HIDE_SEARCH_VIEW") {
+            if (key == "HIDE_SEARCH_VIEW") {
+                updateSearchVisibility()
+                return
+            }
+            selectedTag = null
+            currentProfileFilter = null
+            viewModel.clearAppCache() // Ensure we re-sort the list
+            viewModel.getAppList()
         }
     }
 
@@ -961,7 +1156,7 @@ class AppDrawerFragment : BaseFragment() {
         System.out.println("AppDrawerDebug: showTagDialog for $pkg")
 
         val editText = android.widget.EditText(context)
-        editText.setText(tag)
+        editText.hint = context.getString(R.string.new_tag)
         editText.setSelectAllOnFocus(true)
 
         // Collect existing tags
@@ -983,17 +1178,18 @@ class AppDrawerFragment : BaseFragment() {
             scrollView.layoutParams = scrollParams
             scrollView.isHorizontalScrollBarEnabled = false
 
-            val chipGroup = com.google.android.material.chip.ChipGroup(context)
-            chipGroup.isSingleLine = true
+            val chipGroup = com.google.android.material.chip.ChipGroup(context).apply {
+                setTag("DIALOG_CHIP_GROUP")
+                isSingleLine = true
+            }
             
             existingTags.forEach { existingTag ->
                 val chip = com.google.android.material.chip.Chip(context)
                 chip.text = existingTag
+                val currentAppTags = tag.split(",").map { it.trim() }.filter { it.isNotBlank() }
                 chip.isCheckable = true
-                chip.setOnClickListener {
-                     editText.setText(existingTag)
-                     editText.setSelection(existingTag.length)
-                }
+                chip.isChecked = currentAppTags.contains(existingTag)
+                // Chip handles toggling itself because isCheckable = true
                 chipGroup.addView(chip)
             }
             scrollView.addView(chipGroup)
@@ -1012,8 +1208,26 @@ class AppDrawerFragment : BaseFragment() {
             .setTitle(R.string.tag)
             .setView(container)
             .setPositiveButton(R.string.save) { _, _ ->
-                val newTag = editText.text.toString().trim()
-                Prefs(context).setAppTag(pkg, newTag, user)
+                val typedTags = editText.text.toString().split(",").map { it.trim() }.filter { it.isNotBlank() }
+                val chipGroup = container.findViewWithTag<com.google.android.material.chip.ChipGroup>("DIALOG_CHIP_GROUP")
+                val selectedChips = mutableListOf<String>()
+                
+                if (chipGroup != null) {
+                    for (i in 0 until chipGroup.childCount) {
+                        val chip = chipGroup.getChildAt(i) as? com.google.android.material.chip.Chip
+                        if (chip?.isChecked == true) {
+                            selectedChips.add(chip.text.toString())
+                        }
+                    }
+                }
+
+                // Merge: selected chips + typed tags, maintaining order of chips then new ones
+                val finalTagsSet = (selectedChips + typedTags).distinct()
+                val finalTagString = finalTagsSet.joinToString(", ")
+
+                android.util.Log.d("TagEdit", "Final merged tags for $pkg: '$finalTagString'")
+                Prefs(context).setAppTag(pkg, finalTagString, user)
+                viewModel.clearAppCache()
                 viewModel.getAppList()
             }
             .setNegativeButton(R.string.cancel, null)

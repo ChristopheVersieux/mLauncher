@@ -96,6 +96,12 @@
     <string name="haptic_feedback">Haptic Feedback</string>
 
     <string name="search">Search</string>
+    <string name="drawer_type">Drawer Type</string>
+    <string name="alphabetical">Alphabetical</string>
+    <string name="new_tag">New tag...</string>
+    <string name="most_used">Most Used</string>
+    <string name="tags">Tags</string>
+    <string name="work">Work</string>
 
     <string name="search_engine">Search Engine</string>
     <string name="show_az_sidebar">Show A-Z Sidebar</string>

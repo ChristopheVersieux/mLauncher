@@ -1,4 +1,4 @@
-﻿package app.wazabe.mlauncher.ui
+package app.wazabe.mlauncher.ui
 
 import HomeAppsAdapter
 import android.annotation.SuppressLint
@@ -29,6 +29,8 @@ import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
 import android.text.style.SuperscriptSpan
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.util.TypedValue
 import android.view.GestureDetector
 import android.view.Gravity
@@ -37,12 +39,15 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.ScrollView
 import android.widget.Space
 import android.widget.TextView
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonToggleGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.SearchView
 import androidx.biometric.BiometricPrompt
@@ -151,6 +156,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     private var lastWidgetInfo: AppWidgetProviderInfo? = null
 
     private var longPressToSelectApp: Int = 0
+    private var selectedTag: String? = null
+    private var currentProfileFilter: String? = null
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
@@ -308,7 +315,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
             dailyWord.gravity = prefs.dailyWordAlignment.value()
             (dailyWord.layoutParams as LinearLayout.LayoutParams).gravity = prefs.dailyWordAlignment.value()
-
+            
+            setupAppDrawerSearch(appDrawerLayout)
         }
         if (::homeAppsAdapter.isInitialized) {
             homeAppsAdapter.notifyDataSetChanged()
@@ -515,8 +523,17 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             "DATE_SIZE_TEXT", "CLOCK_SIZE_TEXT", "ALARM_SIZE_TEXT", "DAILY_WORD_SIZE_TEXT", "BATTERY_SIZE_TEXT", "APP_SIZE_TEXT",
             "DATE_COLOR", "CLOCK_COLOR", "ALARM_CLOCK_COLOR", "DAILY_WORD_COLOR", "BATTERY_COLOR", "APP_COLOR",
             "BACKGROUND_COLOR", "APP_OPACITY", "SHOW_BACKGROUND", "TEXT_PADDING_SIZE",
-            "SHOW_WEATHER", "APP_USAGE_STATS" -> {
+            "SHOW_WEATHER", "APP_USAGE_STATS", "DRAWER_TYPE", "HIDE_SEARCH_VIEW" -> {
+                if (key == "DRAWER_TYPE" || key == "HIDE_SEARCH_VIEW") {
+                    selectedTag = null
+                    currentProfileFilter = null
+                    viewModel.clearAppCache()
+                    if (key == "HIDE_SEARCH_VIEW") {
+                        setupAppDrawer() // Re-setup to hide/show search
+                    }
+                }
                 updateUIFromPreferences()
+                viewModel.getAppList()
             }
             "HOME_ALIGNMENT", "CLOCK_ALIGNMENT", "DATE_ALIGNMENT", "ALARM_ALIGNMENT", "DAILY_WORD_ALIGNMENT", "DRAWER_ALIGNMENT", "HOME_ALIGNMENT_BOTTOM" -> {
                 if (key == "DRAWER_ALIGNMENT") {
@@ -1454,6 +1471,14 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         drawerBinding.appsRecyclerView.adapter = appsAdapter
         drawerBinding.contactsRecyclerView.adapter = contactsAdapter
 
+        drawerBinding.clearFiltersButton.setOnClickListener {
+            drawerBinding.search.setQuery("", false)
+            selectedTag = null
+            currentProfileFilter = null
+            viewModel.clearAppCache()
+            viewModel.getAppList()
+        }
+
         initAppDrawerViewModel(drawerBinding)
         setupAppDrawerSearch(drawerBinding)
     }
@@ -1597,7 +1622,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     private fun showTagDialog(context: Context, viewModel: MainViewModel, pkg: String, tag: String, user: UserHandle) {
         val editText = android.widget.EditText(context)
-        editText.setText(tag)
+        editText.hint = context.getString(R.string.new_tag)
         editText.setSelectAllOnFocus(true)
 
         // Collect existing tags
@@ -1619,17 +1644,18 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             scrollView.layoutParams = scrollParams
             scrollView.isHorizontalScrollBarEnabled = false
 
-            val chipGroup = com.google.android.material.chip.ChipGroup(context)
-            chipGroup.isSingleLine = true
+            val chipGroup = com.google.android.material.chip.ChipGroup(context).apply {
+                setTag("DIALOG_CHIP_GROUP")
+                isSingleLine = true
+            }
             
             existingTags.forEach { existingTag ->
                 val chip = com.google.android.material.chip.Chip(context)
                 chip.text = existingTag
+                val currentAppTags = tag.split(",").map { it.trim() }.filter { it.isNotBlank() }
                 chip.isCheckable = true
-                chip.setOnClickListener {
-                     editText.setText(existingTag)
-                     editText.setSelection(existingTag.length)
-                }
+                chip.isChecked = currentAppTags.contains(existingTag)
+                // Chip handles toggling itself because isCheckable = true
                 chipGroup.addView(chip)
             }
             scrollView.addView(chipGroup)
@@ -1648,8 +1674,26 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             .setTitle(R.string.tag)
             .setView(container)
             .setPositiveButton(R.string.save) { _, _ ->
-                val newTag = editText.text.toString().trim()
-                Prefs(context).setAppTag(pkg, newTag, user)
+                val typedTags = editText.text.toString().split(",").map { it.trim() }.filter { it.isNotBlank() }
+                val chipGroup = container.findViewWithTag<com.google.android.material.chip.ChipGroup>("DIALOG_CHIP_GROUP")
+                val selectedChips = mutableListOf<String>()
+                
+                if (chipGroup != null) {
+                    for (i in 0 until chipGroup.childCount) {
+                        val chip = chipGroup.getChildAt(i) as? com.google.android.material.chip.Chip
+                        if (chip?.isChecked == true) {
+                            selectedChips.add(chip.text.toString())
+                        }
+                    }
+                }
+
+                // Merge: selected chips + typed tags, maintaining order of chips then new ones
+                val finalTagsSet = (selectedChips + typedTags).distinct()
+                val finalTagString = finalTagsSet.joinToString(", ")
+
+                android.util.Log.d("TagEdit", "Final merged tags for $pkg: '$finalTagString'")
+                Prefs(context).setAppTag(pkg, finalTagString, user)
+                viewModel.clearAppCache()
                 viewModel.getAppList()
             }
             .setNegativeButton(R.string.cancel, null)
@@ -1661,19 +1705,37 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     private fun initAppDrawerViewModel(drawerBinding: FragmentAppDrawerBottomSheetBinding) {
         viewModel.appList.observe(viewLifecycleOwner) { rawAppList ->
             rawAppList?.let { list ->
+                setupFilterChips(drawerBinding, list) {
+                    viewModel.appList.value = viewModel.appList.value // Trigger refresh
+                }
+
                 val appsByProfile = list.groupBy { it.profileType }
-                val mergedList = listOf("SYSTEM", "PRIVATE", "WORK", "USER").flatMap { profile ->
-                    appsByProfile[profile].orEmpty()
-                }
+                val allProfiles = listOf("SYSTEM", "PRIVATE", "WORK", "USER")
                 
-                // Fix: mutually exclusive visibility
-                val isEmpty = mergedList.isEmpty()
-                if (drawerBinding.menuView.displayedChild == 0) { // Apps view
-                    drawerBinding.listEmptyHint.isVisible = isEmpty
-                    drawerBinding.appsRecyclerView.isVisible = !isEmpty
-                    drawerBinding.sidebarContainer.isVisible = prefs.showAZSidebar && !isEmpty
+                // Merge apps based on profile filter
+                val mergedList = allProfiles.flatMap { profile ->
+                    val apps = appsByProfile[profile].orEmpty()
+                    if (apps.isNotEmpty() && (currentProfileFilter == null || currentProfileFilter.equals(profile, true))) {
+                        apps
+                    } else emptyList()
                 }
-                appsAdapter.setAppList(mergedList.toMutableList())
+
+                // Filter by Tag if needed
+                val finalFilteredList = if (selectedTag != null) {
+                    mergedList.filter { 
+                         it.customTag.split(",").map { t -> t.trim() }.contains(selectedTag)
+                    }
+                } else {
+                    mergedList
+                }
+
+                val isEmpty = finalFilteredList.isEmpty()
+                if (drawerBinding.menuView.displayedChild == 0) { // Apps view
+                    drawerBinding.emptyStateContainer.isVisible = isEmpty
+                    drawerBinding.appsRecyclerView.isVisible = !isEmpty
+                    drawerBinding.sidebarContainer.isVisible = prefs.showAZSidebar && prefs.drawerType == Constants.DrawerType.Alphabetical && !isEmpty
+                }
+                appsAdapter.setAppList(finalFilteredList.toMutableList())
             }
         }
 
@@ -1681,7 +1743,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             newList?.let {
                 val isEmpty = it.isEmpty()
                 if (drawerBinding.menuView.displayedChild == 1) { // Contacts view
-                     drawerBinding.listEmptyHint.isVisible = isEmpty
+                     drawerBinding.emptyStateContainer.isVisible = isEmpty
                      drawerBinding.contactsRecyclerView.isVisible = !isEmpty
                 }
                 contactsAdapter.setContactList(it.toMutableList())
@@ -1689,7 +1751,144 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         }
     }
 
+    private fun setupFilterChips(drawerBinding: FragmentAppDrawerBottomSheetBinding, list: List<AppListItem>, onFilterChanged: () -> Unit) {
+        val drawerType = prefs.drawerType
+        val tags = list.flatMap { it.customTag.split(",").map { t -> t.trim() } }
+            .filter { it.isNotBlank() }
+            .distinct()
+            .sorted()
+
+        val shouldShowTags = tags.isNotEmpty()
+        val shouldShowProfiles = false // Placeholder for future work profile logic
+
+        if (!shouldShowTags && !shouldShowProfiles) {
+            drawerBinding.filterBarContainer.isVisible = false
+            if (selectedTag != null || currentProfileFilter != null) {
+                selectedTag = null
+                currentProfileFilter = null
+                view?.post { onFilterChanged() }
+            }
+            return
+        }
+
+        // Reset selectedTag if it no longer exists
+        if (selectedTag != null && !tags.contains(selectedTag)) {
+            selectedTag = null
+            view?.post { onFilterChanged() }
+        }
+
+        drawerBinding.filterBarContainer.isVisible = true
+        val toggleGroup = drawerBinding.filterToggleGroup
+
+        val listener = MaterialButtonToggleGroup.OnButtonCheckedListener { group, checkedId, isChecked ->
+            if (isChecked) {
+                val button = group.findViewById<MaterialButton>(checkedId)
+                val newTag = if (button.text == "All") null else button.text.toString()
+                if (selectedTag != newTag) {
+                    selectedTag = newTag
+                    view?.post { onFilterChanged() }
+                }
+            }
+        }
+        
+        toggleGroup.clearOnButtonCheckedListeners()
+        toggleGroup.removeAllViews()
+
+        val buttonStyle = com.google.android.material.R.attr.materialButtonOutlinedStyle
+
+        fun createSegmentButton(id: Int, title: String, isSelected: Boolean): MaterialButton {
+            return MaterialButton(requireContext(), null, buttonStyle).apply {
+                this.id = id
+                this.text = title
+                this.isCheckable = true
+                this.isChecked = isSelected
+                this.setPadding(32, 0, 32, 0)
+                this.cornerRadius = (20 * resources.displayMetrics.density).toInt()
+                this.minHeight = (40 * resources.displayMetrics.density).toInt()
+                this.layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    marginEnd = (8 * resources.displayMetrics.density).toInt()
+                }
+                
+                // Color states for background and text
+                val states = arrayOf(
+                    intArrayOf(android.R.attr.state_checked),
+                    intArrayOf(-android.R.attr.state_checked)
+                )
+                
+                val backgroundColors = intArrayOf(
+                    ContextCompat.getColor(context, R.color.colorPrimary),
+                    Color.TRANSPARENT
+                )
+                this.backgroundTintList = ColorStateList(states, backgroundColors)
+                
+                // Theme-aware unselected text color
+                val typedValue = TypedValue()
+                context.theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
+                val colorOnSurface = if (typedValue.resourceId != 0) {
+                    ContextCompat.getColor(context, typedValue.resourceId)
+                } else {
+                    typedValue.data
+                }
+                
+                val textColors = intArrayOf(
+                    Color.WHITE, // Selected
+                    colorOnSurface // Unselected
+                )
+                this.setTextColor(ColorStateList(states, textColors))
+                
+                // Stroke visibility
+                val strokeColors = intArrayOf(
+                    Color.TRANSPARENT,
+                    ContextCompat.getColor(context, R.color.light_gray_medium)
+                )
+                this.strokeColor = ColorStateList(states, strokeColors)
+            }
+        }
+
+        if (shouldShowProfiles) {
+            val profiles = mutableListOf<String>()
+            if (prefs.getProfileCounter("SYSTEM") > 0) profiles.add("SYSTEM")
+            if (prefs.getProfileCounter("WORK") > 0) profiles.add("WORK")
+            if (prefs.getProfileCounter("PRIVATE") > 0 && !PrivateSpaceManager(requireContext()).isPrivateSpaceLocked()) profiles.add("PRIVATE")
+
+            toggleGroup.addView(createSegmentButton(View.generateViewId(), "All", currentProfileFilter == null))
+
+            profiles.forEach { profile ->
+                val label = when(profile) {
+                    "SYSTEM" -> "Personal"
+                    "WORK" -> "Work"
+                    "PRIVATE" -> "Private"
+                    else -> profile
+                }
+                val btn = createSegmentButton(View.generateViewId(), label, profile == currentProfileFilter)
+                btn.tag = profile
+                toggleGroup.addView(btn)
+            }
+            toggleGroup.addOnButtonCheckedListener(listener)
+        } else if (shouldShowTags) {
+            toggleGroup.addView(createSegmentButton(View.generateViewId(), "All", selectedTag == null))
+
+            tags.forEach { tag ->
+                toggleGroup.addView(createSegmentButton(View.generateViewId(), tag, tag == selectedTag))
+            }
+            toggleGroup.addOnButtonCheckedListener(listener)
+        }
+        
+        drawerBinding.drawerRoot.requestLayout()
+    }
+
+
+
     private fun setupAppDrawerSearch(drawerBinding: FragmentAppDrawerBottomSheetBinding) {
+        val hideSearch = prefs.hideSearchView
+       drawerBinding.search.isVisible = !hideSearch
+        if (hideSearch) {
+            drawerBinding.search.clearFocus()
+            return
+        }
         drawerBinding.search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 val searchQuery = query?.trim() ?: ""

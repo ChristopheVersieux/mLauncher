@@ -31,6 +31,9 @@ class Prefs(val context: Context) {
     val messageWrongListType: ParameterizedType = Types.newParameterizedType(List::class.java, MessageWrong::class.java)
     val messageWrongAdapter: JsonAdapter<List<MessageWrong>> = moshi.adapter(messageWrongListType)
 
+    val usageCountType: ParameterizedType = Types.newParameterizedType(Map::class.java, String::class.java, Int::class.javaObjectType)
+    val usageCountAdapter: JsonAdapter<Map<String, Int>> = moshi.adapter(usageCountType)
+
     internal val prefsNormal: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     internal val prefsOnboarding: SharedPreferences = context.getSharedPreferences(PREFS_ONBOARDING_FILENAME, Context.MODE_PRIVATE)
     internal val pinnedAppsKey = PINNED_APPS
@@ -597,6 +600,26 @@ class Prefs(val context: Context) {
             return getEnumSetting(LAUNCHER_FONT, Constants.FontFamily.System)
         }
         set(value) = prefsNormal.edit { putString(LAUNCHER_FONT, value.name) }
+
+    var drawerType: Constants.DrawerType
+        get() {
+            return getEnumSetting(DRAWER_TYPE, Constants.DrawerType.Alphabetical)
+        }
+        set(value) = prefsNormal.edit { putString(DRAWER_TYPE, value.name) }
+
+    var appUsageCounts: Map<String, Int>
+        get() {
+            val json = prefsNormal.getString(APP_USAGE_COUNTS, "{}") ?: "{}"
+            return try {
+                usageCountAdapter.fromJson(json) ?: emptyMap()
+            } catch (e: Exception) {
+                emptyMap()
+            }
+        }
+        set(value) {
+            val json = usageCountAdapter.toJson(value)
+            prefsNormal.edit { putString(APP_USAGE_COUNTS, json) }
+        }
 
     var hiddenApps: MutableSet<String>
         get() = prefsNormal.getStringSet(HIDDEN_APPS, mutableSetOf()) as MutableSet<String>

@@ -141,4 +141,14 @@
         <item>RestartApp</item>
         <item>Disabled</item>
     </string-array>
+
+    <!-- Drawer Type -->
+    <string-array name="drawer_type_entries">
+        <item>@string/alphabetical</item>
+        <item>@string/most_used</item>
+    </string-array>
+    <string-array name="drawer_type_values">
+        <item>Alphabetical</item>
+        <item>MostUsed</item>
+    </string-array>
 </resources>
