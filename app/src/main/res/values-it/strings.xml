@@ -58,6 +58,9 @@
     <string name="app_language_description">Apri impostazioni lingua di sistema</string>
     <string name="auto_text_color">Colore testo automatico</string>
     <string name="auto_text_color_description">Regola automaticamente il colore del testo in base alla luminosità dello sfondo</string>
+    <string name="manual_text_color">Colore del testo della home</string>
+    <string name="text_color_light">Chiaro</string>
+    <string name="text_color_dark">Scuro</string>
     <!-- Strings used for features settings -->
     <string name="features_settings_title">Caratteristiche</string>
     <string name="personalization">Personalizzazione</string>
@@ -113,7 +116,7 @@
     <string name="app_padding_size">Dimensione della spaziatura</string>
     <string name="extend_home_apps_area">Estendi l\'area cliccabile</string>
     <string name="alignment_to_bottom">Allinea in basso</string>
-    <string name="visibility_display">Visibilità &amp; Visualizzazione</string>
+    <string name="visibility_display">Testo e visibilità della home</string>
     <string name="show_status_bar">Mostra barra di stato</string>
     <string name="show_navigation_bar">Mostra barra di navigazione</string>
     <string name="show_recent_apps">Mostra app recenti</string>
@@ -222,7 +225,7 @@
     <string name="advanced_settings_share_application_description">Migliora la tua esperienza con %1$s!</string>
     <string name="advanced_settings_share_application_description_addon">Scaricalo ora su %1$s e scopri di cosa parlano tutti! %2$s\n</string>
     <!-- Strings used for about settings -->
-    <string name="about_settings_title">Circa %1$s</string>
+    <string name="about_settings_title">Informazioni</string>
     <!-- Strings used for expert settings -->
     <string name="expert_settings_title">Esperto</string>
     <string name="toggleable_items">Elementi attivabili/disattivabili</string>

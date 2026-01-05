@@ -153,10 +153,15 @@
     <string name="extend_home_apps_area">Extend Clickable Area</string>
     <string name="alignment_to_bottom">Align to Bottom</string>
 
-    <string name="visibility_display">Visibility &amp; Display</string>
+    <string name="visibility_display">Home Screen Text &amp; Visibility</string>
 
     <string name="auto_text_color">Auto Text Color</string>
     <string name="auto_text_color_description">Automatically adjust text color based on wallpaper brightness</string>
+    <string name="manual_text_color">Homescreen Text Color</string>
+    <string name="text_color_light">Light</string>
+    <string name="text_color_dark">Dark</string>
+    <string name="experimental_feature_title">Experimental Feature</string>
+    <string name="experimental_widgets_message">Widget customization is currently experimental. More advanced options are coming in future updates!</string>
 
     <string name="show_status_bar">Show Status bar</string>
     <string name="show_navigation_bar">Show Navigation bar</string>
@@ -299,7 +304,14 @@
 
 
     <!-- Strings used for about settings -->
-    <string name="about_settings_title">About %1$s</string>
+    <string name="about_settings_title">About</string>
+    <string name="about_description">A minimal, distraction-free Android launcher focused on simplicity and productivity.</string>
+    <string name="source_code">Source Code</string>
+    <string name="github_repo">ChristopheVersieux/mLauncher</string>
+    <string name="support_development">Support Development</string>
+    <string name="donate_via_paypal">Donate via PayPal</string>
+    <string name="license">License</string>
+    <string name="gpl_license">GNU General Public License v3.0</string>
 
 
     <!-- Strings used for expert settings -->

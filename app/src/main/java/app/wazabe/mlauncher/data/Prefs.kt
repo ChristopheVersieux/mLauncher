@@ -3,7 +3,7 @@
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.UserHandle
-import androidx.core.app.AppLocalesStorageHelper
+
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.content.edit
 import androidx.core.graphics.toColorInt
@@ -467,6 +467,10 @@ class Prefs(val context: Context) {
         get() = prefsNormal.getString(CUSTOM_ICON_PACK_APP_LIST, emptyString()).toString()
         set(value) = prefsNormal.edit { putString(CUSTOM_ICON_PACK_APP_LIST, value) }
 
+    var manualTextColor: String
+        get() = prefsNormal.getString(MANUAL_TEXT_COLOR, "light") ?: "light"
+        set(value) = prefsNormal.edit { putString(MANUAL_TEXT_COLOR, value) }
+
     var wordList: String
         get() = prefsNormal.getString(WORD_LIST, emptyString()).toString()
         set(value) = prefsNormal.edit { putString(WORD_LIST, value) }
@@ -581,11 +585,6 @@ class Prefs(val context: Context) {
         }
         set(value) = prefsNormal.edit { putString(TEMP_UNIT, value.name) }
 
-    var appLanguage: Constants.Language
-        get() {
-            return getEnumSetting(APP_LANGUAGE, Constants.Language.System)
-        }
-        set(value) = prefsNormal.edit { AppLogger.e(message="SET LANG To "+value.name);putString(APP_LANGUAGE, value.name) }
 
     var searchEngines: Constants.SearchEngines
         get() {

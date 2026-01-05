@@ -4,23 +4,47 @@
 
     <PreferenceCategory android:title="@string/home_management">
         <SeekBarPreference
-            android:key="home_apps_num"
-            android:title="@string/number_of_home_apps"
+            android:key="HOME_APPS_NUM"
+            android:title="@string/apps_on_home_screen"
             android:max="12"
+            app:min="1"
             android:defaultValue="6"
+            app:showSeekBarValue="true"
             app:iconSpaceReserved="false" />
 
         <SwitchPreferenceCompat
-            android:key="lock_home_apps"
+            android:key="HOME_LOCKED"
             android:title="@string/lock_home_apps"
             app:iconSpaceReserved="false" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/layout_positioning">
         <ListPreference
-            android:key="home_alignment"
+            android:key="HOME_ALIGNMENT"
             android:title="@string/home_alignment"
+            android:entries="@array/alignment_names"
+            android:entryValues="@array/alignment_values"
+            android:defaultValue="Left"
+            app:useSimpleSummaryProvider="true"
             app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/visibility_display">
+        <SwitchPreferenceCompat
+            android:key="AUTO_TEXT_COLOR"
+            android:title="@string/auto_text_color"
+            android:summary="@string/auto_text_color_description"
+            android:defaultValue="true"
+            app:disableDependentsState="true" />
+
+        <ListPreference
+            android:key="MANUAL_TEXT_COLOR"
+            android:title="@string/manual_text_color"
+            android:entries="@array/text_color_entries"
+            android:entryValues="@array/text_color_values"
+            android:defaultValue="light"
+            android:dependency="AUTO_TEXT_COLOR"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
 </PreferenceScreen>

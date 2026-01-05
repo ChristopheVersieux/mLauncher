@@ -414,9 +414,10 @@ class AppDrawerFragment : BaseFragment() {
             }
         })
 
-        if (prefs.hideSearchView) {
-            binding.search.isVisible = false
-        } else {
+        // Always set visibility based on preference
+        updateSearchVisibility()
+        
+        if (!prefs.hideSearchView) {
             val appListButtonFlags = prefs.getMenuFlags("APPLIST_BUTTON_FLAGS", "00")
             when (flag) {
                 AppDrawerFlag.LaunchApp -> {
@@ -517,6 +518,17 @@ class AppDrawerFragment : BaseFragment() {
                 return false
             }
         })
+    }
+    
+    private fun updateSearchVisibility() {
+        if (_binding == null) return
+        val hide = prefs.hideSearchView
+        binding.searchContainer.isVisible = !hide
+        binding.search.isVisible = !hide
+        if (hide) {
+             binding.search.clearFocus()
+        }
+        binding.root.requestLayout()
     }
 
     private fun setupProfileButtons(
@@ -725,6 +737,7 @@ class AppDrawerFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
+        updateSearchVisibility()
         if (requireContext().hasSoftKeyboard()) {
             binding.search.showKeyboard()
         }

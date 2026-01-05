@@ -4,20 +4,24 @@
 
     <PreferenceCategory android:title="@string/search">
         <SwitchPreferenceCompat
-            android:key="hide_search_view"
+            android:key="HIDE_SEARCH_VIEW"
             android:title="@string/hide_search_view"
             app:iconSpaceReserved="false" />
 
         <SwitchPreferenceCompat
-            android:key="auto_show_keyboard"
+            android:key="AUTO_SHOW_KEYBOARD"
             android:title="@string/auto_show_keyboard"
             app:iconSpaceReserved="false" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/layout_positioning">
         <ListPreference
-            android:key="drawer_alignment"
+            android:key="DRAWER_ALIGNMENT"
             android:title="@string/drawer_alignment"
+            android:entries="@array/alignment_names"
+            android:entryValues="@array/alignment_values"
+            android:defaultValue="Right"
+            app:useSimpleSummaryProvider="true"
             app:iconSpaceReserved="false" />
     </PreferenceCategory>
 

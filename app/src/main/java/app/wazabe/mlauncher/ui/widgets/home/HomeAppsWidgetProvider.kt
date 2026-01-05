@@ -37,7 +37,7 @@ class HomeAppsWidgetProvider : AppWidgetProvider() {
                 val packageName = appModel.activityPackage
                 if (packageName.isEmpty()) continue
 
-                val itemRv = RemoteViews(context.packageName, R.layout.item_home_app)
+                val itemRv = RemoteViews(context.packageName, R.layout.item_widget_home_app)
 
                 // --- App label ---
                 val appLabel = try {

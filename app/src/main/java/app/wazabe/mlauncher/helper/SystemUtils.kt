@@ -149,16 +149,15 @@ fun getNextAlarm(context: Context, prefs: Prefs): CharSequence {
     val nextAlarmClock = alarmManager.nextAlarmClock ?: return "No alarm is set."
 
     val alarmTime = nextAlarmClock.triggerTime
-    val timezone =
-        prefs.appLanguage.timezone()  // Assuming this returns a string like "America/New_York"
-    val formattedDate = DateFormat.getBestDateTimePattern(timezone, "eeeddMMM")
+    val locale = Locale.getDefault()
+    val formattedDate = DateFormat.getBestDateTimePattern(locale, "eeeddMMM")
     val best12 = DateFormat.getBestDateTimePattern(
-        timezone,
+        locale,
         if (prefs.showClockFormat) "hhmma" else "hhmm"
     ).let {
         if (!prefs.showClockFormat) it.removeSuffix(" a") else it
     }
-    val best24 = DateFormat.getBestDateTimePattern(timezone, "HHmm")
+    val best24 = DateFormat.getBestDateTimePattern(locale, "HHmm")
     val formattedTime = if (is24HourFormat) best24 else best12
     val formattedAlarm =
         SimpleDateFormat("$formattedDate $formattedTime", Locale.getDefault()).format(alarmTime)

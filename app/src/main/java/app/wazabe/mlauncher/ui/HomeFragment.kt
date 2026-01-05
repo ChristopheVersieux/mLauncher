@@ -331,7 +331,10 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
     override fun onLongClick(view: View): Boolean {
-        if (prefs.homeLocked) return true
+        if (prefs.homeLocked) {
+            trySettings()
+            return true
+        }
 
         val n = view.id
         showAppList(AppDrawerFlag.SetHomeApp, includeHiddenApps = true, includeRecentApps = false, n)
@@ -507,21 +510,30 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
-            "showDate", "showClock", "showAlarm", "showDailyWord", "showBattery",
-            "dateSize", "clockSize", "alarmSize", "dailyWordSize", "batterySize", "appSize",
-            "dateColor", "clockColor", "alarmColor", "dailyWordColor", "batteryColor", "appColor",
-            "backgroundColor", "opacityNum", "showBackground", "textPaddingSize",
-            "showWeather", "appUsageStats" -> {
+            "SHOW_DATE", "SHOW_CLOCK", "SHOW_ALARM", "SHOW_DAILY_WORD", "SHOW_BATTERY",
+            "DATE_SIZE_TEXT", "CLOCK_SIZE_TEXT", "ALARM_SIZE_TEXT", "DAILY_WORD_SIZE_TEXT", "BATTERY_SIZE_TEXT", "APP_SIZE_TEXT",
+            "DATE_COLOR", "CLOCK_COLOR", "ALARM_CLOCK_COLOR", "DAILY_WORD_COLOR", "BATTERY_COLOR", "APP_COLOR",
+            "BACKGROUND_COLOR", "APP_OPACITY", "SHOW_BACKGROUND", "TEXT_PADDING_SIZE",
+            "SHOW_WEATHER", "APP_USAGE_STATS" -> {
                 updateUIFromPreferences()
             }
-            "homeAlignment", "clockAlignment", "dateAlignment", "alarmAlignment", "dailyWordAlignment", "drawerAlignment", "homeAlignmentBottom" -> {
+            "HOME_ALIGNMENT", "CLOCK_ALIGNMENT", "DATE_ALIGNMENT", "ALARM_ALIGNMENT", "DAILY_WORD_ALIGNMENT", "DRAWER_ALIGNMENT", "HOME_ALIGNMENT_BOTTOM" -> {
+                if (key == "DRAWER_ALIGNMENT") {
+                    setupAppDrawer() // Re-create adapter to pick new XML layout
+                }
+                if (key == "HOME_ALIGNMENT") {
+                    // Recreate homeAppsAdapter to pick new XML layout
+                    homeAppsAdapter = HomeAppsAdapter(
+                        prefs,
+                        onClick = { location -> homeAppClicked(location) },
+                        onLongClick = { location -> showHomeAppMenu(location) }
+                    )
+                    binding.homeAppsRecyclerView.adapter = homeAppsAdapter
+                }
                 updateUIFromPreferences()
-                // Some alignments might require layout updates
                 binding.mainLayout.requestLayout()
             }
-            "iconPackHome", "customIconPackHome", "iconPackAppList", "customIconPackAppList" -> {
-                // Reload icons if needed - HomeFragment usually handles this via AppReloader or similar
-                // For now, refresh UI
+            "ICON_PACK_HOME", "CUSTOM_ICON_PACK_HOME", "ICON_PACK_APP_LIST", "CUSTOM_ICON_PACK_APP_LIST" -> {
                 updateUIFromPreferences()
             }
         }
@@ -530,8 +542,11 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     private fun homeAppClicked(location: Int) {
         AnalyticsHelper.logUserAction("Clicked Home App: $location")
-        if (prefs.getAppName(location).isEmpty()) showLongPressToast()
-        else viewModel.launchApp(prefs.getHomeAppModel(location), this)
+        if (prefs.getAppName(location).isEmpty()) {
+            if (prefs.homeLocked) trySettings() else showLongPressToast()
+        } else {
+            viewModel.launchApp(prefs.getHomeAppModel(location), this)
+        }
     }
 
     private fun showAppList(flag: AppDrawerFlag, includeHiddenApps: Boolean = false, includeRecentApps: Boolean = true, n: Int = 0) {
@@ -1935,11 +1950,15 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     @SuppressLint("SetTextI18n", "RestrictedApi")
     private fun showHomeAppMenu(position: Int) {
+        if (prefs.homeLocked) {
+            trySettings()
+            return
+        }
         val appModel = prefs.getHomeAppModel(position)
         val isEmpty = appModel.activityPackage.isEmpty()
 
         val viewHolder = binding.homeAppsRecyclerView.findViewHolderForAdapterPosition(position) ?: return
-        val anchorView = viewHolder.itemView.findViewById<View>(R.id.appIconLeft) ?: viewHolder.itemView
+        val anchorView = viewHolder.itemView.findViewById<View>(R.id.appIcon) ?: viewHolder.itemView
 
         val popup = androidx.appcompat.widget.PopupMenu(requireContext(), anchorView)
         val menu = popup.menu
@@ -1962,45 +1981,28 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         }
 
         // Helper to get layered icon with colored circle background
-        fun getLayeredIcon(resId: Int, color: Int): Drawable? {
-            val context = requireContext()
-            val icon = ContextCompat.getDrawable(context, resId)?.mutate() ?: return null
-            icon.setColorFilter(color, PorterDuff.Mode.SRC_IN)
-
-            val background = GradientDrawable().apply {
-                shape = GradientDrawable.OVAL
-                setColor(ColorUtils.setAlphaComponent(color, 40)) // ~15% opacity
+        val typedValue = android.util.TypedValue()
+        requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
+        val iconColor = typedValue.data
+        
+        fun getThemedIcon(resId: Int): Drawable? {
+            return ContextCompat.getDrawable(requireContext(), resId)?.mutate()?.apply {
+                setColorFilter(iconColor, PorterDuff.Mode.SRC_IN)
             }
-
-            val layerDrawable = LayerDrawable(arrayOf(background, icon))
-            
-            // Add padding to icon (layer 1)
-            val density = context.resources.displayMetrics.density
-            val inset = (6 * density).toInt()
-            layerDrawable.setLayerInset(1, inset, inset, inset, inset)
-            
-            return layerDrawable
         }
-
-        // Colors
-        val colorRemove = android.graphics.Color.parseColor("#E91E63") // Pink
-        val colorChange = android.graphics.Color.parseColor("#FFC107") // Yellow/Amber
-        val colorAdd = android.graphics.Color.parseColor("#4CAF50") // Green
-        val colorInfo = android.graphics.Color.parseColor("#2196F3") // Blue
-        val colorSettings = android.graphics.Color.parseColor("#9E9E9E") // Grey
 
         // Group 0: App Actions
         if (!isEmpty) {
-            menu.add(0, 1, 0, "Remove").icon = getLayeredIcon(R.drawable.ic_close, colorRemove)
-            menu.add(0, 2, 1, "Change").icon = getLayeredIcon(R.drawable.ic_restart, colorChange)
-            menu.add(0, 3, 2, "App Info").icon = getLayeredIcon(R.drawable.ic_info, colorInfo)
+            menu.add(0, 1, 0, "Remove").icon = getThemedIcon(R.drawable.ic_close)
+            menu.add(0, 2, 1, "Change").icon = getThemedIcon(R.drawable.ic_restart)
+            menu.add(0, 3, 2, "App Info").icon = getThemedIcon(R.drawable.ic_info)
         } else {
              // Empty slot -> Add
-             menu.add(0, 2, 1, "Add").icon = getLayeredIcon(R.drawable.ic_add, colorAdd)
+             menu.add(0, 2, 1, "Add").icon = getThemedIcon(R.drawable.ic_add)
         }
         
         // Group 1: Settings (Separated)
-        menu.add(1, 4, 3, "Cascade Settings").icon = getLayeredIcon(R.drawable.ic_settings, colorSettings)
+        menu.add(1, 4, 3, "Cascade Settings").icon = getThemedIcon(R.drawable.ic_settings)
 
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {

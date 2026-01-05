@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@android:color/system_accent1_600</color>
+    <color name="colorPrimary">#00897B</color> <!-- Teal 600 -->
     <color name="colorPrimaryDark">@android:color/darker_gray</color>
     <color name="colorPrimaryBackground">@color/background_bubble</color>
     <color name="transparent">#00000000</color>
     <color name="colorAccent">#222222</color>
-    <color name="preference_accent">@android:color/system_accent1_600</color>
-    <color name="preference_accent_light">@android:color/system_accent1_300</color>
-    <color name="preference_accent_dark">@android:color/system_accent1_800</color>
+    <color name="preference_accent">#00897B</color> <!-- Teal 600 -->
+    <color name="preference_accent_light">#4DB6AC</color> <!-- Teal 300 -->
+    <color name="preference_accent_dark">#00695C</color> <!-- Teal 800 -->
+    <color name="about_screen_accent">@color/colorPrimary</color>
     <color name="system_surface">@android:color/system_neutral1_10</color>
     <color name="system_on_surface">@android:color/system_neutral1_900</color>
     <color name="colorSelected">#651FFF</color>

@@ -84,12 +84,20 @@ class AppDrawerAdapter(
 
     private var isBangSearch = false
 
+    override fun getItemViewType(position: Int): Int {
+        return when (prefs.drawerAlignment) {
+            Constants.Gravity.Left -> 0
+            Constants.Gravity.Center -> 1
+            Constants.Gravity.Right -> 2
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val prefs = Prefs(parent.context)
-        val layoutRes = when (prefs.drawerAlignment) {
-            Constants.Gravity.Left -> R.layout.adapter_app_drawer_left
-            Constants.Gravity.Center -> R.layout.adapter_app_drawer_center
-            Constants.Gravity.Right -> R.layout.adapter_app_drawer_right
+        val layoutRes = when (viewType) {
+            0 -> R.layout.item_app_left
+            1 -> R.layout.item_app_center
+            2 -> R.layout.item_app_right
+            else -> R.layout.item_app_left
         }
         val view = LayoutInflater.from(parent.context).inflate(layoutRes, parent, false)
         
@@ -110,78 +118,11 @@ class AppDrawerAdapter(
 
         val appModel = appFilteredList[holder.absoluteAdapterPosition]
         AppLogger.d("AppListDebug", "🔧 Binding position=$position, label=${appModel.label}, package=${appModel.activityPackage}")
-        // Pass icon cache and loading scope to bind
         holder.bind(flag, gravity, appModel, appClickListener, appInfoListener, appDeleteListener, iconCache, iconLoadingScope, prefs)
-        holder.appHide.setOnClickListener {
-            AppLogger.d("AppListDebug", "❌ Hide clicked for ${appModel.label} (${appModel.activityPackage})")
-
-            appFilteredList.removeAt(holder.absoluteAdapterPosition)
-            appsList.remove(appModel)
-            notifyItemRemoved(holder.absoluteAdapterPosition)
-
-            AppLogger.d("AppListDebug", "📤 notifyItemRemoved at ${holder.absoluteAdapterPosition}")
-            appHideListener(flag, appModel)
-        }
-        holder.appLock.setOnClickListener {
-            val appName = appModel.activityPackage
-            val currentLockedApps = prefs.lockedApps
-
-            if (currentLockedApps.contains(appName)) {
-                biometricHelper.startBiometricAuth(appModel, object : BiometricHelper.CallbackApp {
-                    override fun onAuthenticationSucceeded(appListItem: AppListItem) {
-                        AppLogger.d("AppListDebug", "🔓 Auth succeeded for $appName - unlocking")
-                        holder.appLock.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.padlock_off, 0, 0)
-                        holder.appLock.text = holder.itemView.context.getString(R.string.lock)
-                        currentLockedApps.remove(appName)
-                        prefs.lockedApps = currentLockedApps
-                        AppLogger.d("AppListDebug", "🔐 Updated lockedApps: $currentLockedApps")
-                    }
-
-                    override fun onAuthenticationFailed() {
-                        AppLogger.e("Authentication", holder.itemView.context.getString(R.string.text_authentication_failed))
-                    }
-
-                    override fun onAuthenticationError(errorCode: Int, errorMessage: CharSequence?) {
-                        val msg = when (errorCode) {
-                            BiometricPrompt.ERROR_USER_CANCELED -> holder.itemView.context.getString(R.string.text_authentication_cancel)
-                            else -> holder.itemView.context.getString(R.string.text_authentication_error).format(errorMessage, errorCode)
-                        }
-                        AppLogger.e("Authentication", msg)
-                    }
-                })
-            } else {
-                AppLogger.d("AppListDebug", "🔒 Locking $appName")
-                holder.appLock.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.padlock, 0, 0)
-                holder.appLock.text = holder.itemView.context.getString(R.string.unlock)
-                currentLockedApps.add(appName)
-            }
-
-            // Update the lockedApps value (save the updated set back to prefs)
-            prefs.lockedApps = currentLockedApps
-            AppLogger.d("lockedApps", prefs.lockedApps.toString())
-        }
-
-        holder.appSaveRename.setOnClickListener {
-            val name = holder.appRenameEdit.text.toString().trim()
-            AppLogger.d("AppListDebug", "✏️ Renaming ${appModel.activityPackage} to $name")
-            appModel.customLabel = name
-            notifyItemChanged(holder.absoluteAdapterPosition)
-            AppLogger.d("AppListDebug", "🔁 notifyItemChanged at ${holder.absoluteAdapterPosition}")
-            appRenameListener(appModel.activityPackage, appModel.customLabel)
-        }
-
-        holder.appSaveTag.setOnClickListener {
-            val name = holder.appTagEdit.text.toString().trim()
-            AppLogger.d("AppListDebug", "✏️ Tagging ${appModel.activityPackage} to $name")
-            appModel.customTag = name
-            notifyItemChanged(holder.absoluteAdapterPosition)
-            AppLogger.d("AppListDebug", "🔁 notifyItemChanged at ${holder.absoluteAdapterPosition}")
-            appTagListener(appModel.activityPackage, appModel.customTag, appModel.user)
-        }
 
         autoLaunch(position)
 
-        holder.appTitleFrame.setOnLongClickListener {
+        holder.itemView.setOnLongClickListener {
              val openApp = flag == AppDrawerFlag.LaunchApp || flag == AppDrawerFlag.HiddenApps
              if (!openApp) return@setOnLongClickListener true
 
@@ -200,31 +141,11 @@ class AppDrawerAdapter(
                 setForceIcons.invoke(menuPopupHelper, true)
              } catch (e: Exception) { e.printStackTrace() }
 
-             fun getLayeredIcon(resId: Int, color: Int): Drawable? {
-                 val ctx = holder.itemView.context
-                 val icon = AppCompatResources.getDrawable(ctx, resId)?.mutate() ?: return null
-                 icon.setColorFilter(color, PorterDuff.Mode.SRC_IN)
-
-                 val background = GradientDrawable().apply {
-                     shape = GradientDrawable.OVAL
-                     setColor(ColorUtils.setAlphaComponent(color, 40))
-                 }
-
-                 val layerDrawable = LayerDrawable(arrayOf(background, icon))
-                 val density = ctx.resources.displayMetrics.density
-                 val inset = (6 * density).toInt()
-                 layerDrawable.setLayerInset(1, inset, inset, inset, inset)
-                 return layerDrawable
-             }
+             val ctx = holder.itemView.context
              
-             // Creative Colors
-             val colorLock = android.graphics.Color.parseColor("#9C27B0") // Purple
-             val colorPin = android.graphics.Color.parseColor("#009688") // Teal
-             val colorHide = android.graphics.Color.parseColor("#607D8B") // Blue Grey
-             val colorRename = android.graphics.Color.parseColor("#4CAF50") // Green
-             val colorTag = android.graphics.Color.parseColor("#FFC107") // Amber
-             val colorInfo = android.graphics.Color.parseColor("#2196F3") // Blue
-             val colorUninstall = android.graphics.Color.parseColor("#E91E63") // Pink
+             fun getThemedIcon(resId: Int): Drawable? {
+                 return AppCompatResources.getDrawable(ctx, resId)
+             }
 
              val pkg = appModel.activityPackage
              val isLocked = prefs.lockedApps.contains(pkg)
@@ -235,53 +156,66 @@ class AppDrawerAdapter(
              if (contextMenuFlags[1]) {
                   val title = if (isLocked) holder.itemView.context.getString(R.string.unlock) else holder.itemView.context.getString(R.string.lock)
                   val icon = if (isLocked) R.drawable.padlock_off else R.drawable.padlock
-                  menu.add(0, 1, 0, title).icon = getLayeredIcon(icon, colorLock)
+                  menu.add(0, 1, 0, title).icon = getThemedIcon(icon)
              }
              if (contextMenuFlags[0]) {
                   val title = if (isPinned) holder.itemView.context.getString(R.string.unpin) else holder.itemView.context.getString(R.string.pin)
                   val icon = if (isPinned) R.drawable.pin_off else R.drawable.pin
-                  menu.add(0, 2, 1, title).icon = getLayeredIcon(icon, colorPin)
+                  menu.add(0, 2, 1, title).icon = getThemedIcon(icon)
              }
              if (contextMenuFlags[2]) {
                   val title = if (isHidden) holder.itemView.context.getString(R.string.show) else holder.itemView.context.getString(R.string.hide)
                   val icon = if (isHidden) R.drawable.visibility else R.drawable.visibility_off
-                  menu.add(0, 3, 2, title).icon = getLayeredIcon(icon, colorHide)
+                  menu.add(0, 3, 2, title).icon = getThemedIcon(icon)
              }
 
              if (contextMenuFlags[3]) {
-                  menu.add(1, 4, 3, holder.itemView.context.getString(R.string.rename)).icon = getLayeredIcon(R.drawable.ic_rename, colorRename)
+                  menu.add(1, 4, 3, holder.itemView.context.getString(R.string.rename)).icon = getThemedIcon(R.drawable.ic_rename)
              }
              if (contextMenuFlags[4]) {
-                  menu.add(1, 5, 4, holder.itemView.context.getString(R.string.tag)).icon = getLayeredIcon(R.drawable.ic_tag, colorTag)
+                  menu.add(1, 5, 4, holder.itemView.context.getString(R.string.tag)).icon = getThemedIcon(R.drawable.ic_tag)
              }
-             menu.add(1, 6, 5, "App Info").icon = getLayeredIcon(R.drawable.ic_info, colorInfo)
+             menu.add(1, 6, 5, "App Info").icon = getThemedIcon(R.drawable.ic_info)
              
-             menu.add(2, 7, 6, "Uninstall").icon = getLayeredIcon(R.drawable.ic_delete, colorUninstall)
+             menu.add(2, 7, 6, "Uninstall").icon = getThemedIcon(R.drawable.ic_delete)
 
              popup.setOnMenuItemClickListener { item ->
                  when(item.itemId) {
-                     1 -> holder.appLock.performClick()
-                     2 -> holder.appPin.performClick()
-                     3 -> holder.appHide.performClick()
-                     4 -> {
-                         holder.appRenameEdit.hint = appModel.activityLabel
-                         holder.appRenameLayout.isVisible = true
-                         holder.appHideLayout.isVisible = false
-                         holder.appRenameEdit.showKeyboard()
-                         holder.appRenameEdit.imeOptions = EditorInfo.IME_ACTION_DONE
-                         val act = holder.itemView.context as? Activity
-                         act?.findViewById<View>(R.id.sidebar_container)?.isVisible = false
-                         visibleHideLayouts.add(holder.absoluteAdapterPosition)
+                     1 -> { // Lock/Unlock
+                         val currentLockedApps = prefs.lockedApps.toMutableSet()
+                         if (isLocked) {
+                             biometricHelper.startBiometricAuth(appModel, object : BiometricHelper.CallbackApp {
+                                 override fun onAuthenticationSucceeded(appListItem: AppListItem) {
+                                     currentLockedApps.remove(pkg)
+                                     prefs.lockedApps = currentLockedApps
+                                     notifyItemChanged(holder.absoluteAdapterPosition)
+                                 }
+                                 override fun onAuthenticationFailed() {}
+                                 override fun onAuthenticationError(errorCode: Int, errorMessage: CharSequence?) {}
+                             })
+                         } else {
+                             currentLockedApps.add(pkg)
+                             prefs.lockedApps = currentLockedApps
+                             notifyItemChanged(holder.absoluteAdapterPosition)
+                         }
                      }
-                     5 -> {
-                         holder.appTagEdit.hint = appModel.activityLabel
-                         holder.appTagLayout.isVisible = true
-                         holder.appHideLayout.isVisible = false
-                         holder.appTagEdit.showKeyboard()
-                         holder.appTagEdit.imeOptions = EditorInfo.IME_ACTION_DONE
-                         val act = holder.itemView.context as? Activity
-                         act?.findViewById<View>(R.id.sidebar_container)?.isVisible = false
-                         visibleHideLayouts.add(holder.absoluteAdapterPosition)
+                     2 -> { // Pin/Unpin
+                         val currentPinnedApps = prefs.pinnedApps.toMutableSet()
+                         if (isPinned) currentPinnedApps.remove(pkg) else currentPinnedApps.add(pkg)
+                         prefs.pinnedApps = currentPinnedApps
+                         notifyItemChanged(holder.absoluteAdapterPosition)
+                     }
+                     3 -> { // Hide/Show
+                         appFilteredList.removeAt(holder.absoluteAdapterPosition)
+                         appsList.remove(appModel)
+                         notifyItemRemoved(holder.absoluteAdapterPosition)
+                         appHideListener(flag, appModel)
+                     }
+                     4 -> { // Rename
+                         appRenameListener(appModel.activityPackage, appModel.customLabel)
+                     }
+                     5 -> { // Tag
+                         appTagListener(appModel.activityPackage, appModel.customTag, appModel.user)
                      }
                      6 -> appInfoListener(appModel)
                      7 -> appDeleteListener(appModel)
@@ -416,25 +350,8 @@ class AppDrawerAdapter(
     class ViewHolder(
         view: View
     ) : RecyclerView.ViewHolder(view) {
-        val appHide: TextView = view.findViewById(R.id.appHide)
-        val appLock: TextView = view.findViewById(R.id.appLock)
-        val appRenameEdit: EditText = view.findViewById(R.id.appRenameEdit)
-        val appSaveRename: TextView = view.findViewById(R.id.appSaveRename)
-        val appTagEdit: EditText = view.findViewById(R.id.appTagEdit)
-        val appSaveTag: TextView = view.findViewById(R.id.appSaveTag)
-
-        val appHideLayout: LinearLayout = view.findViewById(R.id.appHideLayout)
-        val appRenameLayout: LinearLayout = view.findViewById(R.id.appRenameLayout)
-        val appTagLayout: LinearLayout = view.findViewById(R.id.appTagLayout)
-        private val appRename: TextView = view.findViewById(R.id.appRename)
-        private val appTag: TextView = view.findViewById(R.id.appTag)
-        val appPin: TextView = view.findViewById(R.id.appPin)
         val appTitle: TextView = view.findViewById(R.id.appTitle)
-        val appTitleFrame: LinearLayout = view.findViewById(R.id.appTitleFrame)
-        private val appClose: TextView = view.findViewById(R.id.appClose)
-        private val appInfo: TextView = view.findViewById(R.id.appInfo)
-        private val appDelete: TextView = view.findViewById(R.id.appDelete)
-        private val appIcon: android.widget.ImageView = view.findViewById(R.id.appIcon)
+        val appIcon: android.widget.ImageView = view.findViewById(R.id.appIcon)
 
         @SuppressLint("RtlHardcoded", "NewApi")
         fun bind(
@@ -449,135 +366,20 @@ class AppDrawerAdapter(
             prefs: Prefs
         ) {
             val context = itemView.context
-            val resources = itemView.resources
-            val label = appListItem.label
-
-            val contextMenuFlags = prefs.getMenuFlags("CONTEXT_MENU_FLAGS", "0011111")
-
-            // ----------------------------
-            // 1️⃣ Hide optional layouts
-            appHideLayout.isVisible = false
-            appRenameLayout.isVisible = false
-            appTagLayout.isVisible = false
-
             val packageName = appListItem.activityPackage
 
-            // ----------------------------
-            // 2️⃣ Precompute lock/pin/hide state
-            val isLocked = prefs.lockedApps.contains(packageName)
-            val isPinned = prefs.pinnedApps.contains(packageName)
-            val isHidden = (flag == AppDrawerFlag.HiddenApps)
-
-            // ----------------------------
-            // 3️⃣ Setup lock/pin/hide buttons
-            appLock.apply {
-                isVisible = contextMenuFlags[1]
-                setCompoundDrawablesWithIntrinsicBounds(
-                    0,
-                    if (isLocked) R.drawable.padlock else R.drawable.padlock_off,
-                    0,
-                    0
-                )
-                //text = if (isLocked) context.getString(R.string.unlock) else context.getString(R.string.lock)
-            }
-
-            appPin.apply {
-                isVisible = contextMenuFlags[0]
-                setCompoundDrawablesWithIntrinsicBounds(
-                    0,
-                    if (isPinned) R.drawable.pin_off else R.drawable.pin,
-                    0,
-                    0
-                )
-                text = if (isPinned) context.getString(R.string.unpin) else context.getString(R.string.pin)
-            }
-
-            appHide.apply {
-                isVisible = contextMenuFlags[2]
-                setCompoundDrawablesWithIntrinsicBounds(
-                    0,
-                    if (isHidden) R.drawable.visibility else R.drawable.visibility_off,
-                    0,
-                    0
-                )
-                text = if (isHidden) context.getString(R.string.show) else context.getString(R.string.hide)
-            }
-
-            // ----------------------------
-            // 4️⃣ Setup rename/tag layouts
-            appRename.apply {
-                isVisible = contextMenuFlags[3]
-                setOnClickListener {
-                    appRenameEdit.hint = appListItem.activityLabel
-                    appRenameLayout.isVisible = true
-                    appHideLayout.isVisible = false
-                    appRenameEdit.showKeyboard()
-                    appRenameEdit.imeOptions = EditorInfo.IME_ACTION_DONE
-                }
-            }
-
-            appTag.apply {
-                isVisible = contextMenuFlags[4]
-                setOnClickListener {
-                    appTagEdit.hint = appListItem.activityLabel
-                    appTagLayout.isVisible = true
-                    appHideLayout.isVisible = false
-                    appTagEdit.showKeyboard()
-                    appTagEdit.imeOptions = EditorInfo.IME_ACTION_DONE
-                }
-            }
-
-            appRenameEdit.apply {
-                text = Editable.Factory.getInstance().newEditable(appListItem.label)
-                addTextChangedListener(object : TextWatcher {
-                    override fun afterTextChanged(s: Editable) {}
-                    override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-                    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                        appSaveRename.text = when {
-                            text.isEmpty() -> context.getString(R.string.reset)
-                            text.toString() == appListItem.customLabel -> context.getString(R.string.cancel)
-                            else -> context.getString(R.string.rename)
-                        }
-                    }
-                })
-            }
-
-            appTagEdit.apply {
-                text = Editable.Factory.getInstance().newEditable(appListItem.customTag)
-                addTextChangedListener(object : TextWatcher {
-                    override fun afterTextChanged(s: Editable) {}
-                    override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-                    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                        appSaveTag.text = if (text.toString() == appListItem.customTag) context.getString(R.string.cancel)
-                        else context.getString(R.string.tag)
-                    }
-                })
-            }
-
-            appClose.setOnClickListener {
-                appHideLayout.isVisible = false
-                visibleHideLayouts.remove(absoluteAdapterPosition)
-                val sidebarContainer = (context as? Activity)?.findViewById<View>(R.id.sidebar_container)
-                if (visibleHideLayouts.isEmpty()) sidebarContainer?.isVisible = prefs.showAZSidebar
-            }
-
-            // ----------------------------
-            // 5️⃣ App title
+            // Set app title
             appTitle.text = appListItem.label
-            appTitle.setTextColor(prefs.appColor)
+            
+            // Set text color
+            // Text Color is handled by system theme (?android:attr/textColorPrimary)
             appTitle.textSize = prefs.appSize.toFloat()
 
             if (app.wazabe.mlauncher.Mlauncher.prefs.launcherFont != "system") {
                 appTitle.typeface = app.wazabe.mlauncher.Mlauncher.globalTypeface
             }
 
-            // Programmatic gravity and padding removed: now handled by XML layouts
-            // (adapter_app_drawer_left/right/center.xml)
-            val padding: Int = prefs.textPaddingSize
-            appTitleFrame.updatePadding(top = padding, bottom = padding)
-
-            // ----------------------------
-            // 6️⃣ Icon loading off main thread
+            // Icon loading
             val placeholderIcon = AppCompatResources.getDrawable(context, R.drawable.ic_default_app)
             val cachedIcon = iconCache[packageName]
             setAppTitleIcon(appTitle, cachedIcon ?: placeholderIcon, prefs)
@@ -599,26 +401,8 @@ class AppDrawerAdapter(
                 }
             }
 
-            // ----------------------------
-            // 7️⃣ Click listeners
-            val sidebarContainer = (context as? Activity)?.findViewById<View>(R.id.sidebar_container)
-            appTitleFrame.setOnClickListener { appClickListener(appListItem) }
-
-            appInfo.setOnClickListener { appInfoListener(appListItem) }
-            appDelete.setOnClickListener { appDeleteListener(appListItem) }
-
-            // ----------------------------
-            // 8️⃣ Lock/Pin toggle actions
-            appLock.setOnClickListener {
-                val updated = prefs.lockedApps.toMutableSet()
-                if (isLocked) updated.remove(packageName) else updated.add(packageName)
-                prefs.lockedApps = updated
-            }
-            appPin.setOnClickListener {
-                val updated = prefs.pinnedApps.toMutableSet()
-                if (isPinned) updated.remove(packageName) else updated.add(packageName)
-                prefs.pinnedApps = updated
-            }
+            // Click listener on entire item
+            itemView.setOnClickListener { appClickListener(appListItem) }
         }
 
 

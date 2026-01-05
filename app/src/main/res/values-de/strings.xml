@@ -58,6 +58,9 @@
     <string name="app_language_description">System-Spracheinstellungen öffnen</string>
     <string name="auto_text_color">Automatische Textfarbe</string>
     <string name="auto_text_color_description">Textfarbe automatisch basierend auf Hintergrundhelligkeit anpassen</string>
+    <string name="manual_text_color">Startbildschirm-Textfarbe</string>
+    <string name="text_color_light">Hell</string>
+    <string name="text_color_dark">Dunkel</string>
     <!-- Strings used for features settings -->
     <string name="features_settings_title">Merkmale</string>
     <string name="personalization">Personalisierung</string>
@@ -113,7 +116,7 @@
     <string name="app_padding_size">Polstergröße</string>
     <string name="extend_home_apps_area">Klickbaren Bereich erweitern</string>
     <string name="alignment_to_bottom">Unten ausrichten</string>
-    <string name="visibility_display">Sichtbarkeit &amp; Anzeige</string>
+    <string name="visibility_display">Startbildschirm-Text &amp; Sichtbarkeit</string>
     <string name="show_status_bar">Statusleiste anzeigen</string>
     <string name="show_navigation_bar">Navigationsleiste anzeigen</string>
     <string name="show_recent_apps">Zuletzt verwendete Apps anzeigen</string>
@@ -222,7 +225,7 @@
     <string name="advanced_settings_share_application_description">Erweitern Sie Ihr Erlebnis mit %1$s!</string>
     <string name="advanced_settings_share_application_description_addon">Hol es dir jetzt auf %1$s und sieh, worüber alle reden! %2$s\n</string>
     <!-- Strings used for about settings -->
-    <string name="about_settings_title">Über %1$s</string>
+    <string name="about_settings_title">Über</string>
     <!-- Strings used for expert settings -->
     <string name="expert_settings_title">Experte</string>
     <string name="toggleable_items">Umschaltbare Elemente</string>

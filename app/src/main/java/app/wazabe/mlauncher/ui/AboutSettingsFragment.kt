@@ -1,39 +1,49 @@
 package app.wazabe.mlauncher.ui
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.fragment.app.Fragment
 import app.wazabe.mlauncher.R
+import com.google.android.material.card.MaterialCardView
 
-class AboutSettingsFragment : GenericPref() {
+class AboutSettingsFragment : Fragment() {
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.preferences_about, rootKey)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_about, container, false)
+    }
 
-        findPreference<Preference>("about_header")?.title = getString(R.string.app_name)
-        findPreference<Preference>("about_header")?.summary = getString(R.string.created_by)
-
-        findPreference<Preference>("sourceCode")?.setOnPreferenceClickListener {
-            openUrl(getString(R.string.github_link))
-            true
-        }
-
-        // Donations and Credits could be ListPreference or multiple entries.
-        // For simplicity and matching the original "links" feel, I'll handle them if I had specific keys.
-        // In my XML I added "donations" and "credits" as single preferences.
-        // I'll make them open the most prominent link or a chooser.
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         
-        findPreference<Preference>("donations")?.setOnPreferenceClickListener {
-            openUrl(getString(R.string.sponsor_link))
-            true
+        // Set app version
+        val versionTextView = view.findViewById<TextView>(R.id.appVersion)
+        try {
+            val packageInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
+            versionTextView.text = "Version ${packageInfo.versionName}"
+        } catch (e: PackageManager.NameNotFoundException) {
+            versionTextView.text = "Version unknown"
         }
-
-        findPreference<Preference>("credits")?.setOnPreferenceClickListener {
-            openUrl(getString(R.string.weather_link))
-            true
+        
+        // Setup GitHub card click
+        val githubCard = view.findViewById<MaterialCardView>(R.id.githubCard)
+        githubCard.setOnClickListener {
+            openUrl("https://github.com/ChristopheVersieux/mLauncher")
+        }
+        
+        // Setup Donation card click
+        val donationCard = view.findViewById<MaterialCardView>(R.id.donationCard)
+        donationCard.setOnClickListener {
+            openUrl("https://www.paypal.com/donate/?business=Y4ZVAYMZCCD7A&no_recurring=0&currency_code=EUR")
         }
     }
 
@@ -42,7 +52,7 @@ class AboutSettingsFragment : GenericPref() {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(intent)
         } catch (e: Exception) {
-            // Handle error
+            // Handle error silently
         }
     }
 }

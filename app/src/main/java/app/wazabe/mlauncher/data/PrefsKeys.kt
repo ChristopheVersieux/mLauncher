@@ -13,6 +13,7 @@ internal const val FIRST_OPEN = "FIRST_OPEN"
 internal const val FIRST_SETTINGS_OPEN = "FIRST_SETTINGS_OPEN"
 internal const val FORCE_COLORED_WALLPAPER = "FORCE_COLORED_WALLPAPER"
 internal const val AUTO_TEXT_COLOR = "AUTO_TEXT_COLOR"
+internal const val MANUAL_TEXT_COLOR = "MANUAL_TEXT_COLOR"
 
 // Home & Drawer
 internal const val HOME_APPS_NUM = "HOME_APPS_NUM"
@@ -110,7 +111,6 @@ internal const val APP_ALIAS = "APP_ALIAS"
 internal const val APP_ACTIVITY = "APP_ACTIVITY"
 internal const val APP_USAGE_STATS = "APP_USAGE_STATS"
 internal const val APP_OPACITY = "APP_OPACITY"
-internal const val APP_LANGUAGE = "APP_LANGUAGE"
 internal const val APP_THEME = "APP_THEME"
 internal const val TEMP_UNIT = "TEMP_UNIT"
 

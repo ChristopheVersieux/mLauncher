@@ -44,41 +44,6 @@ class FeaturesSettingsFragment : GenericPref() {
             }
 
 
-        val langPref = findPreference<Preference>("APP_LANGUAGE")
-
-        langPref?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-            val langCode = newValue.toString() // e.g., "en", "fr", "ar", or "system"
-
-            Toast.makeText(requireContext(), "Changing language to: $langCode", Toast.LENGTH_SHORT).show()
-
-            // 1. Update the Locale for the current process immediately
-            val locale = if (langCode == "system") {
-                java.util.Locale.getDefault()
-            } else {
-                java.util.Locale(langCode)
-            }
-
-            java.util.Locale.setDefault(locale)
-            val resources = requireContext().resources
-            val config = resources.configuration
-            config.setLocale(locale)
-
-            // updateConfiguration ensures the current fragment/activity sees the change before restart
-            resources.updateConfiguration(config, resources.displayMetrics)
-
-            // 2. Restart the app to refresh the entire Activity stack with new strings
-            view?.postDelayed({
-                val intent = requireActivity().packageManager.getLaunchIntentForPackage(requireActivity().packageName)
-                intent?.let { safeIntent ->
-                    // Clear the task stack so the app starts fresh from the main screen
-                    safeIntent.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
-                    startActivity(safeIntent)
-                    requireActivity().finish()
-                }
-            }, 200)
-
-            true // Return true to save the new value to SharedPreferences
-        }
 
 
         val fontPref = findPreference<ListPreference>("LAUNCHER_FONT")

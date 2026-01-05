@@ -26,6 +26,7 @@
             android:layout_height="48dp"
             android:padding="12dp"
             android:background="@drawable/bg_icon_circle"
+            android:tint="@android:color/white"
             tools:src="@drawable/ic_settings" />
     </FrameLayout>
 

@@ -39,26 +39,6 @@ open class BaseActivity : AppCompatActivity() {
             })
         }
 
-        // Apply localization using AppCompatDelegate
-        val prefs = app.wazabe.mlauncher.data.Prefs(this)
-        val locale = prefs.appLanguage.locale()
-
-        // DEBUG: Toast to verify expected locale
-        //android.widget.Toast.makeText(this, "Target: ${locale.toLanguageTag()} | System: ${java.util.Locale.getDefault().toLanguageTag()}", android.widget.Toast.LENGTH_LONG).show()
-
-        val localeList = if (prefs.appLanguage == app.wazabe.mlauncher.data.Constants.Language.System) {
-            androidx.core.os.LocaleListCompat.getEmptyLocaleList()
-        } else {
-            androidx.core.os.LocaleListCompat.create(locale)
-        }
-        
-        // Launcher apps (activityType=home) cannot change locales after initialization
-        // This is an Android platform limitation, so we catch and ignore the exception
-        try {
-            androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(localeList)
-        } catch (e: IllegalStateException) {
-            // Silently ignore - launcher apps have restrictions on locale changes
-        }
 
 
         super.onCreate(savedInstanceState)

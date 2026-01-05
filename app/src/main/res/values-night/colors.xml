@@ -1,75 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@android:color/system_accent1_800</color>
-    <color name="colorPrimaryDark">@android:color/darker_gray</color>
+    <!-- Teal colors for dark mode -->
+    <color name="colorPrimary">#00695C</color> <!-- Teal 800 - Darker for dark mode -->
+    <color name="preference_accent">#00695C</color> <!-- Teal 800 -->
+    <color name="preference_accent_light">#26A69A</color> <!-- Teal 400 -->
+    <color name="preference_accent_dark">#004D40</color> <!-- Teal 900 -->
+    <color name="about_screen_accent">#80CBC4</color> <!-- Teal 200 - Lighter for About screen in dark mode -->
+    <color name="background_bubble">#FF2C2C2C</color>
     <color name="colorPrimaryBackground">@color/background_bubble</color>
-    <color name="transparent">#00000000</color>
-    <color name="colorAccent">#888888</color>
-    <color name="colorSelected">#B388FF</color>
-
-    <color name="buttonTextPrimary">#222222</color>
-    <color name="buttonBackgroundPrimary">#a6da95</color>
-    <color name="buttonBackgroundError">#ed8796</color>
-    <!-- White -->
-    <color name="white">#FFFFFF</color>
-    <color name="whiteTrans90">#E6FFFFFF</color>
-    <color name="whiteTrans80">#CCFFFFFF</color>
-    <color name="whiteTrans50">#80FFFFFF</color>
-    <color name="whiteTrans25">#40FFFFFF</color>
-    <color name="whiteTrans10">#1AFFFFFF</color>
-    <color name="whiteInverse">#000000</color>
-    <color name="whiteInverseTrans10">#1A000000</color>
-    <color name="whiteInverseTrans25">#40000000</color>
-    <color name="whiteInverseTrans50">#80000000</color>
-    <color name="whiteInverseTrans80">#CC000000</color>
-    <color name="whiteInverseTrans90">#E6000000</color>
-    <!-- Black -->
-    <color name="black">#000000</color>
-    <color name="blackTrans90">#E6000000</color>
-    <color name="blackTrans80">#CC000000</color>
-    <color name="blackTrans50">#80000000</color>
-    <color name="blackTrans25">#40000000</color>
-    <color name="blackTrans10">#1A000000</color>
-    <color name="blackInverse">#FFFFFF</color>
-    <color name="blackInverseTrans10">#1AFFFFFF</color>
-    <color name="blackInverseTrans25">#40FFFFFF</color>
-    <color name="blackInverseTrans50">#80FFFFFF</color>
-    <color name="blackInverseTrans80">#CCFFFFFF</color>
-    <color name="blackInverseTrans90">#E6FFFFFF</color>
-
-    <color name="background_light">#FFFFFFFF</color>
-    <color name="background_dark">#FF121212</color>
-    <color name="background_bubble">#FF181818</color>
-
-    <color name="fab_background">#FF282A36</color>
-    <color name="fab_border">#FFBD93F9</color>
-
-    <color name="hover_effect">#1A000000</color>
-
-    <color name="green">#4CAF50</color>
-    <color name="orange">#AF684C</color>
-    <color name="red">#AF4C4C</color>
-
-    <color name="low">#a6da95</color>
-    <color name="medium">#f5a97f</color>
-    <color name="high">#ed8796</color>
-
-    <color name="light_gray_very_light">#D3D3D3</color>
-    <color name="light_gray_light">#B0B0B0</color>
-    <color name="light_gray_medium">#8C8C8C</color>
-    <color name="light_gray_dark">#6E6E6E</color>
-    <color name="light_gray_very_dark">#4F4F4F</color>
-
-    <color name="gray_very_light">#A1A1A1</color>
-    <color name="gray_light">#808080</color>
-    <color name="gray_medium">#6D6D6D</color>
-    <color name="gray_dark">#595959</color>
-    <color name="gray_very_dark">#404040</color>
-
-    <color name="dark_gray_very_light">#6F6F6F</color>
-    <color name="dark_gray_light">#4F4F4F</color>
-    <color name="dark_gray_medium">#333333</color>
-    <color name="dark_gray_dark">#1A1A1A</color>
-    <color name="dark_gray_very_dark">#000000</color>
-
 </resources>

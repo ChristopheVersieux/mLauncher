@@ -208,7 +208,7 @@
     <string name="advanced_settings_share_application_description">قم بترقية تجربتك مع %1$s!</string>
     <string name="advanced_settings_share_application_description_addon">احصل عليه الآن على %1$s وشاهد ما يتحدث عنه الجميع! %2$s\n</string>
     <!-- Strings used for about settings -->
-    <string name="about_settings_title">حول %1$s</string>
+    <string name="about_settings_title">حول</string>
     <!-- Strings used for expert settings -->
     <string name="expert_settings_title">خبير</string>
     <string name="toggleable_items">العناصر القابلة للتبديل</string>

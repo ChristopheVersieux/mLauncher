@@ -3,20 +3,18 @@
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
-import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.RecyclerView
 import com.github.droidworksstudio.common.AppLogger
 import com.github.droidworksstudio.fuzzywuzzy.FuzzyFinder
+import app.wazabe.mlauncher.R
 import app.wazabe.mlauncher.data.Constants
 import app.wazabe.mlauncher.data.ContactListItem
 import app.wazabe.mlauncher.data.Prefs
-import app.wazabe.mlauncher.databinding.AdapterAppDrawerBinding
 import java.text.Normalizer
 
 class ContactDrawerAdapter(
@@ -29,18 +27,25 @@ class ContactDrawerAdapter(
     private var contactFilter = createContactFilter()
     var contactsList: MutableList<ContactListItem> = mutableListOf()
     var contactFilteredList: MutableList<ContactListItem> = mutableListOf()
-    private lateinit var binding: AdapterAppDrawerBinding
+
+    override fun getItemViewType(position: Int): Int {
+        return when (prefs.drawerAlignment) {
+            Constants.Gravity.Left -> 0
+            Constants.Gravity.Center -> 1
+            Constants.Gravity.Right -> 2
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        binding = AdapterAppDrawerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         prefs = Prefs(parent.context)
-        val fontColor = prefs.appColor
-        binding.appTitle.setTextColor(fontColor)
-
-        binding.appTitle.textSize = prefs.appSize.toFloat()
-        val padding: Int = prefs.textPaddingSize
-        binding.appTitle.setPadding(0, padding, 0, padding)
-        return ViewHolder(binding)
+        val layoutRes = when (viewType) {
+            0 -> R.layout.item_app_left
+            1 -> R.layout.item_app_center
+            2 -> R.layout.item_app_right
+            else -> R.layout.item_app_left
+        }
+        val view = LayoutInflater.from(parent.context).inflate(layoutRes, parent, false)
+        return ViewHolder(view)
     }
 
     fun getItemAt(position: Int): ContactListItem? {
@@ -52,8 +57,7 @@ class ContactDrawerAdapter(
         if (contactFilteredList.isEmpty() || position !in contactFilteredList.indices) return
 
         val contactModel = contactFilteredList[holder.absoluteAdapterPosition]
-
-        holder.bind(gravity, contactModel, contactClickListener)
+        holder.bind(contactModel, contactClickListener, prefs)
     }
 
     override fun getItemCount(): Int = contactFilteredList.size
@@ -142,38 +146,32 @@ class ContactDrawerAdapter(
 
     fun getFirstInList(): String? {
         return if (contactFilteredList.isNotEmpty()) {
-            contactFilteredList[0].displayName   // or .displayName depending on your model
+            contactFilteredList[0].displayName
         } else {
             null
         }
     }
 
 
-    class ViewHolder(
-        itemView: AdapterAppDrawerBinding,
-    ) : RecyclerView.ViewHolder(itemView.root) {
-        private val appTitle: TextView = itemView.appTitle
-        private val appTitleFrame: LinearLayout = itemView.appTitleFrame
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val appTitle: TextView = view.findViewById(R.id.appTitle)
 
         fun bind(
-            contactLabelGravity: Int,
             contactItem: ContactListItem,
             contactClickListener: (ContactListItem) -> Unit,
-        ) = with(itemView) {
-
+            prefs: Prefs
+        ) {
             appTitle.text = contactItem.displayName
-
-            // set text gravity
-            val params = appTitle.layoutParams as FrameLayout.LayoutParams
-            params.gravity = contactLabelGravity
-            appTitle.layoutParams = params
-
-            appTitleFrame.setOnClickListener {
-                contactClickListener(contactItem)
+            appTitle.textSize = prefs.appSize.toFloat()
+            // appTitle.setTextColor(prefs.appColor) - Using system default
+            
+            if (app.wazabe.mlauncher.Mlauncher.prefs.launcherFont != "system") {
+                appTitle.typeface = app.wazabe.mlauncher.Mlauncher.globalTypeface
             }
 
-            val padding = 24
-            appTitle.updatePadding(left = padding, right = padding)
+            itemView.setOnClickListener {
+                contactClickListener(contactItem)
+            }
         }
     }
 }

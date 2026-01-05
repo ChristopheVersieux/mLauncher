@@ -208,7 +208,7 @@
     <string name="advanced_settings_share_application_description">%1$s로 더욱 향상된 경험을 느껴보세요!</string>
     <string name="advanced_settings_share_application_description_addon">지금 %1$s 에서 받아보시고 모두가 무슨 이야기를 하는지 확인해보세요! %2$s\n</string>
     <!-- Strings used for about settings -->
-    <string name="about_settings_title">%1$s에 대하여</string>
+    <string name="about_settings_title">정보</string>
     <!-- Strings used for expert settings -->
     <string name="expert_settings_title">전문가</string>
     <string name="toggleable_items">토글 가능한 항목</string>

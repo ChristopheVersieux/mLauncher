@@ -12,51 +12,6 @@
         <item>Light</item>
     </string-array>
 
-    <!-- Language -->
-    <string-array name="language_entries">
-        <item>@string/system_default</item>
-        <item>@string/lang_arabic</item>
-        <item>@string/lang_czech</item>
-        <item>@string/lang_dutch</item>
-        <item>@string/lang_english</item>
-        <item>@string/lang_french</item>
-        <item>@string/lang_german</item>
-        <item>@string/lang_hebrew</item>
-        <item>@string/lang_italian</item>
-        <item>@string/lang_japanese</item>
-        <item>@string/lang_korean</item>
-        <item>@string/lang_lithuanian</item>
-        <item>@string/lang_polish</item>
-        <item>@string/lang_portuguese</item>
-        <item>@string/lang_romanian</item>
-        <item>@string/lang_russian</item>
-        <item>@string/lang_slovak</item>
-        <item>@string/lang_spanish</item>
-        <item>@string/lang_thai</item>
-        <item>@string/lang_turkish</item>
-    </string-array>
-    <string-array name="language_values">
-        <item>System</item>
-        <item>Arabic</item>
-        <item>Czech</item>
-        <item>Dutch</item>
-        <item>English</item>
-        <item>French</item>
-        <item>German</item>
-        <item>Hebrew</item>
-        <item>Italian</item>
-        <item>Japanese</item>
-        <item>Korean</item>
-        <item>Lithuanian</item>
-        <item>Polish</item>
-        <item>Portuguese</item>
-        <item>Romanian</item>
-        <item>Russian</item>
-        <item>Slovak</item>
-        <item>Spanish</item>
-        <item>Thai</item>
-        <item>Turkish</item>
-    </string-array>
 
     <!-- Font Family -->
     <string-array name="font_family_entries">
@@ -127,7 +82,17 @@
         <item>Celsius</item>
         <item>Fahrenheit</item>
     </string-array>
-    
+
+    <!-- Text Color -->
+    <string-array name="text_color_entries">
+        <item>@string/text_color_light</item>
+        <item>@string/text_color_dark</item>
+    </string-array>
+    <string-array name="text_color_values">
+        <item>light</item>
+        <item>dark</item>
+    </string-array>
+
     <!-- Alignment -->
     <string-array name="alignment_names">
         <item>@string/left</item>

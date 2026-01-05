@@ -355,19 +355,19 @@ fun Context.requestRuntimePermission(
 }
 
 fun Context.getCurrentTimestamp(prefs: Prefs): String {
-    val timezone = prefs.appLanguage.timezone()
+    val locale = Locale.getDefault()
     val is24HourFormat = DateFormat.is24HourFormat(this)
     val best12 = DateFormat.getBestDateTimePattern(
-        timezone,
+        locale,
         if (prefs.showClockFormat) "hhmma" else "hhmm"
     ).let {
         if (!prefs.showClockFormat) it.removeSuffix(" a") else it
     }
-    val best24 = DateFormat.getBestDateTimePattern(timezone, "HHmm")
+    val best24 = DateFormat.getBestDateTimePattern(locale, "HHmm")
     val timePattern = if (is24HourFormat) best24 else best12
-    val datePattern = DateFormat.getBestDateTimePattern(timezone, "eeeddMMM")
+    val datePattern = DateFormat.getBestDateTimePattern(locale, "eeeddMMM")
 
-    return SimpleDateFormat("$datePattern - $timePattern", Locale.getDefault()).format(Date())
+    return SimpleDateFormat("$datePattern - $timePattern", locale).format(Date())
 }
 
 fun Context.getRamInfo(): String {

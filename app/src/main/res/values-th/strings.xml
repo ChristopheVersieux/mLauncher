@@ -208,7 +208,7 @@
     <string name="advanced_settings_share_application_description">ยกระดับประสบการณ์ของคุณด้วย %1$s!</string>
     <string name="advanced_settings_share_application_description_addon">รับเลยตอนนี้ที่ %1$s และดูว่าทุกคนกำลังพูดถึงอะไร! %2$s\n</string>
     <!-- Strings used for about settings -->
-    <string name="about_settings_title">เกี่ยวกับ %1$s</string>
+    <string name="about_settings_title">เกี่ยวกับ</string>
     <!-- Strings used for expert settings -->
     <string name="expert_settings_title">ผู้เชี่ยวชาญ</string>
     <string name="toggleable_items">รายการที่สามารถสลับได้</string>

@@ -208,7 +208,7 @@
     <string name="advanced_settings_share_application_description">%1$sile deneyiminizi bir üst seviyeye taşıyın!</string>
     <string name="advanced_settings_share_application_description_addon">Hemen %1$s adresinden edinin ve herkesin ne hakkında konuştuğunu görün! %2$s\n</string>
     <!-- Strings used for about settings -->
-    <string name="about_settings_title">%1$sHakkında</string>
+    <string name="about_settings_title">Hakkında</string>
     <!-- Strings used for expert settings -->
     <string name="expert_settings_title">Uzman</string>
     <string name="toggleable_items">Değiştirilebilir Öğeler</string>

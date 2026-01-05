@@ -18,6 +18,7 @@ class GeneralSettingsFragment : GenericPref() {
         setPreferencesFromResource(R.xml.general_preferences, rootKey)
         
         setupThemePreference()
+        setupWallpaperPreference()
         setupLanguagePreference()
         setupFontPreference()
     }
@@ -48,6 +49,25 @@ class GeneralSettingsFragment : GenericPref() {
         }
     }
     
+    private fun setupWallpaperPreference() {
+        val wallpaperPref = findPreference<Preference>("pref_wallpaper_styles")
+        wallpaperPref?.setOnPreferenceClickListener {
+            try {
+                val intent = Intent(Intent.ACTION_SET_WALLPAPER)
+                startActivity(intent)
+            } catch (e: Exception) {
+                // Fallback if the specific intent fails
+                try {
+                    val intent = Intent(Settings.ACTION_DISPLAY_SETTINGS)
+                    startActivity(intent)
+                } catch (e2: Exception) {
+                    e2.printStackTrace()
+                }
+            }
+            true
+        }
+    }
+    
     private fun setupLanguagePreference() {
         val langPref = findPreference<Preference>("pref_app_language")
         
@@ -62,9 +82,23 @@ class GeneralSettingsFragment : GenericPref() {
     }
     
     private fun setupFontPreference() {
-        val fontPref = findPreference<ListPreference>("LAUNCHER_FONT")
+        val fontPref = findPreference<Preference>("LAUNCHER_FONT")
         
-        fontPref?.let { pref ->
+        // Update summary to current font
+        fun updateSummary() {
+            val currentFontPath = Mlauncher.prefs.launcherFont
+            if (currentFontPath == "system") {
+                fontPref?.summary = "System Default"
+            } else {
+                fontPref?.summary = currentFontPath.substringAfterLast("/").substringBeforeLast(".")
+                    .replace("_", " ")
+                    .replaceFirstChar { it.uppercase() }
+            }
+        }
+        
+        updateSummary()
+        
+        fontPref?.setOnPreferenceClickListener {
             val fontEntries = mutableListOf<String>()
             val fontValues = mutableListOf<String>()
             
@@ -87,15 +121,27 @@ class GeneralSettingsFragment : GenericPref() {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
+
+            val adapter = app.wazabe.mlauncher.ui.adapter.FontAdapter(requireContext(), fontEntries, fontValues)
             
-            pref.entries = fontEntries.toTypedArray()
-            pref.entryValues = fontValues.toTypedArray()
-        }
-        
-        fontPref?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, _ ->
-            Mlauncher.reloadFont()
-            AppReloader.restartApp(requireContext())
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.font_family)
+                .setAdapter(adapter) { _, which ->
+                    val selectedFont = fontValues[which]
+                    Mlauncher.prefs.launcherFont = selectedFont
+                    Mlauncher.reloadFont()
+                    
+                    updateSummary()
+                    
+                    // Direct application by recreating the activity
+                    requireActivity().recreate()
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
+            
             true
         }
     }
+
+
 }

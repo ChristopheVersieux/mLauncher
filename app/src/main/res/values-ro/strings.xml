@@ -208,7 +208,7 @@
     <string name="advanced_settings_share_application_description">Îmbunătățește-ți experiența cu %1$s!</string>
     <string name="advanced_settings_share_application_description_addon">Descarcă-l acum pe %1$s și vezi despre ce vorbește toată lumea! %2$s\n</string>
     <!-- Strings used for about settings -->
-    <string name="about_settings_title">Despre %1$s</string>
+    <string name="about_settings_title">Despre</string>
     <!-- Strings used for expert settings -->
     <string name="expert_settings_title">Expert</string>
     <string name="toggleable_items">Elemente comutabile</string>

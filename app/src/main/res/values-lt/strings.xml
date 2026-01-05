@@ -208,7 +208,7 @@
     <string name="advanced_settings_share_application_description">Padidinkite savo patirtį naudodami %1$s!</string>
     <string name="advanced_settings_share_application_description_addon">Gaukite jį dabar %1$s ir pažiūrėkite, apie ką visi kalba! %2$s\n</string>
     <!-- Strings used for about settings -->
-    <string name="about_settings_title">Apie %1$s</string>
+    <string name="about_settings_title">Apie</string>
     <!-- Strings used for expert settings -->
     <string name="expert_settings_title">Ekspertas</string>
     <string name="toggleable_items">Perjungiami elementai</string>

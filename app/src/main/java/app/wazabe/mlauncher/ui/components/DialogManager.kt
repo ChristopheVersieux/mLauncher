@@ -45,7 +45,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class DialogManager(val context: Context, val activity: Activity) {
 
     private lateinit var prefs: Prefs
-    val selectedColor: Int = ContextCompat.getColor(context, R.color.colorSelected)
 
     var backupRestoreBottomSheet: FontBottomSheetDialogLocked? = null
 
@@ -70,6 +69,7 @@ class DialogManager(val context: Context, val activity: Activity) {
             return TextView(context).apply {
                 this.text = text
                 textSize = 16f
+                // Text color inherited from theme
                 setPadding(0, 32, 0, 32)
                 isClickable = true
                 isFocusable = true
@@ -127,6 +127,7 @@ class DialogManager(val context: Context, val activity: Activity) {
             return TextView(context).apply {
                 this.text = text
                 textSize = 16f
+                // Text color inherited from theme
                 setPadding(0, 32, 0, 32)
                 isClickable = true
                 isFocusable = true
@@ -185,6 +186,7 @@ class DialogManager(val context: Context, val activity: Activity) {
             return TextView(context).apply {
                 this.text = text
                 textSize = 16f
+                // Text color inherited from theme
                 setPadding(0, 32, 0, 32)
                 isClickable = true
                 isFocusable = true
@@ -383,12 +385,9 @@ class DialogManager(val context: Context, val activity: Activity) {
             choiceMode = ListView.CHOICE_MODE_SINGLE
         }
 
-        // Mutable var so we can update highlight after a tap (even though we dismiss right away)
         var currentSelected = selectedIndex
-        val defaultColor = TypedValue().let { value ->
-            context.theme.resolveAttribute(android.R.attr.textColorPrimary, value, true)
-            ContextCompat.getColor(context, value.resourceId)
-        }
+        val defaultColor = ContextCompat.getColor(context, android.R.color.primary_text_light)
+        val selectedColor = ContextCompat.getColor(context, R.color.colorSelected)
 
         val adapter = object : ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, itemStrings) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -502,7 +501,8 @@ class DialogManager(val context: Context, val activity: Activity) {
             for (i in 0 until pillGroup.childCount) {
                 val pill = pillGroup.getChildAt(i) as TextView
                 val isSelected = i == selected
-                pill.setTextColor(if (isSelected) textColor else context.resources.getColor(strokeColor, null))
+                val accentColor = ContextCompat.getColor(context, R.color.colorSelected)
+                pill.setTextColor(if (isSelected) Color.WHITE else accentColor)
 
                 val drawable = GradientDrawable().apply {
                     shape = GradientDrawable.RECTANGLE
@@ -511,8 +511,8 @@ class DialogManager(val context: Context, val activity: Activity) {
                         itemStrings.lastIndex -> floatArrayOf(0f, 0f, 48f, 48f, 48f, 48f, 0f, 0f)
                         else -> floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
                     }
-                    setColor(if (isSelected) selectedColor else Color.TRANSPARENT)
-                    setStroke(3, context.resources.getColor(strokeColor, null))
+                    setColor(if (isSelected) accentColor else Color.TRANSPARENT)
+                    setStroke(3, accentColor)
                 }
 
                 pill.background = drawable

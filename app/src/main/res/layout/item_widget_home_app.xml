@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="48dp"
-    android:backgroundTint="@color/red"
-    android:background="?attr/selectableItemBackground"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingHorizontal="16dp"
@@ -17,9 +16,9 @@
         android:layout_height="32dp"
         android:layout_marginEnd="16dp"
         android:contentDescription="@string/app_name"
-        android:scaleType="fitXY"
-        tools:src="@android:drawable/sym_def_app_icon"
-        tools:visibility="visible" />
+        android:scaleType="fitCenter"
+        android:visibility="gone"
+        tools:src="@android:drawable/sym_def_app_icon" />
 
     <TextView
         android:id="@+id/appLabel"
@@ -28,9 +27,7 @@
         android:layout_weight="1"
         android:gravity="center_vertical"
         android:ellipsize="end"
-        android:includeFontPadding="false"
         android:maxLines="1"
-        android:singleLine="true"
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="16sp"
         tools:text="Application Name" />
