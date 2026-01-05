@@ -20,6 +20,7 @@ import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.UserHandle
 import android.os.Vibrator
 import android.text.Spannable
 import android.text.SpannableString
@@ -1389,29 +1390,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 drawerBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             },
             { appModel ->
-                if (requireContext().isSystemApp(appModel.activityPackage))
-                    showShortToast(getString(R.string.can_not_delete_system_apps))
-                else {
-                    val intent = Intent(Intent.ACTION_DELETE, "package:${appModel.activityPackage}".toUri())
-                    requireContext().startActivity(intent)
-                }
-            },
-            { p, a -> prefs.setAppAlias(p, a) },
-            { p, t, u -> prefs.setAppTag(p, t, u); appsAdapter.notifyDataSetChanged() },
-            { flag, appModel ->
-                val newSet = mutableSetOf<String>()
-                newSet.addAll(prefs.hiddenApps)
-                if (flag == AppDrawerFlag.HiddenApps) {
-                    newSet.remove(appModel.activityPackage + "|" + appModel.activityClass + "|" + appModel.user.hashCode())
-                } else {
-                    newSet.add(appModel.activityPackage + "|" + appModel.activityClass + "|" + appModel.user.hashCode())
-                }
-                prefs.hiddenApps = newSet
-                viewModel.getAppList()
-            },
-            { appModel ->
-                openAppInfo(requireContext(), appModel.user, appModel.activityPackage)
-                drawerBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                showCenteredAppOptionsDialog(requireContext(), viewModel, appModel)
             }
         )
 
@@ -1477,6 +1456,206 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
         initAppDrawerViewModel(drawerBinding)
         setupAppDrawerSearch(drawerBinding)
+    }
+
+
+    private fun showCenteredAppOptionsDialog(context: Context, viewModel: MainViewModel, appModel: AppListItem) {
+        val dialogView = android.widget.LinearLayout(context).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(50, 50, 50, 50)
+            gravity = Gravity.CENTER_HORIZONTAL
+        }
+
+        // App Icon
+        val iconView = android.widget.ImageView(context)
+        val iconSize = (60 * resources.displayMetrics.density).toInt()
+        val iconParams = android.widget.LinearLayout.LayoutParams(iconSize, iconSize)
+        iconParams.bottomMargin = 20
+        iconView.layoutParams = iconParams
+        try {
+            iconView.setImageDrawable(app.wazabe.mlauncher.helper.IconPackHelper.getSafeAppIcon(context, appModel.activityPackage, true, app.wazabe.mlauncher.helper.IconCacheTarget.APP_LIST))
+        } catch (e: Exception) {
+            iconView.setImageResource(R.drawable.app_launcher)
+        }
+        dialogView.addView(iconView)
+
+        // App Name
+        val nameView = android.widget.TextView(context)
+        nameView.text = appModel.label
+        nameView.textSize = 20f
+        // Removed setTextColor to use system default
+        nameView.gravity = Gravity.CENTER
+        val nameParams = android.widget.LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        nameParams.bottomMargin = 40
+        nameView.layoutParams = nameParams
+        dialogView.addView(nameView)
+
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(context)
+            .setView(dialogView)
+            .create()
+
+        // Helper to add buttons
+        fun addButton(text: String, iconRes: Int, onClick: () -> Unit) {
+            val button = com.google.android.material.button.MaterialButton(context, null, android.R.attr.borderlessButtonStyle)
+            button.text = text
+            button.setIconResource(iconRes)
+            button.iconTint = null // Keep original icon colors
+            button.iconPadding = (16 * resources.displayMetrics.density).toInt() // Add space between icon and text
+            button.iconGravity = com.google.android.material.button.MaterialButton.ICON_GRAVITY_TEXT_START
+            button.gravity = Gravity.START or Gravity.CENTER_VERTICAL
+            button.setOnClickListener {
+                dialog.dismiss()
+                onClick()
+            }
+            // Ensure full width
+            val params = android.widget.LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            button.layoutParams = params
+            dialogView.addView(button)
+        }
+
+        // Helper to add separator
+        fun addSeparator() {
+            val view = android.view.View(context)
+            val isDark = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+            view.setBackgroundColor(if (isDark) android.graphics.Color.parseColor("#33FFFFFF") else android.graphics.Color.parseColor("#1F000000"))
+            val params = android.widget.LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                (1 * resources.displayMetrics.density).toInt()
+            )
+            view.layoutParams = params
+            dialogView.addView(view)
+        }
+
+        addButton("Rename", R.drawable.ic_rename) {
+            showRenameDialog(context, viewModel, appModel.activityPackage, appModel.customLabel)
+        }
+        
+        addSeparator()
+
+        addButton("Tag", R.drawable.ic_tag) {
+            showTagDialog(context, viewModel, appModel.activityPackage, appModel.customTag, appModel.user)
+        }
+        
+        addSeparator()
+
+        val isHidden = prefs.hiddenApps.contains(appModel.activityPackage + "|" + appModel.activityClass + "|" + appModel.user.hashCode())
+        val hideText = if (isHidden) "Show App" else "Hide App"
+        val hideIcon = if (isHidden) R.drawable.visibility else R.drawable.visibility_off
+        addButton(hideText, hideIcon) {
+             val newSet = mutableSetOf<String>()
+             newSet.addAll(prefs.hiddenApps)
+             val key = appModel.activityPackage + "|" + appModel.activityClass + "|" + appModel.user.hashCode()
+             if (isHidden) newSet.remove(key) else newSet.add(key)
+             prefs.hiddenApps = newSet
+             viewModel.getAppList()
+        }
+        
+        addSeparator()
+        
+        addButton("App Info", R.drawable.ic_info) {
+            openAppInfo(requireContext(), appModel.user, appModel.activityPackage)
+            drawerBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+
+        dialog.show()
+    }
+
+    private fun showRenameDialog(context: Context, viewModel: MainViewModel, pkg: String, alias: String) {
+        val editText = android.widget.EditText(context)
+        editText.setText(alias)
+        editText.setSelectAllOnFocus(true)
+
+        val container = android.widget.FrameLayout(context)
+        val params = android.widget.FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        val margin = (20 * resources.displayMetrics.density).toInt()
+        params.setMargins(margin, margin, margin, margin)
+        editText.layoutParams = params
+        container.addView(editText)
+
+        androidx.appcompat.app.AlertDialog.Builder(context)
+            .setTitle(R.string.rename)
+            .setView(container)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val newName = editText.text.toString().trim()
+                Prefs(context).setAppAlias(pkg, newName)
+                viewModel.getAppList()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+        
+        editText.requestFocus()
+    }
+
+    private fun showTagDialog(context: Context, viewModel: MainViewModel, pkg: String, tag: String, user: UserHandle) {
+        val editText = android.widget.EditText(context)
+        editText.setText(tag)
+        editText.setSelectAllOnFocus(true)
+
+        // Collect existing tags
+        val existingTags = viewModel.appList.value?.map { it.customTag }?.filter { !it.isNullOrBlank() }?.distinct()?.sorted() ?: emptyList()
+
+        val container = android.widget.LinearLayout(context)
+        container.orientation = android.widget.LinearLayout.VERTICAL
+        val margin = (20 * resources.displayMetrics.density).toInt()
+        container.setPadding(margin, margin, margin, margin)
+
+        // Filter Chips (only if tags exist)
+        if (existingTags.isNotEmpty()) {
+            val scrollView = android.widget.HorizontalScrollView(context)
+            val scrollParams = android.widget.LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            scrollParams.bottomMargin = margin
+            scrollView.layoutParams = scrollParams
+            scrollView.isHorizontalScrollBarEnabled = false
+
+            val chipGroup = com.google.android.material.chip.ChipGroup(context)
+            chipGroup.isSingleLine = true
+            
+            existingTags.forEach { existingTag ->
+                val chip = com.google.android.material.chip.Chip(context)
+                chip.text = existingTag
+                chip.isCheckable = true
+                chip.setOnClickListener {
+                     editText.setText(existingTag)
+                     editText.setSelection(existingTag.length)
+                }
+                chipGroup.addView(chip)
+            }
+            scrollView.addView(chipGroup)
+            container.addView(scrollView)
+        }
+
+        // EditText
+        val params = android.widget.LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        editText.layoutParams = params
+        container.addView(editText)
+
+        androidx.appcompat.app.AlertDialog.Builder(context)
+            .setTitle(R.string.tag)
+            .setView(container)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val newTag = editText.text.toString().trim()
+                Prefs(context).setAppTag(pkg, newTag, user)
+                viewModel.getAppList()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+        
+        editText.requestFocus()
     }
 
     private fun initAppDrawerViewModel(drawerBinding: FragmentAppDrawerBottomSheetBinding) {
