@@ -60,10 +60,6 @@ class AdvancedSettingsFragment : GenericPref() {
             true
         }
 
-        findPreference<Preference>("wotdSettings")?.setOnPreferenceClickListener {
-            dialogManager.showSaveDownloadWOTDBottomSheet()
-            true
-        }
 
         findPreference<Preference>("helpFeedback")?.setOnPreferenceClickListener {
             helpFeedbackButton(requireContext())

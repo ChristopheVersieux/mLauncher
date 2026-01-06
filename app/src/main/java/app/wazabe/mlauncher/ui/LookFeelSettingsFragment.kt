@@ -72,7 +72,6 @@ class LookFeelSettingsFragment : PreferenceFragmentCompat() {
             "dateColor" to R.string.date_color,
             "clockColor" to R.string.clock_color,
             "alarmClockColor" to R.string.alarm_color,
-            "dailyWordColor" to R.string.daily_word_color,
             "batteryColor" to R.string.battery_color,
             "shortcutIconsColor" to R.string.shortcuts_color
         )
@@ -85,7 +84,6 @@ class LookFeelSettingsFragment : PreferenceFragmentCompat() {
                     "dateColor" -> prefs.dateColor
                     "clockColor" -> prefs.clockColor
                     "alarmClockColor" -> prefs.alarmClockColor
-                    "dailyWordColor" -> prefs.dailyWordColor
                     "batteryColor" -> prefs.batteryColor
                     "shortcutIconsColor" -> prefs.shortcutIconsColor
                     else -> 0
@@ -101,7 +99,6 @@ class LookFeelSettingsFragment : PreferenceFragmentCompat() {
                         "dateColor" -> prefs.dateColor = newColor
                         "clockColor" -> prefs.clockColor = newColor
                         "alarmClockColor" -> prefs.alarmClockColor = newColor
-                        "dailyWordColor" -> prefs.dailyWordColor = newColor
                         "batteryColor" -> prefs.batteryColor = newColor
                         "shortcutIconsColor" -> prefs.shortcutIconsColor = newColor
                     }

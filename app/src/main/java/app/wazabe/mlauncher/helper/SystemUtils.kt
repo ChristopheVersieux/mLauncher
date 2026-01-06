@@ -57,7 +57,6 @@ import app.wazabe.mlauncher.data.Prefs
 import app.wazabe.mlauncher.helper.utils.packageNames
 import app.wazabe.mlauncher.services.ActionService
 import app.wazabe.mlauncher.ui.widgets.home.HomeAppsWidgetProvider
-import app.wazabe.mlauncher.ui.widgets.wordoftheday.WordOfTheDayWidget
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -192,13 +191,6 @@ fun getNextAlarm(context: Context, prefs: Prefs): CharSequence {
     }
 }
 
-fun wordOfTheDay(context: Context, prefs: Prefs): String {
-    val dailyWordsArray = loadWordList(context, prefs)
-    val dayOfYear = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
-    val wordIndex =
-        (dayOfYear - 1) % dailyWordsArray.size // Subtracting 1 to align with array indexing
-    return dailyWordsArray[wordIndex]
-}
 
 fun ismlauncherDefault(context: Context): Boolean {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -226,11 +218,6 @@ fun themeDownloadButton(context: Context) {
     context.startActivity(intent)
 }
 
-fun wordofthedayDownloadButton(context: Context) {
-    val uri = "https://mlauncher.5646316.xyz/themes.html#word-of-the-day".toUri()
-    val intent = Intent(Intent.ACTION_VIEW, uri)
-    context.startActivity(intent)
-}
 
 fun communitySupportButton(context: Context) {
     val uri = "https://discord.com/invite/modmydevice".toUri()
@@ -392,17 +379,6 @@ fun sp2px(resources: Resources, sp: Float): Float {
         sp,
         resources.displayMetrics
     )
-}
-
-
-fun loadWordList(context: Context, prefs: Prefs): List<String> {
-    val customWordListString = prefs.wordList
-    // If the user has imported their own list, use it
-    return if (customWordListString != emptyString()) {
-        prefs.wordList.split("||")
-    } else {
-        context.resources.getStringArray(R.array.word_of_the_day).toList()
-    }
 }
 
 
@@ -803,7 +779,6 @@ fun getSystemIcons(
 
 fun updateAllWidgets(context: Context) {
     updateHomeWidget(context)
-    updateWordWidget(context)
     updateFabWidget(context)
 }
 
@@ -819,17 +794,6 @@ fun updateHomeWidget(context: Context) {
     context.sendBroadcast(intent)
 }
 
-fun updateWordWidget(context: Context) {
-    val appWidgetManager = AppWidgetManager.getInstance(context)
-    val componentName = ComponentName(context, WordOfTheDayWidget::class.java)
-    val appWidgetIds = appWidgetManager.getAppWidgetIds(componentName)
-
-    val intent = Intent(context, WordOfTheDayWidget::class.java).apply {
-        action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-        putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
-    }
-    context.sendBroadcast(intent)
-}
 
 fun updateFabWidget(context: Context) {
     val appWidgetManager = AppWidgetManager.getInstance(context)

@@ -131,10 +131,6 @@
             android:title="@string/show_alarm"
             android:defaultValue="false" />
 
-        <SwitchPreferenceCompat
-            android:key="SHOW_DAILY_WORD"
-            android:title="@string/show_daily_word"
-            android:defaultValue="false" />
 
         <SwitchPreferenceCompat
             android:key="SHOW_BATTERY"

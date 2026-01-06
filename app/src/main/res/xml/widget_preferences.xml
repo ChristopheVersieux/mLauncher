@@ -10,4 +10,13 @@
             app:iconSpaceReserved="false" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/warning">
+        <Preference
+            android:key="experimental_warning"
+            android:title="@string/experimental_feature"
+            android:summary="@string/widgets_experimental_warning"
+            android:selectable="false"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

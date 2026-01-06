@@ -8,11 +8,14 @@ plugins {
     alias(libs.plugins.google.firebase.crashlytics)
 }
 
+import java.util.Properties
+import java.io.FileInputStream
+
 // Top of build.gradle.kts
 val major = 1
 val minor = 0
 val patch = 0
-val build = 1
+val build = 4
 
 val type = 0 // 1=beta, 2=alpha else=production
 
@@ -42,7 +45,7 @@ android {
 
     defaultConfig {
         applicationId = applicationName
-        minSdk = 33
+        minSdk = 33  // Android 13+
         targetSdk = 36
         versionCode = versionCodeInt
         versionName = versionNameStr
@@ -53,8 +56,34 @@ android {
         includeInBundle = false
     }
 
+    // Load keystore properties from file
+    val keystorePropertiesFile = rootProject.file("keystore.properties")
+    val keystoreProperties = Properties()
+    
+    if (keystorePropertiesFile.exists()) {
+        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+    }
+
+    signingConfigs {
+        create("release") {
+            if (keystorePropertiesFile.exists()) {
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+            } else {
+                // Fallback to debug keystore if keystore.properties doesn't exist
+                storeFile = file("${System.getProperty("user.home")}/.android/debug.keystore")
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+        }
+    }
+
     buildTypes {
         getByName("debug") {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             isShrinkResources = false
             isDebuggable = true
@@ -69,7 +98,7 @@ android {
         }
 
         getByName("release") {
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

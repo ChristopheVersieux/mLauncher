@@ -95,6 +95,10 @@
     <string name="lock_orientation">Lock Orientation</string>
     <string name="haptic_feedback">Haptic Feedback</string>
 
+    <string name="warning">Warning</string>
+    <string name="experimental_feature">Experimental Feature</string>
+    <string name="widgets_experimental_warning">Widgets are not ready yet and this is a very experimental feature. Use at your own risk.</string>
+
     <string name="search">Search</string>
     <string name="drawer_type">Drawer Type</string>
     <string name="alphabetical">Alphabetical</string>
@@ -127,7 +131,7 @@
     <string name="show_clock_format">Show Format (AM/PM)</string>
     <string name="show_date">Show Date</string>
     <string name="show_alarm">Show Alarm</string>
-    <string name="show_daily_word">Show Daily Word</string>
+    <string name="show_daily_word">Show Random Fact</string>
     <string name="show_battery">Show Battery</string>
     <string name="show_battery_icon">Show Battery Icon</string>
 
@@ -150,7 +154,7 @@
     <string name="date_text_size">Date Text Size</string>
     <string name="clock_text_size">Clock Text Size</string>
     <string name="alarm_text_size">Alarm Text Size</string>
-    <string name="daily_word_text_size">Daily Word Text Size</string>
+    <string name="daily_word_text_size">Random Fact Text Size</string>
     <string name="battery_text_size">Battery Text Size</string>
 
     <string name="layout_positioning">Layout &amp; Positioning</string>
@@ -187,7 +191,7 @@
     <string name="date_alignment">Date</string>
     <string name="clock_alignment">Clock</string>
     <string name="alarm_alignment">Alarm</string>
-    <string name="daily_word_alignment">Daily Word</string>
+    <string name="daily_word_alignment">Random Fact</string>
     <string name="home_alignment">Home Apps</string>
     <string name="drawer_alignment">Drawer Apps</string>
 
@@ -198,7 +202,7 @@
     <string name="clock_color">Clock</string>
     <string name="date_color">Date</string>
     <string name="alarm_color">Alarm</string>
-    <string name="daily_word_color">Daily Word</string>
+    <string name="daily_word_color">Random Fact</string>
     <string name="battery_color">Battery</string>
     <string name="rainbow_shortcuts">Rainbow Shortcuts</string>
     <string name="shortcuts_color">Shortcuts</string>
@@ -286,8 +290,8 @@
     <string name="advanced_settings_theme_title">Theme Creations</string>
     <string name="advanced_settings_theme_description">Customize themes to suit you.</string>
 
-    <string name="advanced_settings_wotd_title">Word of the Day</string>
-    <string name="advanced_settings_wotd_description">Import custom Word of the Day list.</string>
+    <string name="advanced_settings_wotd_title">Random Fact</string>
+    <string name="advanced_settings_wotd_description">Fetch facts every 2 hours.</string>
 
     <string name="advanced_settings_theme_download">Download</string>
     <string name="advanced_settings_theme_export">Export</string>
@@ -338,6 +342,8 @@
 
     <!-- App Page Strings -->
     <string name="hidden_apps">Hidden Apps</string>
+    <string name="manage_hidden_apps">Manage Hidden Apps</string>
+    <string name="manage_hidden_apps_summary">View and unhide apps</string>
     <string name="favorite_apps">Favorite Apps</string>
     <string name="clear_home_app">Clear Home App</string>
 
@@ -355,6 +361,7 @@
     <string name="can_not_delete_system_apps">Can\'t Delete System Apps</string>
     <string name="please_select_app">Please select an app</string>
     <string name="drawer_list_empty_hint">No apps found</string>
+    <string name="hidden_apps_empty_hint">Long press on apps in the drawer if you want to hide them</string>
     <string name="long_press_for_settings">Long press anywhere for settings</string>
     <string name="long_press_to_select_app">Long press to select app</string>
     <string name="long_press_to_select_app_locked">Unlock home apps to select app</string>
@@ -393,6 +400,7 @@
     <string name="left">Left</string>
     <string name="right">Right</string>
     <string name="center">Center</string>
+    <string name="icon_only">Icon Only</string>
     <string name="dark">Dark</string>
     <string name="light">Light</string>
     <string name="system_default">System</string>

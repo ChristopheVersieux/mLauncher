@@ -82,4 +82,11 @@
     <color name="dark_gray_medium">#333333</color>
     <color name="dark_gray_dark">#1A1A1A</color>
     <color name="dark_gray_very_dark">#000000</color>
+    <!-- Icon circle backgrounds -->
+    <color name="bg_icon_circle_red">#EF5350</color>
+    <color name="bg_icon_circle_blue">#42A5F5</color>
+    <color name="bg_icon_circle_teal">#26A69A</color>
+    <color name="bg_icon_circle_orange">#FFA726</color>
+    <color name="bg_icon_circle_purple">#AB47BC</color>
+
 </resources>

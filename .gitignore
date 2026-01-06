@@ -13,3 +13,5 @@ diff.*
 local.properties
 app/google-services.json
 local.properties
+keystore.properties
+/app/tof162new.jks

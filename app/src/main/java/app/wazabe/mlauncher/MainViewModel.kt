@@ -84,6 +84,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val homeAppsNum = MutableLiveData(prefs.homeAppsNum)
     val homePagesNum = MutableLiveData(prefs.homePagesNum)
     val recentCounter = MutableLiveData(prefs.recentCounter)
+    val randomFact = MutableLiveData<String>()
 
     private val prefsNormal = prefs.prefsNormal
     private val pinnedAppsKey = prefs.pinnedAppsKey
@@ -135,6 +136,31 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     init {
+        // Migrate old hidden apps format (package|class|userHash) to new format (package|class)
+        val oldHiddenApps = prefs.hiddenApps
+        if (oldHiddenApps.isNotEmpty() && oldHiddenApps.any { it.count { c -> c == '|' } == 2 }) {
+            val migratedSet = oldHiddenApps.map { oldKey ->
+                val parts = oldKey.split("|")
+                if (parts.size == 3) {
+                    // Convert package|class|userHash to package|class
+                    "${parts[0]}|${parts[1]}"
+                } else {
+                    oldKey // Keep as is if already in new format
+                }
+            }.toSet()
+            prefs.hiddenApps = migratedSet.toMutableSet()
+        }
+        
+        // Invalidate old cache (version 1 = filtered cache)
+        val cacheVersion = prefs.prefsNormal.getInt("CACHE_VERSION", 0)
+        if (cacheVersion != 1) {
+            appsCacheFile.delete()
+            contactsCacheFile.delete()
+            appsMemoryCache = null
+            contactsMemoryCache = null
+            prefs.prefsNormal.edit().putInt("CACHE_VERSION", 1).apply()
+        }
+        
         prefsNormal.registerOnSharedPreferenceChangeListener(pinnedAppsListener)
 
         // Register content observer for contacts to refresh cache only when changes occur
@@ -311,36 +337,135 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
      * Public entry: loads apps from cache instantly and refreshes in background.
+     * Hidden apps are ALWAYS filtered out.
      */
-    fun getAppList(includeHiddenApps: Boolean = true, includeRecentApps: Boolean = true) {
-        // Fast path: show memory cache
+    fun getAppList(includeRecentApps: Boolean = true) {
+        val hiddenSet = prefs.hiddenApps
+        
+        // Simple filter: ALWAYS remove hidden apps
+        fun filterHidden(list: List<AppListItem>): List<AppListItem> {
+            val filtered = list.filter { item ->
+                // Check both formats to handle legacy data mixed with new data
+                val keyShort = "${item.activityPackage}|${item.activityClass}"
+                val keyLong = "${item.activityPackage}|${item.activityClass}|${item.user.hashCode()}"
+                
+                val isHidden = (keyShort in hiddenSet) || (keyLong in hiddenSet)
+                !isHidden
+            }
+            return filtered
+        }
+
+        // Fast path: show memory cache (filtered)
         appsMemoryCache?.let {
-            appList.postValue(it)
+            appList.postValue(filterHidden(it))
+            return@let
         } ?: run {
-            // try file cache
+            // try file cache (filtered)
             loadAppsFromFileCache()?.let { cached ->
                 appsMemoryCache = cached.toMutableList()
-                appList.postValue(cached)
+                appList.postValue(filterHidden(cached))
             }
         }
 
-        // Background refresh (only one at a time)
-        if (appsRefreshing.compareAndSet(false, true)) {
-            viewModelScope.launch {
-                try {
-                    val fresh = getAppsList(appContext, includeRegularApps = true, includeHiddenApps, includeRecentApps)
-                    appsMemoryCache = fresh
-                    saveAppsToFileCache(fresh)
-                    // publish on main
-                    withContext(Dispatchers.Main) {
-                        appList.value = fresh
-                    }
-                } finally {
-                    appsRefreshing.set(false)
+        // Background refresh
+        viewModelScope.launch {
+            try {
+                val fresh = getAppsList(appContext, includeRegularApps = true, includeHiddenApps = false, includeRecentApps)
+                appsMemoryCache = fresh
+                saveAppsToFileCache(fresh)
+                // publish on main (filtered)
+                withContext(Dispatchers.Main) {
+                    appList.value = filterHidden(fresh)
+                }
+            } catch (e: Exception) {
+                AppLogger.e("MainViewModel", "Error refreshing app list", e)
+            }
+        }
+    }
+
+    fun toggleAppVisibility(app: AppListItem, refreshMainList: Boolean = true) {
+        val hiddenSet = prefs.hiddenApps.toMutableSet()
+        val keyShort = "${app.activityPackage}|${app.activityClass}"
+        val keyLong = "${app.activityPackage}|${app.activityClass}|${app.user.hashCode()}"
+
+        val isHidden = hiddenSet.contains(keyShort) || hiddenSet.contains(keyLong)
+
+        if (isHidden) {
+            // Unhide: remove both possible keys to be clean
+            hiddenSet.remove(keyShort)
+            hiddenSet.remove(keyLong)
+        } else {
+            // Hide: always use the new short format
+            hiddenSet.add(keyShort)
+        }
+        prefs.hiddenApps = hiddenSet
+
+        // Update Hidden Apps list (always useful if that screen is open or cached)
+        getHiddenApps()
+        
+        // Clear global app cache so next full load picks up changes
+        clearAppCache()
+
+        // Only refresh main list if requested
+        if (refreshMainList) {
+            getAppList()
+        }
+    }
+
+    /**
+     * Get ONLY hidden apps for the "Manage Hidden Apps" screen
+     */
+    fun getHiddenApps() {
+        AppLogger.d("MainViewModel", "getHiddenApps called")
+        viewModelScope.launch {
+            try {
+                val freshList = getAppsList(appContext, includeRegularApps = false, includeHiddenApps = true, includeRecentApps = false)
+                AppLogger.d("MainViewModel", "getHiddenApps result: ${freshList.size} apps")
+                withContext(Dispatchers.Main) {
+                    hiddenApps.value = freshList
+                }
+            } catch (e: Exception) {
+                AppLogger.e("MainViewModel", "Error getting hidden apps", e)
+            }
+        }
+    }
+
+    fun fetchRandomFact(force: Boolean = false) {
+        val now = System.currentTimeMillis()
+        val lastFetch = prefs.randomFactLastFetch
+        val cachedFact = prefs.randomFactText
+
+        // Refresh every 2 hours (2 * 60 * 60 * 1000 ms)
+        if (!force && cachedFact.isNotEmpty() && (now - lastFetch < 2 * 60 * 60 * 1000)) {
+            randomFact.postValue(cachedFact)
+            return
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val url = java.net.URL("https://uselessfacts.jsph.pl/random.json")
+                val connection = url.openConnection() as java.net.HttpURLConnection
+                connection.requestMethod = "GET"
+                connection.connect()
+
+                if (connection.responseCode == 200) {
+                    val jsonResponse = connection.inputStream.bufferedReader().use { it.readText() }
+                    val fact = JSONObject(jsonResponse).getString("text")
+
+                    prefs.randomFactText = fact
+                    prefs.randomFactLastFetch = now
+                    randomFact.postValue(fact)
+                }
+            } catch (e: Exception) {
+                AppLogger.e("MainViewModel", "Failed to fetch random fact: ${e.message}", e)
+                // Fallback to cached fact if available
+                if (cachedFact.isNotEmpty()) {
+                    randomFact.postValue(cachedFact)
                 }
             }
         }
     }
+
 
     fun clearAppCache() {
         appsMemoryCache = null
@@ -375,13 +500,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     contactsRefreshing.set(false)
                 }
             }
-        }
-    }
-
-    fun getHiddenApps() {
-        viewModelScope.launch {
-            hiddenApps.value =
-                getAppsList(appContext, includeRegularApps = false, includeHiddenApps = true)
         }
     }
 
@@ -514,9 +632,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val profiles = userManager.userProfiles.toList()
         val privateManager = PrivateSpaceManager(context)
 
-        fun appKey(pkg: String, cls: String, profileHash: Int) = "$pkg|$cls|$profileHash"
-        fun isHidden(pkg: String, key: String) =
-            listOf(pkg, key, "$pkg|${key.hashCode()}").any { it in hiddenAppsSet }
+        fun appKey(pkg: String, cls: String, profileHash: Int) = "$pkg|$cls"
+        fun isHidden(pkg: String, key: String): Boolean = key in hiddenAppsSet
 
         // Lightweight intermediate storage
         data class RawApp(
@@ -529,8 +646,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         )
 
         val rawApps = mutableListOf<RawApp>()
-
-        // 🔹 Recent apps
+        
         if (prefs.recentAppsDisplayed && includeRecentApps) {
             runCatching {
                 AppUsageMonitor.createInstance(context)
@@ -554,7 +670,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 AppLogger.e("AppListDebug", "Failed to add recent apps: ${t.message}", t)
             }
         }
-
+        
         // 🔹 Profile apps in parallel
         val launcherApps = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
         val deferreds = profiles.map { profile ->
@@ -583,8 +699,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                             if (!seenAppKeys.add(key)) return@mapNotNull null
 
                             // Skip hidden / regular apps based on toggles
-                            if ((isHidden(pkg, key) && !includeHiddenApps) || (!isHidden(pkg, key) && !includeRegularApps))
+                            val hidden = isHidden(pkg, key)
+                            if (hidden && !includeHiddenApps) {
                                 return@mapNotNull null
+                            }
+                            if (!hidden && !includeRegularApps) {
+                                return@mapNotNull null
+                            }
 
                             val category = if (pkg in pinnedPackages) AppCategory.PINNED else AppCategory.REGULAR
                             RawApp(pkg, cls, info.label.toString(), profile, profileType, category)
@@ -633,19 +754,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             )
             .toMutableList()
 
-        // 🔹 Build scroll map and finalize
-        buildList(
-            items = allApps,
-            seenKey = mutableSetOf(),
-            scrollMapLiveData = _appScrollMap,
-            includeHidden = includeHiddenApps,
-            getKey = { "${it.activityPackage}|${it.activityClass}|${it.user.hashCode()}" },
-            isHidden = { it.activityPackage in hiddenAppsSet },
-            isPinned = { it.activityPackage in pinnedPackages },
-            buildItem = { it },
-            getLabel = { it.label },
-            normalize = ::normalizeForSort
-        )
+        // 🔹 Build scroll map only (filtering already done above)
+        val scrollMap = mutableMapOf<String, Int>()
+        allApps.forEachIndexed { index, item ->
+            val pinned = item.category == AppCategory.PINNED
+            val key = if (pinned) "★" else item.label.firstOrNull()?.uppercaseChar()?.toString() ?: "#"
+            scrollMap.putIfAbsent(key, index)
+        }
+        _appScrollMap.postValue(scrollMap)
+        
+        allApps
     }
 
 

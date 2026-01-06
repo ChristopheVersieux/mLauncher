@@ -31,6 +31,7 @@ import android.text.style.ImageSpan
 import android.text.style.SuperscriptSpan
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.util.TypedValue
 import android.view.GestureDetector
 import android.view.Gravity
@@ -91,7 +92,6 @@ import app.wazabe.mlauncher.helper.showPermissionDialog
 import app.wazabe.mlauncher.helper.utils.AppReloader
 import app.wazabe.mlauncher.helper.utils.BiometricHelper
 import app.wazabe.mlauncher.helper.utils.PrivateSpaceManager
-import app.wazabe.mlauncher.helper.wordOfTheDay
 import app.wazabe.mlauncher.listener.GestureAdapter
 import app.wazabe.mlauncher.listener.GestureManager
 import app.wazabe.mlauncher.listener.NotificationDotManager
@@ -259,6 +259,13 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     override fun onResume() {
         super.onResume()
+        
+        // Reset adapter flags to LaunchApp mode to prevent staying in edit mode
+        if (::appsAdapter.isInitialized) {
+            appsAdapter.flag = Constants.AppDrawerFlag.LaunchApp
+            appsAdapter.location = 0
+        }
+        
         if (::appWidgetHost.isInitialized) {
             appWidgetHost.startListening()
             restoreWidgets()
@@ -289,11 +296,11 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     private fun updateUIFromPreferences() {
         binding.apply {
             // Static UI setup
-            dailyWord.textSize = prefs.dailyWordSize.toFloat()
+            dailyWord.textSize = prefs.appSize.toFloat()
             homeScreenPager.textSize = prefs.appSize.toFloat()
 
-            dailyWord.isVisible = prefs.showDailyWord && dailyWord.text.toString().isNotBlank()
-            dailyWord.setTextColor(prefs.dailyWordColor)
+            dailyWord.isVisible = dailyWord.text.toString().isNotBlank()
+            dailyWord.setTextColor(prefs.appColor)
             
             // Rounded corners for drawer
             val radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 28f, resources.displayMetrics)
@@ -313,8 +320,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             appDrawerLayout.root.background = backgroundDrawable
             mainLayout.setBackgroundColor(getHexForOpacity(prefs))
 
-            dailyWord.gravity = prefs.dailyWordAlignment.value()
-            (dailyWord.layoutParams as LinearLayout.LayoutParams).gravity = prefs.dailyWordAlignment.value()
+            dailyWord.gravity = Gravity.CENTER
+            (dailyWord.layoutParams as LinearLayout.LayoutParams).gravity = Gravity.CENTER
             
             setupAppDrawerSearch(appDrawerLayout)
         }
@@ -324,9 +331,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
     private fun updateTimeAndInfo() {
-        binding.apply {
-            dailyWord.text = wordOfTheDay(requireContext(), prefs)
-        }
+        viewModel.fetchRandomFact()
     }
 
 
@@ -346,7 +351,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         }
 
         val n = view.id
-        showAppList(AppDrawerFlag.SetHomeApp, includeHiddenApps = true, includeRecentApps = false, n)
+        showAppList(AppDrawerFlag.SetHomeApp, includeRecentApps = false, n)
         AnalyticsHelper.logUserAction("Show App List")
         return true
     }
@@ -493,6 +498,10 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             // Focus on search view
             binding.appDrawerLayout.search.isIconified = false
         }
+        
+        binding.dailyWord.setOnClickListener {
+            viewModel.fetchRandomFact(force = true)
+        }
     }
 
 
@@ -506,6 +515,11 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                // default launcher check visual removed
             }
 
+            randomFact.observe(viewLifecycleOwner) { fact ->
+                binding.dailyWord.text = fact
+                binding.dailyWord.isVisible = fact.isNotBlank()
+            }
+
             homeAppsNum.observe(viewLifecycleOwner) { num ->
                 homeAppsAdapter.notifyDataSetChanged()
                 if (prefs.appUsageStats) {
@@ -517,11 +531,12 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         }
     }
 
+
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
-            "SHOW_DATE", "SHOW_CLOCK", "SHOW_ALARM", "SHOW_DAILY_WORD", "SHOW_BATTERY",
-            "DATE_SIZE_TEXT", "CLOCK_SIZE_TEXT", "ALARM_SIZE_TEXT", "DAILY_WORD_SIZE_TEXT", "BATTERY_SIZE_TEXT", "APP_SIZE_TEXT",
-            "DATE_COLOR", "CLOCK_COLOR", "ALARM_CLOCK_COLOR", "DAILY_WORD_COLOR", "BATTERY_COLOR", "APP_COLOR",
+            "SHOW_DATE", "SHOW_CLOCK", "SHOW_ALARM", "SHOW_BATTERY",
+            "DATE_SIZE_TEXT", "CLOCK_SIZE_TEXT", "ALARM_SIZE_TEXT", "BATTERY_SIZE_TEXT", "APP_SIZE_TEXT",
+            "DATE_COLOR", "CLOCK_COLOR", "ALARM_CLOCK_COLOR", "BATTERY_COLOR", "APP_COLOR",
             "BACKGROUND_COLOR", "APP_OPACITY", "SHOW_BACKGROUND", "TEXT_PADDING_SIZE",
             "SHOW_WEATHER", "APP_USAGE_STATS", "DRAWER_TYPE", "HIDE_SEARCH_VIEW" -> {
                 if (key == "DRAWER_TYPE" || key == "HIDE_SEARCH_VIEW") {
@@ -535,7 +550,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 updateUIFromPreferences()
                 viewModel.getAppList()
             }
-            "HOME_ALIGNMENT", "CLOCK_ALIGNMENT", "DATE_ALIGNMENT", "ALARM_ALIGNMENT", "DAILY_WORD_ALIGNMENT", "DRAWER_ALIGNMENT", "HOME_ALIGNMENT_BOTTOM" -> {
+            "HOME_ALIGNMENT", "CLOCK_ALIGNMENT", "DATE_ALIGNMENT", "ALARM_ALIGNMENT", "DRAWER_ALIGNMENT", "HOME_ALIGNMENT_BOTTOM" -> {
                 if (key == "DRAWER_ALIGNMENT") {
                     setupAppDrawer() // Re-create adapter to pick new XML layout
                 }
@@ -567,8 +582,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         }
     }
 
-    private fun showAppList(flag: AppDrawerFlag, includeHiddenApps: Boolean = false, includeRecentApps: Boolean = true, n: Int = 0) {
-        viewModel.getAppList(includeHiddenApps, includeRecentApps)
+    private fun showAppList(flag: AppDrawerFlag, includeRecentApps: Boolean = true, n: Int = 0) {
+        viewModel.getAppList(includeRecentApps)
         appsAdapter.flag = flag
         appsAdapter.location = n
         appsAdapter.notifyDataSetChanged()
@@ -724,7 +739,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             Action.ShowNotification -> expandNotificationDrawer(requireContext())
             Action.LockScreen -> lockPhone()
             Action.TogglePrivateSpace -> PrivateSpaceManager(requireContext()).togglePrivateSpaceLock(showToast = false, launchSettings = false)
-            Action.ShowAppList -> showAppList(AppDrawerFlag.LaunchApp, includeHiddenApps = false)
+            Action.ShowAppList -> showAppList(AppDrawerFlag.LaunchApp)
             Action.ShowNotesManager -> showNotesManager()
             Action.ShowDigitalWellbeing -> requireContext().openDigitalWellbeing()
             Action.OpenQuickSettings -> expandQuickSettings(requireContext())
@@ -1391,6 +1406,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         val gravity = when (prefs.drawerAlignment) {
             Constants.Gravity.Left -> Gravity.LEFT
             Constants.Gravity.Center -> Gravity.CENTER
+            Constants.Gravity.IconOnly -> Gravity.CENTER
             Constants.Gravity.Right -> Gravity.RIGHT
         }
 
@@ -1445,7 +1461,15 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
 // 2. On ajuste la marge en temps réel pendant le glissement
         drawerBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {}
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                // Reset to normal launch mode when drawer collapses
+                if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    if (::appsAdapter.isInitialized) {
+                        appsAdapter.flag = Constants.AppDrawerFlag.LaunchApp
+                        appsAdapter.location = 0
+                    }
+                }
+            }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 // slideOffset va de 0.0 (fermé) à 1.0 (ouvert)
@@ -1778,73 +1802,24 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         }
 
         drawerBinding.filterBarContainer.isVisible = true
-        val toggleGroup = drawerBinding.filterToggleGroup
+        val chipGroup = drawerBinding.filterChipGroup
 
-        val listener = MaterialButtonToggleGroup.OnButtonCheckedListener { group, checkedId, isChecked ->
-            if (isChecked) {
-                val button = group.findViewById<MaterialButton>(checkedId)
-                val newTag = if (button.text == "All") null else button.text.toString()
-                if (selectedTag != newTag) {
-                    selectedTag = newTag
-                    view?.post { onFilterChanged() }
-                }
-            }
-        }
-        
-        toggleGroup.clearOnButtonCheckedListeners()
-        toggleGroup.removeAllViews()
+        // Clear existing chips
+        chipGroup.removeAllViews()
 
-        val buttonStyle = com.google.android.material.R.attr.materialButtonOutlinedStyle
-
-        fun createSegmentButton(id: Int, title: String, isSelected: Boolean): MaterialButton {
-            return MaterialButton(requireContext(), null, buttonStyle).apply {
+        // Helper to create chips
+        fun createFilterChip(id: Int, label: String, isSelected: Boolean): com.google.android.material.chip.Chip {
+            return com.google.android.material.chip.Chip(requireContext(), null, R.attr.chipStyle).apply {
+                setChipBackgroundColorResource(R.color.chip_background_color)
+                setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.chip_text_color))
+                chipStrokeColor = ContextCompat.getColorStateList(requireContext(), R.color.chip_stroke_color)
+                chipStrokeWidth = (1 * resources.displayMetrics.density)
+                checkedIconTint = ContextCompat.getColorStateList(requireContext(), android.R.color.white)
                 this.id = id
-                this.text = title
+                this.text = label
                 this.isCheckable = true
                 this.isChecked = isSelected
-                this.setPadding(32, 0, 32, 0)
-                this.cornerRadius = (20 * resources.displayMetrics.density).toInt()
-                this.minHeight = (40 * resources.displayMetrics.density).toInt()
-                this.layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                ).apply {
-                    marginEnd = (8 * resources.displayMetrics.density).toInt()
-                }
-                
-                // Color states for background and text
-                val states = arrayOf(
-                    intArrayOf(android.R.attr.state_checked),
-                    intArrayOf(-android.R.attr.state_checked)
-                )
-                
-                val backgroundColors = intArrayOf(
-                    ContextCompat.getColor(context, R.color.colorPrimary),
-                    Color.TRANSPARENT
-                )
-                this.backgroundTintList = ColorStateList(states, backgroundColors)
-                
-                // Theme-aware unselected text color
-                val typedValue = TypedValue()
-                context.theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
-                val colorOnSurface = if (typedValue.resourceId != 0) {
-                    ContextCompat.getColor(context, typedValue.resourceId)
-                } else {
-                    typedValue.data
-                }
-                
-                val textColors = intArrayOf(
-                    Color.WHITE, // Selected
-                    colorOnSurface // Unselected
-                )
-                this.setTextColor(ColorStateList(states, textColors))
-                
-                // Stroke visibility
-                val strokeColors = intArrayOf(
-                    Color.TRANSPARENT,
-                    ContextCompat.getColor(context, R.color.light_gray_medium)
-                )
-                this.strokeColor = ColorStateList(states, strokeColors)
+                this.isCheckedIconVisible = true
             }
         }
 
@@ -1854,7 +1829,9 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             if (prefs.getProfileCounter("WORK") > 0) profiles.add("WORK")
             if (prefs.getProfileCounter("PRIVATE") > 0 && !PrivateSpaceManager(requireContext()).isPrivateSpaceLocked()) profiles.add("PRIVATE")
 
-            toggleGroup.addView(createSegmentButton(View.generateViewId(), "All", currentProfileFilter == null))
+            // "All" Chip
+            val allChip = createFilterChip(View.generateViewId(), "All", currentProfileFilter == null)
+            chipGroup.addView(allChip)
 
             profiles.forEach { profile ->
                 val label = when(profile) {
@@ -1863,18 +1840,34 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                     "PRIVATE" -> "Private"
                     else -> profile
                 }
-                val btn = createSegmentButton(View.generateViewId(), label, profile == currentProfileFilter)
-                btn.tag = profile
-                toggleGroup.addView(btn)
+                val chip = createFilterChip(View.generateViewId(), label, profile == currentProfileFilter)
+                chip.tag = profile
+                chipGroup.addView(chip)
             }
-            toggleGroup.addOnButtonCheckedListener(listener)
         } else if (shouldShowTags) {
-            toggleGroup.addView(createSegmentButton(View.generateViewId(), "All", selectedTag == null))
+            // "All" Chip
+            val allChip = createFilterChip(View.generateViewId(), "All", selectedTag == null)
+            chipGroup.addView(allChip)
 
             tags.forEach { tag ->
-                toggleGroup.addView(createSegmentButton(View.generateViewId(), tag, tag == selectedTag))
+                val chip = createFilterChip(View.generateViewId(), tag, tag == selectedTag)
+                chipGroup.addView(chip)
             }
-            toggleGroup.addOnButtonCheckedListener(listener)
+        }
+        
+        // Listener for changes
+        chipGroup.setOnCheckedStateChangeListener { group, checkedIds ->
+            // Single selection, so checkedIds should have 0 or 1 item
+            if (checkedIds.isEmpty()) return@setOnCheckedStateChangeListener
+            
+            val checkedId = checkedIds[0]
+            val chip = group.findViewById<com.google.android.material.chip.Chip>(checkedId)
+            val newTag = if (chip.text == "All") null else chip.text.toString()
+
+            if (selectedTag != newTag) {
+                selectedTag = newTag
+                view?.post { onFilterChanged() }
+            }
         }
         
         drawerBinding.drawerRoot.requestLayout()
@@ -1916,7 +1909,6 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     private fun dismissDialogs() {
         dialogBuilder.backupRestoreBottomSheet?.dismiss()
         dialogBuilder.saveLoadThemeBottomSheet?.dismiss()
-        dialogBuilder.saveDownloadWOTDBottomSheet?.dismiss()
         dialogBuilder.singleChoiceBottomSheetPill?.dismiss()
         dialogBuilder.singleChoiceBottomSheet?.dismiss()
         dialogBuilder.colorPickerBottomSheet?.dismiss()
@@ -2314,6 +2306,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
 
     private fun removeHomeApp(position: Int) {
+        // Clear the app at this position
         val emptyApp = AppListItem(
             activityLabel = "",
             activityPackage = "",
@@ -2322,8 +2315,18 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             customLabel = "",
             customTag = ""
         )
-        prefs.setHomeAppModel(position, emptyApp)
-        homeAppsAdapter.notifyItemChanged(position)
+        
+        // Check if this is the last position
+        val currentTotal = prefs.homeAppsNum
+        if (position == currentTotal - 1) {
+            // If it's the last slot, decrease the total count
+            prefs.homeAppsNum = currentTotal - 1
+            homeAppsAdapter.notifyDataSetChanged()
+        } else {
+            // Otherwise just clear it
+            prefs.setHomeAppModel(position, emptyApp)
+            homeAppsAdapter.notifyItemChanged(position)
+        }
     }
 
     @SuppressLint("SetTextI18n", "RestrictedApi")
@@ -2358,34 +2361,43 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             e.printStackTrace()
         }
 
-        // Helper to get layered icon with colored circle background
-        val typedValue = android.util.TypedValue()
-        requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
-        val iconColor = typedValue.data
-        
-        fun getThemedIcon(resId: Int): Drawable? {
-            return ContextCompat.getDrawable(requireContext(), resId)?.mutate()?.apply {
-                setColorFilter(iconColor, PorterDuff.Mode.SRC_IN)
+        // Helper to get icon with colored circle background
+        fun getIconWithBackground(iconRes: Int, bgColorRes: Int): Drawable {
+            val icon = ContextCompat.getDrawable(requireContext(), iconRes)?.mutate()?.apply {
+                setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN)
+            }
+            
+            val bgColor = ContextCompat.getColor(requireContext(), bgColorRes)
+            val circle = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(bgColor)
+            }
+            
+            val size = (24 * resources.displayMetrics.density).toInt()
+            val padding = (6 * resources.displayMetrics.density).toInt()
+            
+            return LayerDrawable(arrayOf(circle, icon ?: ColorDrawable(Color.TRANSPARENT))).apply {
+                setLayerSize(0, size, size)
+                setLayerSize(1, size - padding * 2, size - padding * 2)
+                setLayerGravity(1, Gravity.CENTER)
             }
         }
 
-        // Group 0: App Actions
+        // Group 0: Main actions
+        menu.add(0, 2, 0, "Change").icon = getIconWithBackground(R.drawable.ic_restart, R.color.bg_icon_circle_blue)
+        
         if (!isEmpty) {
-            menu.add(0, 1, 0, "Remove").icon = getThemedIcon(R.drawable.ic_close)
-            menu.add(0, 2, 1, "Change").icon = getThemedIcon(R.drawable.ic_restart)
-            menu.add(0, 3, 2, "App Info").icon = getThemedIcon(R.drawable.ic_info)
-        } else {
-             // Empty slot -> Add
-             menu.add(0, 2, 1, "Add").icon = getThemedIcon(R.drawable.ic_add)
+            menu.add(0, 3, 1, "App Info").icon = getIconWithBackground(R.drawable.ic_info, R.color.bg_icon_circle_teal)
         }
         
-        // Group 1: Settings (Separated)
-        menu.add(1, 4, 3, "Cascade Settings").icon = getThemedIcon(R.drawable.ic_settings)
+        // Group 1: Settings & Destructive actions (Separated)
+        menu.add(1, 4, 2, "Cascade Settings").icon = getIconWithBackground(R.drawable.ic_settings, R.color.bg_icon_circle_orange)
+        menu.add(1, 1, 3, "Remove").icon = getIconWithBackground(R.drawable.ic_close, R.color.bg_icon_circle_red)
 
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 1 -> removeHomeApp(position)
-                2 -> showAppList(AppDrawerFlag.SetHomeApp, includeHiddenApps = true, includeRecentApps = false, position)
+                2 -> showAppList(AppDrawerFlag.SetHomeApp, includeRecentApps = false, position)
                 3 -> openAppInfo(requireContext(), appModel.user, appModel.activityPackage)
                 4 -> trySettings()
             }

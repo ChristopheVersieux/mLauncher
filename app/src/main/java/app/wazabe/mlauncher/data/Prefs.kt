@@ -278,10 +278,6 @@ class Prefs(val context: Context) {
         get() = getSetting(BATTERY_COLOR, getColor(context, getColorInt("txt")))
         set(value) = prefsNormal.edit { putInt(BATTERY_COLOR, value) }
 
-    var dailyWordColor: Int
-        get() = getSetting(DAILY_WORD_COLOR, getColor(context, getColorInt("txt")))
-        set(value) = prefsNormal.edit { putInt(DAILY_WORD_COLOR, value) }
-
     var shortcutIconsColor: Int
         get() = getSetting(SHORTCUT_ICONS_COLOR, getColor(context, getColorInt("txt")))
         set(value) = prefsNormal.edit { putInt(SHORTCUT_ICONS_COLOR, value) }
@@ -370,12 +366,6 @@ class Prefs(val context: Context) {
         }
         set(value) = prefsNormal.edit { putString(ALARM_ALIGNMENT, value.toString()) }
 
-    var dailyWordAlignment: Gravity
-        get() {
-            return getEnumSetting(DAILY_WORD_ALIGNMENT, Gravity.Left)
-        }
-        set(value) = prefsNormal.edit { putString(DAILY_WORD_ALIGNMENT, value.toString()) }
-
     var drawerAlignment: Gravity
         get() {
             return getEnumSetting(DRAWER_ALIGNMENT, Gravity.Right)
@@ -409,10 +399,6 @@ class Prefs(val context: Context) {
     var showAlarm: Boolean
         get() = getSetting(SHOW_ALARM, false)
         set(value) = prefsNormal.edit { putBoolean(SHOW_ALARM, value) }
-
-    var showDailyWord: Boolean
-        get() = getSetting(SHOW_DAILY_WORD, true)
-        set(value) = prefsNormal.edit { putBoolean(SHOW_DAILY_WORD, value) }
 
     var showFloating: Boolean
         get() = getSetting(SHOW_FLOATING, true)
@@ -474,9 +460,6 @@ class Prefs(val context: Context) {
         get() = prefsNormal.getString(MANUAL_TEXT_COLOR, "light") ?: "light"
         set(value) = prefsNormal.edit { putString(MANUAL_TEXT_COLOR, value) }
 
-    var wordList: String
-        get() = prefsNormal.getString(WORD_LIST, emptyString()).toString()
-        set(value) = prefsNormal.edit { putString(WORD_LIST, value) }
 
     var homeLocked: Boolean
         get() = getSetting(HOME_LOCKED, false)
@@ -606,6 +589,14 @@ class Prefs(val context: Context) {
             return getEnumSetting(DRAWER_TYPE, Constants.DrawerType.Alphabetical)
         }
         set(value) = prefsNormal.edit { putString(DRAWER_TYPE, value.name) }
+
+    var randomFactText: String
+        get() = getSetting(RANDOM_FACT_TEXT, "")
+        set(value) = prefsNormal.edit { putString(RANDOM_FACT_TEXT, value) }
+
+    var randomFactLastFetch: Long
+        get() = prefsNormal.getLong(RANDOM_FACT_LAST_FETCH, 0L)
+        set(value) = prefsNormal.edit { putLong(RANDOM_FACT_LAST_FETCH, value) }
 
     var appUsageCounts: Map<String, Int>
         get() {
@@ -787,13 +778,6 @@ class Prefs(val context: Context) {
             return getSetting(ALARM_SIZE_TEXT, 20)
         }
         set(value) = prefsNormal.edit { putInt(ALARM_SIZE_TEXT, value) }
-
-    var dailyWordSize: Int
-        get() {
-            return getSetting(DAILY_WORD_SIZE_TEXT, 20)
-        }
-        set(value) = prefsNormal.edit { putInt(DAILY_WORD_SIZE_TEXT, value) }
-
 
     var batterySize: Int
         get() {

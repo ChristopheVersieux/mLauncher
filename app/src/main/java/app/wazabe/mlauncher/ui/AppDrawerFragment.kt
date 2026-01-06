@@ -77,6 +77,7 @@ class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceCh
     private lateinit var contactsAdapter: ContactDrawerAdapter
     private var selectedTag: String? = null
     private var currentProfileFilter: String? = null
+    private var flag: AppDrawerFlag = AppDrawerFlag.LaunchApp  // Current drawer mode
 
     private var _binding: FragmentAppDrawerBinding? = null
     private val binding get() = _binding!!
@@ -103,7 +104,7 @@ class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceCh
         val shouldShowProfiles = false // Placeholder for future work profile logic
 
         if (!shouldShowTags && !shouldShowProfiles) {
-            binding.filterBarContainer.isVisible = false
+            binding.filterChipGroup.isVisible = false
             if (selectedTag != null || currentProfileFilter != null) {
                 selectedTag = null
                 currentProfileFilter = null
@@ -118,67 +119,25 @@ class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceCh
             view?.post { onFilterChanged() }
         }
 
-        binding.filterBarContainer.isVisible = true
-        val toggleGroup = binding.filterToggleGroup
+        binding.filterChipGroup.isVisible = true
+        val chipGroup = binding.filterChipGroup
 
-        val listener = MaterialButtonToggleGroup.OnButtonCheckedListener { group, checkedId, isChecked ->
-            if (isChecked) {
-                val button = group.findViewById<MaterialButton>(checkedId)
-                val newTag = if (button.text == "All") null else button.text.toString()
-                if (selectedTag != newTag) {
-                    selectedTag = newTag
-                    view?.post { onFilterChanged() }
-                }
-            }
-        }
-        toggleGroup.clearOnButtonCheckedListeners()
-        toggleGroup.removeAllViews()
+        // Clear existing chips
+        chipGroup.removeAllViews()
 
-        val buttonStyle = com.google.android.material.R.attr.materialButtonOutlinedStyle
-        
-        fun createSegmentButton(id: Int, title: String, isSelected: Boolean): MaterialButton {
-            return MaterialButton(requireContext(), null, buttonStyle).apply {
+        // Helper to create chips
+        fun createFilterChip(id: Int, label: String, isSelected: Boolean): com.google.android.material.chip.Chip {
+            return com.google.android.material.chip.Chip(requireContext(), null, R.attr.chipStyle).apply {
+                setChipBackgroundColorResource(R.color.chip_background_color)
+                setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.chip_text_color))
+                chipStrokeColor = ContextCompat.getColorStateList(requireContext(), R.color.chip_stroke_color)
+                chipStrokeWidth = (1 * resources.displayMetrics.density)
+                checkedIconTint = ContextCompat.getColorStateList(requireContext(), android.R.color.white)
                 this.id = id
-                this.text = title
+                this.text = label
                 this.isCheckable = true
                 this.isChecked = isSelected
-                this.setPadding(32, 0, 32, 0)
-                this.cornerRadius = (20 * resources.displayMetrics.density).toInt()
-                this.minHeight = (40 * resources.displayMetrics.density).toInt()
-                this.layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                ).apply {
-                    marginEnd = (8 * resources.displayMetrics.density).toInt()
-                }
-                
-                val states = arrayOf(
-                    intArrayOf(android.R.attr.state_checked),
-                    intArrayOf(-android.R.attr.state_checked)
-                )
-                
-                val backgroundColors = intArrayOf(
-                    ContextCompat.getColor(context, R.color.colorPrimary),
-                    Color.TRANSPARENT
-                )
-                this.backgroundTintList = ColorStateList(states, backgroundColors)
-                
-                val typedValue = TypedValue()
-                context.theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
-                val colorOnSurface = if (typedValue.resourceId != 0) {
-                    ContextCompat.getColor(context, typedValue.resourceId)
-                } else {
-                    typedValue.data
-                }
-                
-                val textColors = intArrayOf(Color.WHITE, colorOnSurface)
-                this.setTextColor(ColorStateList(states, textColors))
-                
-                val strokeColors = intArrayOf(
-                    Color.TRANSPARENT,
-                    ContextCompat.getColor(context, R.color.light_gray_medium)
-                )
-                this.strokeColor = ColorStateList(states, strokeColors)
+                this.isCheckedIconVisible = true
             }
         }
 
@@ -188,7 +147,9 @@ class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceCh
             if (prefs.getProfileCounter("WORK") > 0) profiles.add("WORK")
             if (prefs.getProfileCounter("PRIVATE") > 0 && !PrivateSpaceManager(requireContext()).isPrivateSpaceLocked()) profiles.add("PRIVATE")
 
-            toggleGroup.addView(createSegmentButton(View.generateViewId(), "All", currentProfileFilter == null))
+            // "All" Chip
+            val allChip = createFilterChip(View.generateViewId(), "All", currentProfileFilter == null)
+            chipGroup.addView(allChip)
 
             profiles.forEach { profile ->
                 val label = when(profile) {
@@ -197,20 +158,36 @@ class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceCh
                     "PRIVATE" -> "Private"
                     else -> profile
                 }
-                val btn = createSegmentButton(View.generateViewId(), label, profile == currentProfileFilter)
-                btn.tag = profile
-                toggleGroup.addView(btn)
+                val chip = createFilterChip(View.generateViewId(), label, profile == currentProfileFilter)
+                chip.tag = profile
+                chipGroup.addView(chip)
             }
-            toggleGroup.addOnButtonCheckedListener(listener)
         } else if (shouldShowTags) {
-            toggleGroup.addView(createSegmentButton(View.generateViewId(), "All", selectedTag == null))
+            // "All" Chip
+            val allChip = createFilterChip(View.generateViewId(), "All", selectedTag == null)
+            chipGroup.addView(allChip)
 
             tags.forEach { tag ->
-                toggleGroup.addView(createSegmentButton(View.generateViewId(), tag, tag == selectedTag))
+                val chip = createFilterChip(View.generateViewId(), tag, tag == selectedTag)
+                chipGroup.addView(chip)
             }
-            toggleGroup.addOnButtonCheckedListener(listener)
         }
         
+        // Listener for changes
+        chipGroup.setOnCheckedStateChangeListener { group, checkedIds ->
+             // Single selection, so checkedIds should have 0 or 1 item
+            if (checkedIds.isEmpty()) return@setOnCheckedStateChangeListener
+            
+            val checkedId = checkedIds[0]
+            val chip = group.findViewById<com.google.android.material.chip.Chip>(checkedId)
+            val newTag = if (chip.text == "All") null else chip.text.toString()
+
+            if (selectedTag != newTag) {
+                selectedTag = newTag
+                view?.post { onFilterChanged() }
+            }
+        }
+
         binding.root.requestLayout()
     }
 
@@ -249,6 +226,7 @@ class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceCh
             when (prefs.drawerAlignment) {
                 Constants.Gravity.Left -> layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END)
                 Constants.Gravity.Center,
+                Constants.Gravity.IconOnly,
                 Constants.Gravity.Right -> layoutParams.addRule(RelativeLayout.ALIGN_PARENT_START)
             }
 
@@ -271,7 +249,7 @@ class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceCh
 
         val flagString = arguments?.getString("flag", AppDrawerFlag.LaunchApp.toString())
             ?: AppDrawerFlag.LaunchApp.toString()
-        val flag = AppDrawerFlag.valueOf(flagString)
+        flag = AppDrawerFlag.valueOf(flagString)  // Set class property
         val n = arguments?.getInt("n", 0) ?: 0
 
         val profileType: String = arguments?.getString("profileType", "SYSTEM") ?: "SYSTEM"
@@ -373,6 +351,7 @@ class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceCh
         val gravity = when (Prefs(requireContext()).drawerAlignment) {
             Constants.Gravity.Left -> Gravity.LEFT
             Constants.Gravity.Center -> Gravity.CENTER
+            Constants.Gravity.IconOnly -> Gravity.CENTER
             Constants.Gravity.Right -> Gravity.RIGHT
         }
 
@@ -596,7 +575,12 @@ class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceCh
             }
         }
 
-        binding.listEmptyHint.text = applyTextColor(getString(R.string.drawer_list_empty_hint), prefs.appColor)
+        // Set appropriate empty hint based on flag
+        val emptyHintText = when (flag) {
+            AppDrawerFlag.HiddenApps -> getString(R.string.hidden_apps_empty_hint)
+            else -> getString(R.string.drawer_list_empty_hint)
+        }
+        binding.listEmptyHint.text = applyTextColor(emptyHintText, prefs.appColor)
         
         binding.clearFiltersButton.setOnClickListener {
             binding.search.setQuery("", false)
@@ -663,12 +647,18 @@ class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceCh
                 return false
             }
         })
+
+        // Initial data load
+        if (flag == AppDrawerFlag.HiddenApps) {
+            viewModel.getHiddenApps()
+        } else {
+            viewModel.getAppList()
+        }
     }
     
     private fun updateSearchVisibility() {
         if (_binding == null) return
         val hide = prefs.hideSearchView
-        android.widget.Toast.makeText(requireContext(), "Search view visible: ${!hide}", android.widget.Toast.LENGTH_SHORT).show()
         binding.searchContainer.isVisible = !hide
         binding.search.isVisible = !hide
         if (hide) {
@@ -821,9 +811,20 @@ class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceCh
             skipCondition: () -> Boolean = { false }
         ) {
             liveData.observe(viewLifecycleOwner) { newList ->
-                if (skipCondition() || newList == currentList) return@observe
+                val shouldSkip = skipCondition()
+                val sameList = newList == currentList
+                
+                if (shouldSkip || sameList) {
+                    return@observe
+                }
+                
                 newList?.let {
-                    binding.emptyStateContainer.isVisible = it.isEmpty()
+                    val isEmpty = it.isEmpty()
+                    binding.emptyStateContainer.isVisible = isEmpty
+
+                    // Force visible just in case
+                    binding.menuView.visibility = View.VISIBLE
+                    
                     binding.sidebarContainer.isVisible = prefs.showAZSidebar
                     onPopulate(it)
                 }
@@ -833,8 +834,13 @@ class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceCh
         // 🔹 Observe hidden apps
         observeList(
             viewModel.hiddenApps, appAdapter.appsList,
-            onPopulate = { populateAppList(it, appAdapter) },
-            skipCondition = { flag != AppDrawerFlag.HiddenApps }
+            onPopulate = { 
+                populateAppList(it, appAdapter) 
+            },
+            skipCondition = { 
+                val skip = flag != AppDrawerFlag.HiddenApps
+                skip
+            }
         )
 
         // 🔹 Observe contacts
@@ -986,7 +992,7 @@ class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceCh
         n: Int = 0
     ): (appListItem: AppListItem) -> Unit = { appModel ->
         viewModel.selectedApp(this, appModel, flag, n)
-        if (flag == AppDrawerFlag.LaunchApp || flag == AppDrawerFlag.HiddenApps)
+        if (flag == AppDrawerFlag.LaunchApp || flag == AppDrawerFlag.HiddenApps || flag == AppDrawerFlag.SetHomeApp)
             findNavController().popBackStack(R.id.mainFragment, false)
         else
             findNavController().popBackStack()
@@ -1109,7 +1115,10 @@ class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceCh
         val hideText = if (isHidden) "Show App" else "Hide App"
         val hideIcon = if (isHidden) R.drawable.visibility else R.drawable.visibility_off
         addButton(hideText, hideIcon) {
-             appShowHideListener(viewModel).invoke(AppDrawerFlag.None, appModel)
+            try {
+                appShowHideListener(viewModel).invoke(AppDrawerFlag.None, appModel)
+            } catch (e: Exception) {
+            }
         }
         
         addSeparator()
@@ -1236,24 +1245,33 @@ class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceCh
         editText.requestFocus()
     }
 
-    private fun appShowHideListener(viewModel: MainViewModel): (flag: AppDrawerFlag, appListItem: AppListItem) -> Unit = { flag, appModel ->
-        val prefs = Prefs(requireContext())
-        val newSet = mutableSetOf<String>()
-        newSet.addAll(prefs.hiddenApps)
-
-        if (flag == AppDrawerFlag.HiddenApps) {
-            newSet.remove(appModel.activityPackage) // for backward compatibility
-            newSet.remove(appModel.activityPackage + "|" + appModel.user.hashCode()) // for backward compatibility
-            newSet.remove(appModel.activityPackage + "|" + appModel.activityClass + "|" + appModel.user.hashCode())
-        } else {
-            newSet.add(appModel.activityPackage + "|" + appModel.activityClass + "|" + appModel.user.hashCode())
-        }
-
-        prefs.hiddenApps = newSet
-
-        if (newSet.isEmpty()) findNavController().popBackStack()
+    private fun appShowHideListener(viewModel: MainViewModel): (flag: AppDrawerFlag, appListItem: AppListItem) -> Unit = { _, appModel ->
+        // 1. Sauvegarde et refresh global
+        viewModel.toggleAppVisibility(appModel, refreshMainList = true)
         
-        viewModel.getAppList()
+        // 2. DISPARITION IMMEDIATE ROBUSTE (Optimistic UI)
+        if (this::appsAdapter.isInitialized) {
+            val currentList = appsAdapter.appsList.toMutableList()
+            
+            // On supprime en cherchant par clé unique, pour éviter les problèmes d'instances différentes
+            val wasRemoved = currentList.removeAll { item ->
+                item.activityPackage == appModel.activityPackage && 
+                item.activityClass == appModel.activityClass &&
+                item.user == appModel.user
+            }
+
+            if (wasRemoved) {
+                appsAdapter.setAppList(currentList)
+            }
+        }
+        
+        // Si on est dans le mode HiddenApps (ne devrait pas arriver ici avec la nouvelle nav), on rafraîchit quand même ou on pop
+        if (this.flag == AppDrawerFlag.HiddenApps) {
+             val prefs = Prefs(requireContext())
+             if (prefs.hiddenApps.isEmpty()) {
+                 findNavController().popBackStack()
+             }
+        }
     }
 
     private fun appInfoListener(): (appListItem: AppListItem) -> Unit = { appModel ->

@@ -38,7 +38,6 @@ import app.wazabe.mlauncher.helper.getDeviceInfo
 import app.wazabe.mlauncher.helper.hasContactsPermission
 import app.wazabe.mlauncher.helper.themeDownloadButton
 import app.wazabe.mlauncher.helper.utils.AppReloader
-import app.wazabe.mlauncher.helper.wordofthedayDownloadButton
 import app.wazabe.mlauncher.services.HapticFeedbackService
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -161,61 +160,6 @@ class DialogManager(val context: Context, val activity: Activity) {
             setContentView(layout)
         }
         saveLoadThemeBottomSheet?.show()
-    }
-
-    var saveDownloadWOTDBottomSheet: FontBottomSheetDialogLocked? = null
-
-    fun showSaveDownloadWOTDBottomSheet() {
-        // Dismiss any existing bottom sheet
-        saveDownloadWOTDBottomSheet?.dismiss()
-
-        HapticFeedbackService.trigger(
-            context,
-            HapticFeedbackService.EffectType.CLICK
-        )
-
-        // Create vertical layout
-        val layout = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(48, 24, 48, 24)
-            gravity = Gravity.CENTER_HORIZONTAL
-        }
-
-        // Utility function to create clickable items
-        fun createItem(text: String, onClick: () -> Unit): TextView {
-            return TextView(context).apply {
-                this.text = text
-                textSize = 16f
-                // Text color inherited from theme
-                setPadding(0, 32, 0, 32)
-                isClickable = true
-                isFocusable = true
-                setOnClickListener {
-                    onClick()
-                    HapticFeedbackService.trigger(
-                        context,
-                        HapticFeedbackService.EffectType.SAVE
-                    )
-                    saveDownloadWOTDBottomSheet?.dismiss()
-                }
-            }
-        }
-
-        // Add Download Option
-        layout.addView(createItem(context.getString(R.string.advanced_settings_wotd_download)) {
-            wordofthedayDownloadButton(context)
-        })
-
-        // Add Import options
-        layout.addView(createItem(context.getString(R.string.advanced_settings_wotd_import)) {
-            (activity as MainActivity).restoreWordsBackup()
-        })
-
-        // Create and show the LockedBottomSheetDialog
-        saveDownloadWOTDBottomSheet = FontBottomSheetDialogLocked(context).apply {
-            setContentView(layout)
-        }
-        saveDownloadWOTDBottomSheet?.show()
     }
 
 

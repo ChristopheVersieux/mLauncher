@@ -2,42 +2,46 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/itemRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="48dp"
+    android:minHeight="56dp"
     android:background="?attr/selectableItemBackground"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:paddingHorizontal="16dp"
-    android:paddingVertical="12dp">
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="16dp">
 
+    <!-- App Icon -->
     <ImageView
         android:id="@+id/appIcon"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginBottom="6dp"
-        android:contentDescription="@string/app_name"
-        android:scaleType="fitCenter"
+        android:contentDescription="@null"
         tools:src="@android:drawable/sym_def_app_icon" />
 
+    <!-- App Name -->
     <com.github.creativecodecat.components.views.FontAppCompatTextView
         android:id="@+id/appTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_marginHorizontal="16dp"
+        android:layout_weight="1"
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="16sp"
-        tools:text="Application Name" />
+        tools:text="App Name" />
 
+    <!-- Unhide Button (Cross) -->
     <ImageView
-        android:id="@+id/btnClose"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginTop="4dp"
+        android:id="@+id/unhideButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:contentDescription="Unhide app"
+        android:focusable="true"
+        android:padding="8dp"
         android:src="@drawable/ic_close"
-        android:visibility="gone"
-        app:tint="?android:attr/textColorPrimary" />
+        app:tint="?attr/primaryColor" />
+
 </LinearLayout>

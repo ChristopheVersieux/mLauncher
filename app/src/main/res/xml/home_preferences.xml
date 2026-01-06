@@ -8,7 +8,7 @@
             android:title="@string/apps_on_home_screen"
             android:max="12"
             app:min="1"
-            android:defaultValue="6"
+            android:defaultValue="4"
             app:showSeekBarValue="true"
             app:iconSpaceReserved="false" />
 

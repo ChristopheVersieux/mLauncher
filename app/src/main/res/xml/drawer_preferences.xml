@@ -34,4 +34,12 @@
             app:iconSpaceReserved="false" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/hidden_apps">
+        <Preference
+            android:key="MANAGE_HIDDEN_APPS"
+            android:title="@string/manage_hidden_apps"
+            android:summary="@string/manage_hidden_apps_summary"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

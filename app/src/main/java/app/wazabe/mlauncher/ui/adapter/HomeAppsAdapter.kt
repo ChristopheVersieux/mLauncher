@@ -26,6 +26,7 @@ class HomeAppsAdapter(
             Constants.Gravity.Left -> 0
             Constants.Gravity.Center -> 1
             Constants.Gravity.Right -> 2
+            Constants.Gravity.IconOnly -> 1  // Use center layout for icons
         }
     }
 
@@ -48,20 +49,26 @@ class HomeAppsAdapter(
         val appName = prefs.getAppName(position)
         holder.textView.text = if (appName.isEmpty()) "..." else appName
 
-        // Style from prefs
-        holder.textView.textSize = prefs.appSize.toFloat()
-        
-        // Auto text color based on wallpaper brightness or manual selection
-        val textColor = if (prefs.autoTextColor) {
-            app.wazabe.mlauncher.helper.utils.WallpaperColorAnalyzer.getRecommendedTextColor(holder.itemView.context)
+        // Hide text if IconOnly mode
+        if (prefs.homeAlignment == Constants.Gravity.IconOnly) {
+            holder.textView.visibility = View.GONE
         } else {
-            if (prefs.manualTextColor == "light") {
-                androidx.core.content.ContextCompat.getColor(holder.itemView.context, R.color.white)
+            holder.textView.visibility = View.VISIBLE
+            // Style from prefs
+            holder.textView.textSize = prefs.appSize.toFloat()
+            
+            // Auto text color based on wallpaper brightness or manual selection
+            val textColor = if (prefs.autoTextColor) {
+                app.wazabe.mlauncher.helper.utils.WallpaperColorAnalyzer.getRecommendedTextColor(holder.itemView.context)
             } else {
-                androidx.core.content.ContextCompat.getColor(holder.itemView.context, R.color.black)
+                if (prefs.manualTextColor == "light") {
+                    androidx.core.content.ContextCompat.getColor(holder.itemView.context, R.color.white)
+                } else {
+                    androidx.core.content.ContextCompat.getColor(holder.itemView.context, R.color.black)
+                }
             }
+            holder.textView.setTextColor(textColor)
         }
-        holder.textView.setTextColor(textColor)
 
         // Icon
         val appModel = prefs.getHomeAppModel(position)

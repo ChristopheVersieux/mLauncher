@@ -35,8 +35,6 @@ object Constants {
     const val MIN_ALARM_SIZE = 10
     const val MAX_ALARM_SIZE = 120
 
-    const val MIN_DAILY_WORD_SIZE = 10
-    const val MAX_DAILY_WORD_SIZE = 120
 
     const val MIN_BATTERY_SIZE = 10
     const val MAX_BATTERY_SIZE = 75
@@ -144,7 +142,8 @@ object Constants {
     enum class Gravity : EnumOption {
         Left,
         Center,
-        Right;
+        Right,
+        IconOnly;
 
         @Composable
         override fun string(): String {
@@ -152,6 +151,7 @@ object Constants {
                 Left -> stringResource(R.string.left)
                 Center -> stringResource(R.string.center)
                 Right -> stringResource(R.string.right)
+                IconOnly -> stringResource(R.string.icon_only)
             }
         }
 
@@ -160,6 +160,7 @@ object Constants {
                 Left -> context.getString(R.string.left)
                 Center -> context.getString(R.string.center)
                 Right -> context.getString(R.string.right)
+                IconOnly -> context.getString(R.string.icon_only)
             }
         }
 
@@ -169,6 +170,7 @@ object Constants {
                 Left -> android.view.Gravity.LEFT
                 Center -> android.view.Gravity.CENTER
                 Right -> android.view.Gravity.RIGHT
+                IconOnly -> android.view.Gravity.CENTER  // Icons centered
             }
         }
     }

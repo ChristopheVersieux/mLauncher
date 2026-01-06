@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Selected state: white text -->
+    <item android:color="@android:color/white" android:state_checked="true"/>
+    <!-- Unselected state: use theme's onSurface color -->
+    <item android:color="?attr/colorOnSurface"/>
+</selector>

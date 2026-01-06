@@ -80,12 +80,6 @@
             android:entryValues="@array/alignment_values" />
 
         <ListPreference
-            android:key="DAILY_WORD_ALIGNMENT"
-            android:title="@string/daily_word_alignment"
-            android:entries="@array/alignment_names"
-            android:entryValues="@array/alignment_values" />
-
-        <ListPreference
             android:key="HOME_ALIGNMENT"
             android:title="@string/home_alignment"
             android:entries="@array/alignment_names"
@@ -118,10 +112,6 @@
         <Preference
             android:key="ALARM_CLOCK_COLOR"
             android:title="@string/alarm_color" />
-
-        <Preference
-            android:key="DAILY_WORD_COLOR"
-            android:title="@string/daily_word_color" />
 
         <Preference
             android:key="BATTERY_COLOR"
@@ -169,12 +159,6 @@
         <SeekBarPreference
             android:key="ALARM_SIZE_TEXT"
             android:title="@string/alarm_text_size"
-            app:showSeekBarValue="true"
-            app:min="10" android:max="120" />
-
-        <SeekBarPreference
-            android:key="DAILY_WORD_SIZE_TEXT"
-            android:title="@string/daily_word_text_size"
             app:showSeekBarValue="true"
             app:min="10" android:max="120" />
 

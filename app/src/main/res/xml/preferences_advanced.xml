@@ -36,10 +36,6 @@
             android:title="@string/advanced_settings_theme_title"
             android:icon="@drawable/ic_theme" />
 
-        <Preference
-            app:key="wotdSettings"
-            android:title="@string/advanced_settings_wotd_title"
-            android:icon="@drawable/ic_word_of_the_day" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/advanced_settings_help_feedback_title">

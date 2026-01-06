@@ -82,10 +82,13 @@ class AppDrawerAdapter(
     private var isBangSearch = false
 
     override fun getItemViewType(position: Int): Int {
+        if (flag == AppDrawerFlag.HiddenApps) return 99 // Special type for Hidden Apps
+        
         return when (prefs.drawerAlignment) {
             Constants.Gravity.Left -> 0
             Constants.Gravity.Center -> 1
             Constants.Gravity.Right -> 2
+            Constants.Gravity.IconOnly -> 1
         }
     }
 
@@ -94,6 +97,7 @@ class AppDrawerAdapter(
             0 -> R.layout.item_app_left
             1 -> R.layout.item_app_center
             2 -> R.layout.item_app_right
+            99 -> R.layout.item_hidden_app
             else -> R.layout.item_app_left
         }
         val view = LayoutInflater.from(parent.context).inflate(layoutRes, parent, false)
@@ -133,20 +137,46 @@ class AppDrawerAdapter(
         }
 
         holder.appTitle.text = appModel.label
-        
-        // Color logic
-        holder.appTitle.setTextColor(prefs.appColor)
-        holder.appTitle.textSize = prefs.appSize.toFloat()
 
-        // Click
-        holder.itemView.setOnClickListener {
-            appClickListener(appModel)
-        }
-
-        // Long Click - New Dialog Logic
-        holder.itemView.setOnLongClickListener {
-            appLongClickListener(appModel)
-            true
+        if (flag == AppDrawerFlag.HiddenApps) {
+            // Hidden Apps Mode (Type 99)
+            holder.appTitle.visibility = View.VISIBLE
+            // Text color logic: let the XML handle it via ?attr/primaryTextColor
+            // Or apply default preference logic if desired, but XML default is safer for contrast.
+            // Let's stick to simple: if user customized color, apply it.
+            // But user asked for "default color if dark/light". 
+            // So we DO NOT apply prefs.appColor here for hidden apps.
+            // We let the XML theme attributes do their job.
+            
+            holder.unhideButton?.setOnClickListener {
+                appClickListener(appModel)
+            }
+            // Disable main item click
+            holder.itemView.setOnClickListener(null)
+            
+        } else {
+            // Normal Drawer Mode
+            
+            // Hide text if IconOnly mode
+            if (prefs.drawerAlignment == Constants.Gravity.IconOnly) {
+                holder.appTitle.visibility = View.GONE
+            } else {
+                holder.appTitle.visibility = View.VISIBLE
+                // Apply custom text color/size preference
+                holder.appTitle.setTextColor(prefs.appColor)
+                holder.appTitle.textSize = prefs.appSize.toFloat()
+            }
+            
+            // Normal Click
+            holder.itemView.setOnClickListener {
+                appClickListener(appModel)
+            }
+            
+            // Long Click
+            holder.itemView.setOnLongClickListener {
+                appLongClickListener(appModel)
+                true
+            }
         }
     }
 
@@ -275,6 +305,7 @@ class AppDrawerAdapter(
     ) : RecyclerView.ViewHolder(view) {
         val appTitle: TextView = view.findViewById(R.id.appTitle)
         val appIcon: android.widget.ImageView = view.findViewById(R.id.appIcon)
+        val unhideButton: android.widget.ImageView? = view.findViewById(R.id.unhideButton)
 
         @SuppressLint("RtlHardcoded", "NewApi")
         fun bind(
@@ -323,9 +354,36 @@ class AppDrawerAdapter(
                     if (appTitle.text == appListItem.label) setAppTitleIcon(appTitle, icon, prefs)
                 }
             }
-
-            // Click listener on entire item
-            itemView.setOnClickListener { appClickListener(appListItem) }
+            
+            // Handle Close Button visibility and click
+            val btnClose = itemView.findViewById<android.widget.ImageView>(R.id.btnClose)
+            if (flag == AppDrawerFlag.HiddenApps) {
+                btnClose.visibility = android.view.View.VISIBLE
+                btnClose.setOnClickListener {
+                     // In HiddenApps mode, clicking the X should trigger the "unhide" logic.
+                     // The registered appClickListener in AppDrawerFragment handles unhiding when flag is HiddenApps.
+                     appClickListener(appListItem)
+                }
+                // Also update the main item click to do nothing or open info?
+                // For now let's keep the main item click as well, but maybe the user wants ONLY the X to remove?
+                // The prompt says "with a cross to remove them".
+                // If I click the item text, it currently unhides it too (because appClickListener does that).
+                // Let's keep it consistent: X unhides. Main body... arguably also unhides or does nothing.
+                // Current implementation of appClickListener in Fragment UNHIDES.
+                // So binding it to item click is fine for now, or we can disable item click if we only want X to work.
+                // But let's stick to X button working.
+                
+                itemView.setOnClickListener { 
+                    // Optional: maybe show info or do nothing? 
+                    // To follow the "manage" pattern, clicking the row usually toggles or does the action.
+                    // Let's keep existing behavior for the row click as well for better UX (larger target).
+                    appClickListener(appListItem)
+                }
+            } else {
+                btnClose.visibility = android.view.View.GONE
+                // Normal Click listener on entire item
+                itemView.setOnClickListener { appClickListener(appListItem) }
+            }
         }
 
 

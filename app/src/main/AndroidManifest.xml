@@ -20,7 +20,6 @@
         android:allowBackup="true"
         android:clearTaskOnLaunch="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
-        android:enableOnBackInvokedCallback="true"
         android:excludeFromRecents="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/app_launcher"
@@ -30,6 +29,8 @@
         android:theme="@style/Theme.mLauncher"
         android:localeConfig="@xml/locales_config"
         tools:targetApi="tiramisu">
+
+        
         <activity
             android:name=".ui.widgets.WidgetActivity"
             android:exported="false" />
@@ -121,21 +122,6 @@
         </receiver>
 
 
-        <receiver
-            android:name=".ui.widgets.wordoftheday.WordOfTheDayWidget"
-            android:exported="false"
-            android:label="@string/widget_wotd_name">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/word_of_the_day_widget_info" />
-        </receiver>
-        <receiver
-            android:name=".ui.widgets.wordoftheday.WordOfTheDayUpdateReceiver"
-            android:exported="false" />
         <receiver
             android:name=".ui.widgets.fab.FabWidget"
             android:exported="false"

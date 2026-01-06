@@ -43,7 +43,6 @@ internal const val DRAWER_TYPE = "DRAWER_TYPE"
 internal const val CLOCK_ALIGNMENT = "CLOCK_ALIGNMENT"
 internal const val DATE_ALIGNMENT = "DATE_ALIGNMENT"
 internal const val ALARM_ALIGNMENT = "ALARM_ALIGNMENT"
-internal const val DAILY_WORD_ALIGNMENT = "DAILY_WORD_ALIGNMENT"
 
 // Display / Status Bar / Navigation
 internal const val SHOW_BACKGROUND = "SHOW_BACKGROUND"
@@ -67,7 +66,6 @@ internal const val CLICK_EDIT_DELETE = "CLICK_EDIT_DELETE"
 internal const val SHOW_CLOCK = "SHOW_CLOCK"
 internal const val SHOW_CLOCK_FORMAT = "SHOW_CLOCK_FORMAT"
 internal const val SHOW_ALARM = "SHOW_ALARM"
-internal const val SHOW_DAILY_WORD = "SHOW_DAILY_WORD"
 internal const val SHOW_FLOATING = "SHOW_FLOATING"
 
 // Icons
@@ -77,7 +75,6 @@ internal const val ICON_PACK_APP_LIST = "ICON_PACK_APP_LIST"
 internal const val CUSTOM_ICON_PACK_APP_LIST = "CUSTOM_ICON_PACK_APP_LIST"
 
 // Words / Search
-internal const val WORD_LIST = "WORD_LIST"
 internal const val SEARCH_START = "SEARCH_START"
 
 // Gestures / App Shortcuts
@@ -138,7 +135,6 @@ internal const val APP_SIZE_TEXT = "APP_SIZE_TEXT"
 internal const val DATE_SIZE_TEXT = "DATE_SIZE_TEXT"
 internal const val CLOCK_SIZE_TEXT = "CLOCK_SIZE_TEXT"
 internal const val ALARM_SIZE_TEXT = "ALARM_SIZE_TEXT"
-internal const val DAILY_WORD_SIZE_TEXT = "DAILY_WORD_SIZE_TEXT"
 internal const val BATTERY_SIZE_TEXT = "BATTERY_SIZE_TEXT"
 internal const val TEXT_SIZE_SETTINGS = "TEXT_SIZE_SETTINGS"
 internal const val TEXT_PADDING_SIZE = "TEXT_PADDING_SIZE"
@@ -150,7 +146,6 @@ internal const val DATE_COLOR = "DATE_COLOR"
 internal const val ALARM_CLOCK_COLOR = "ALARM_CLOCK_COLOR"
 internal const val CLOCK_COLOR = "CLOCK_COLOR"
 internal const val BATTERY_COLOR = "BATTERY_COLOR"
-internal const val DAILY_WORD_COLOR = "DAILY_WORD_COLOR"
 internal const val SHORTCUT_ICONS_COLOR = "SHORTCUT_ICONS_COLOR"
 
 // Notes / Bubbles
@@ -175,3 +170,7 @@ internal const val NOTES_PRIORITY = "NOTES_PRIORITY"
 // Onboarding / Expert options
 internal const val ONBOARDING_COMPLETED = "ONBOARDING_COMPLETED"
 internal const val EXPERT_OPTIONS = "EXPERT_OPTIONS"
+
+// Random Fact Cache
+internal const val RANDOM_FACT_TEXT = "RANDOM_FACT_TEXT"
+internal const val RANDOM_FACT_LAST_FETCH = "RANDOM_FACT_LAST_FETCH"
