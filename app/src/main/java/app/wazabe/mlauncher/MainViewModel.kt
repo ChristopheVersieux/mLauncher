@@ -627,12 +627,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val prefs = Prefs(context)
         val hiddenAppsSet = prefs.hiddenApps
         val pinnedPackages = prefs.pinnedApps.toSet()
-        val seenAppKeys = mutableSetOf<String>()
+        val seenAppKeys = java.util.Collections.synchronizedSet(mutableSetOf<String>())
         val userManager = context.getSystemService(Context.USER_SERVICE) as UserManager
         val profiles = userManager.userProfiles.toList()
         val privateManager = PrivateSpaceManager(context)
 
-        fun appKey(pkg: String, cls: String, profileHash: Int) = "$pkg|$cls"
+        fun appKey(pkg: String, cls: String, profileHash: Int) = "$pkg|$cls|$profileHash"
         fun isHidden(pkg: String, key: String): Boolean = key in hiddenAppsSet
 
         // Lightweight intermediate storage
@@ -686,30 +686,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     }
 
                     runCatching { launcherApps.getActivityList(null, profile) }
-                        .getOrElse {
-                            AppLogger.e("AppListDebug", "Failed to get activities for $profile: ${it.message}", it)
-                            emptyList()
-                        }
-                        .mapNotNull { info ->
-                            val pkg = info.applicationInfo.packageName
-                            val cls = info.componentName.className
+// ... existing code ...
+                                .getOrElse {
+                                    AppLogger.e("AppListDebug", "Failed to get activities for $profile: ${it.message}", it)
+                                    emptyList()
+                                }
+                                .mapNotNull { info ->
+                                    val pkg = info.applicationInfo.packageName
+                                    val cls = info.componentName.className
 
+                                    val key = appKey(pkg, cls, profile.hashCode())
+                                    if (!seenAppKeys.add(key)) return@mapNotNull null
 
-                            val key = appKey(pkg, cls, profile.hashCode())
-                            if (!seenAppKeys.add(key)) return@mapNotNull null
+                                    // Skip hidden / regular apps based on toggles
+                                    val hidden = isHidden(pkg, key)
+                                    if (hidden && !includeHiddenApps) {
+                                        return@mapNotNull null
+                                    }
+                                    if (!hidden && !includeRegularApps) {
+                                        return@mapNotNull null
+                                    }
 
-                            // Skip hidden / regular apps based on toggles
-                            val hidden = isHidden(pkg, key)
-                            if (hidden && !includeHiddenApps) {
-                                return@mapNotNull null
-                            }
-                            if (!hidden && !includeRegularApps) {
-                                return@mapNotNull null
-                            }
-
-                            val category = if (pkg in pinnedPackages) AppCategory.PINNED else AppCategory.REGULAR
-                            RawApp(pkg, cls, info.label.toString(), profile, profileType, category)
-                        }
+                                    val category = if (pkg in pinnedPackages) AppCategory.PINNED else AppCategory.REGULAR
+                                    RawApp(pkg, cls, info.label.toString(), profile, profileType, category)
+                                }
                 }
             }
         }
