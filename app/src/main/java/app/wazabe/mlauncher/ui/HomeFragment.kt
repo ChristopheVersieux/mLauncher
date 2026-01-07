@@ -108,6 +108,7 @@ import com.github.droidworksstudio.common.AnalyticsHelper
 import com.github.droidworksstudio.common.AppLogger
 import com.github.droidworksstudio.common.ColorIconsExtensions
 import com.github.droidworksstudio.common.attachGestureManager
+import com.github.droidworksstudio.common.hideKeyboard
 import com.github.droidworksstudio.common.isSystemApp
 import com.github.droidworksstudio.common.launchCalendar
 import com.github.droidworksstudio.common.openAlarmApp
@@ -1464,6 +1465,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 // Reset to normal launch mode when drawer collapses
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    drawerBinding.search.clearFocus()
+                    hideKeyboard()
                     if (::appsAdapter.isInitialized) {
                         appsAdapter.flag = Constants.AppDrawerFlag.LaunchApp
                         appsAdapter.location = 0
