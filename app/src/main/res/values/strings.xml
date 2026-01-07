@@ -400,7 +400,9 @@
     <string name="left">Left</string>
     <string name="right">Right</string>
     <string name="center">Center</string>
-    <string name="icon_only">Icon Only</string>
+    <string name="icon_left">Icon Left</string>
+    <string name="icon_center">Icon Center</string>
+    <string name="icon_right">Icon Right</string>
     <string name="dark">Dark</string>
     <string name="light">Light</string>
     <string name="system_default">System</string>

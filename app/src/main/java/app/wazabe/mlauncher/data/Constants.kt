@@ -143,7 +143,9 @@ object Constants {
         Left,
         Center,
         Right,
-        IconOnly;
+        IconLeft,
+        IconCenter,
+        IconRight;
 
         @Composable
         override fun string(): String {
@@ -151,7 +153,9 @@ object Constants {
                 Left -> stringResource(R.string.left)
                 Center -> stringResource(R.string.center)
                 Right -> stringResource(R.string.right)
-                IconOnly -> stringResource(R.string.icon_only)
+                IconLeft -> stringResource(R.string.icon_left)
+                IconCenter -> stringResource(R.string.icon_center)
+                IconRight -> stringResource(R.string.icon_right)
             }
         }
 
@@ -160,7 +164,9 @@ object Constants {
                 Left -> context.getString(R.string.left)
                 Center -> context.getString(R.string.center)
                 Right -> context.getString(R.string.right)
-                IconOnly -> context.getString(R.string.icon_only)
+                IconLeft -> context.getString(R.string.icon_left)
+                IconCenter -> context.getString(R.string.icon_center)
+                IconRight -> context.getString(R.string.icon_right)
             }
         }
 
@@ -170,7 +176,9 @@ object Constants {
                 Left -> android.view.Gravity.LEFT
                 Center -> android.view.Gravity.CENTER
                 Right -> android.view.Gravity.RIGHT
-                IconOnly -> android.view.Gravity.CENTER  // Icons centered
+                IconLeft -> android.view.Gravity.LEFT
+                IconCenter -> android.view.Gravity.CENTER
+                IconRight -> android.view.Gravity.RIGHT
             }
         }
     }

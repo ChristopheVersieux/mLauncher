@@ -98,11 +98,17 @@
         <item>@string/left</item>
         <item>@string/center</item>
         <item>@string/right</item>
+        <item>@string/icon_left</item>
+        <item>@string/icon_center</item>
+        <item>@string/icon_right</item>
     </string-array>
     <string-array name="alignment_values">
         <item>Left</item>
         <item>Center</item>
         <item>Right</item>
+        <item>IconLeft</item>
+        <item>IconCenter</item>
+        <item>IconRight</item>
     </string-array>
     <!-- Actions -->
     <string-array name="action_entries">

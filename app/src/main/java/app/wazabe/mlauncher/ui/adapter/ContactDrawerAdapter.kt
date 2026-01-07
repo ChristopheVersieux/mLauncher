@@ -33,7 +33,9 @@ class ContactDrawerAdapter(
             Constants.Gravity.Left -> 0
             Constants.Gravity.Center -> 1
             Constants.Gravity.Right -> 2
-            Constants.Gravity.IconOnly -> 1
+            Constants.Gravity.IconLeft -> 0
+            Constants.Gravity.IconCenter -> 1
+            Constants.Gravity.IconRight -> 2
         }
     }
 

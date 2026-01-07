@@ -88,7 +88,9 @@ class AppDrawerAdapter(
             Constants.Gravity.Left -> 0
             Constants.Gravity.Center -> 1
             Constants.Gravity.Right -> 2
-            Constants.Gravity.IconOnly -> 1
+            Constants.Gravity.IconLeft -> 0
+            Constants.Gravity.IconCenter -> 1
+            Constants.Gravity.IconRight -> 2
         }
     }
 
@@ -157,8 +159,11 @@ class AppDrawerAdapter(
         } else {
             // Normal Drawer Mode
             
-            // Hide text if IconOnly mode
-            if (prefs.drawerAlignment == Constants.Gravity.IconOnly) {
+            // Hide text if Icon mode (IconLeft, IconCenter, IconRight)
+            val isIconMode = prefs.drawerAlignment == Constants.Gravity.IconLeft ||
+                             prefs.drawerAlignment == Constants.Gravity.IconCenter ||
+                             prefs.drawerAlignment == Constants.Gravity.IconRight
+            if (isIconMode) {
                 holder.appTitle.visibility = View.GONE
             } else {
                 holder.appTitle.visibility = View.VISIBLE

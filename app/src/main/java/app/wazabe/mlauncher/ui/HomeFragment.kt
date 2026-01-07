@@ -1407,8 +1407,10 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         val gravity = when (prefs.drawerAlignment) {
             Constants.Gravity.Left -> Gravity.LEFT
             Constants.Gravity.Center -> Gravity.CENTER
-            Constants.Gravity.IconOnly -> Gravity.CENTER
             Constants.Gravity.Right -> Gravity.RIGHT
+            Constants.Gravity.IconLeft -> Gravity.LEFT
+            Constants.Gravity.IconCenter -> Gravity.CENTER
+            Constants.Gravity.IconRight -> Gravity.RIGHT
         }
 
         appsAdapter = AppDrawerAdapter(

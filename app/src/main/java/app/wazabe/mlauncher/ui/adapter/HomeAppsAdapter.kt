@@ -26,7 +26,9 @@ class HomeAppsAdapter(
             Constants.Gravity.Left -> 0
             Constants.Gravity.Center -> 1
             Constants.Gravity.Right -> 2
-            Constants.Gravity.IconOnly -> 1  // Use center layout for icons
+            Constants.Gravity.IconLeft -> 0
+            Constants.Gravity.IconCenter -> 1
+            Constants.Gravity.IconRight -> 2
         }
     }
 
@@ -49,8 +51,11 @@ class HomeAppsAdapter(
         val appName = prefs.getAppName(position)
         holder.textView.text = if (appName.isEmpty()) "..." else appName
 
-        // Hide text if IconOnly mode
-        if (prefs.homeAlignment == Constants.Gravity.IconOnly) {
+        // Hide text if Icon mode (IconLeft, IconCenter, IconRight)
+        val isIconMode = prefs.homeAlignment == Constants.Gravity.IconLeft ||
+                         prefs.homeAlignment == Constants.Gravity.IconCenter ||
+                         prefs.homeAlignment == Constants.Gravity.IconRight
+        if (isIconMode) {
             holder.textView.visibility = View.GONE
         } else {
             holder.textView.visibility = View.VISIBLE

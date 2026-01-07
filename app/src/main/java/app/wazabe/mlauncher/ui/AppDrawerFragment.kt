@@ -226,7 +226,9 @@ class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceCh
             when (prefs.drawerAlignment) {
                 Constants.Gravity.Left -> layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END)
                 Constants.Gravity.Center,
-                Constants.Gravity.IconOnly,
+                Constants.Gravity.IconLeft,
+                Constants.Gravity.IconCenter,
+                Constants.Gravity.IconRight,
                 Constants.Gravity.Right -> layoutParams.addRule(RelativeLayout.ALIGN_PARENT_START)
             }
 
@@ -351,8 +353,10 @@ class AppDrawerFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceCh
         val gravity = when (Prefs(requireContext()).drawerAlignment) {
             Constants.Gravity.Left -> Gravity.LEFT
             Constants.Gravity.Center -> Gravity.CENTER
-            Constants.Gravity.IconOnly -> Gravity.CENTER
             Constants.Gravity.Right -> Gravity.RIGHT
+            Constants.Gravity.IconLeft -> Gravity.LEFT
+            Constants.Gravity.IconCenter -> Gravity.CENTER
+            Constants.Gravity.IconRight -> Gravity.RIGHT
         }
 
         val appAdapter = context?.let {
