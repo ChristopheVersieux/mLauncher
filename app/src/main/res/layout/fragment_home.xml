@@ -52,6 +52,11 @@
             <com.github.creativecodecat.components.views.FontAppCompatTextView
                 android:id="@+id/dailyWord"
                 style="@style/TextDefaultStyle"
+                android:textColor="@android:color/white"
+                android:shadowColor="#FF000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone" />

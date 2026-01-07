@@ -11,9 +11,12 @@ import android.content.Context
 import android.content.Context.VIBRATOR_SERVICE
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
@@ -29,9 +32,6 @@ import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
 import android.text.style.SuperscriptSpan
-import android.content.res.ColorStateList
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.util.TypedValue
 import android.view.GestureDetector
 import android.view.Gravity
@@ -40,15 +40,12 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.ScrollView
 import android.widget.Space
 import android.widget.TextView
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.button.MaterialButtonToggleGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.SearchView
 import androidx.biometric.BiometricPrompt
@@ -56,7 +53,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.toColorInt
-import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -109,7 +105,6 @@ import com.github.droidworksstudio.common.AppLogger
 import com.github.droidworksstudio.common.ColorIconsExtensions
 import com.github.droidworksstudio.common.attachGestureManager
 import com.github.droidworksstudio.common.hideKeyboard
-import com.github.droidworksstudio.common.isSystemApp
 import com.github.droidworksstudio.common.launchCalendar
 import com.github.droidworksstudio.common.openAlarmApp
 import com.github.droidworksstudio.common.openDeviceSettings
@@ -141,6 +136,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     private lateinit var contactsAdapter: ContactDrawerAdapter
     private lateinit var dialogBuilder: DialogManager
     private lateinit var deviceManager: DevicePolicyManager
+    private lateinit var drawerBinding: FragmentAppDrawerBottomSheetBinding
 
 
     private lateinit var biometricHelper: BiometricHelper
@@ -271,6 +267,19 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             appWidgetHost.startListening()
             restoreWidgets()
         }
+
+        // Force refresh drawer layout in case preferences changed while paused
+        refreshDrawerCategoryLayout()
+    }
+
+    private fun refreshDrawerCategoryLayout() {
+        if (::drawerBinding.isInitialized) {
+            viewModel.appList.value?.let { list ->
+                setupFilterChips(drawerBinding, list) {
+                    viewModel.appList.value = viewModel.appList.value
+                }
+            }
+        }
     }
 
     override fun onPause() {
@@ -295,6 +304,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
 
     private fun updateUIFromPreferences() {
+        updateBackgroundOpacity()
         binding.apply {
             // Static UI setup
             dailyWord.textSize = prefs.appSize.toFloat()
@@ -539,7 +549,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             "DATE_SIZE_TEXT", "CLOCK_SIZE_TEXT", "ALARM_SIZE_TEXT", "BATTERY_SIZE_TEXT", "APP_SIZE_TEXT",
             "DATE_COLOR", "CLOCK_COLOR", "ALARM_CLOCK_COLOR", "BATTERY_COLOR", "APP_COLOR",
             "BACKGROUND_COLOR", "APP_OPACITY", "SHOW_BACKGROUND", "TEXT_PADDING_SIZE",
-            "SHOW_WEATHER", "APP_USAGE_STATS", "DRAWER_TYPE", "HIDE_SEARCH_VIEW" -> {
+            "SHOW_WEATHER", "APP_USAGE_STATS", "DRAWER_TYPE", "HIDE_SEARCH_VIEW", "MAIN_BACKGROUND_ALPHA" -> {
                 if (key == "DRAWER_TYPE" || key == "HIDE_SEARCH_VIEW") {
                     selectedTag = null
                     currentProfileFilter = null
@@ -549,6 +559,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                     }
                 }
                 updateUIFromPreferences()
+                updateBackgroundOpacity() // Update opacity immediately
                 viewModel.getAppList()
             }
             "HOME_ALIGNMENT", "CLOCK_ALIGNMENT", "DATE_ALIGNMENT", "ALARM_ALIGNMENT", "DRAWER_ALIGNMENT", "HOME_ALIGNMENT_BOTTOM" -> {
@@ -567,12 +578,36 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 updateUIFromPreferences()
                 binding.mainLayout.requestLayout()
             }
+            "CATEGORIES_LAYOUT" -> {
+                // Refresh the drawer to apply new categories layout immediately
+                refreshDrawerCategoryLayout()
+                viewModel.getAppList()
+            }
             "ICON_PACK_HOME", "CUSTOM_ICON_PACK_HOME", "ICON_PACK_APP_LIST", "CUSTOM_ICON_PACK_APP_LIST" -> {
                 updateUIFromPreferences()
             }
         }
     }
 
+    private fun updateBackgroundOpacity() {
+        // Read directly from the app's SharedPreferences instance
+        val sharedPrefs = prefs.prefsNormal
+        val alphaPercent = sharedPrefs.getInt("MAIN_BACKGROUND_ALPHA", 40)
+        
+        // Convert 0-100 to 0-255
+        val alpha255 = (alphaPercent * 255) / 100
+        
+        // Base color: Black in Dark Mode, White in Light Mode
+        val nightModeFlags = requireContext().resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+        val isDarkMode = nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        val baseColor = if (isDarkMode) Color.BLACK else Color.WHITE
+        
+        // Apply alpha to the solid base color
+        val finalColor = ColorUtils.setAlphaComponent(baseColor, alpha255)
+        
+        // Apply to the View that we KNOW works
+        binding.coordinatorLayout.setBackgroundColor(finalColor)
+    }
 
     private fun homeAppClicked(location: Int) {
         AnalyticsHelper.logUserAction("Clicked Home App: $location")
@@ -1439,7 +1474,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             }
         )
 
-        val drawerBinding = binding.appDrawerLayout
+        this.drawerBinding = binding.appDrawerLayout
 
         var statusBarSize = 0
         ViewCompat.setOnApplyWindowInsetsListener(drawerBinding.root) { _, insets ->
@@ -1451,14 +1486,17 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 TypedValue.COMPLEX_UNIT_DIP, 24f, resources.displayMetrics
             ).toInt()
             
-            // Push search down prevents it from being visible in peek area (Nav Bar + 24dp Buffer)
-            // We use a spacer view instead of margin on searchview to avoid layout issues
-            val spacerParams = drawerBinding.peekSpacer.layoutParams
-            val buffer = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60f, resources.displayMetrics).toInt()
-            spacerParams.height = systemBars.bottom + buffer
-            drawerBinding.peekSpacer.layoutParams = spacerParams
-            
-            drawerBehavior.peekHeight = basePeekHeight + systemBars.bottom
+            // Only update peekSpacer if drawer is collapsed (not when keyboard appears)
+            if (drawerBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                // Push search down prevents it from being visible in peek area (Nav Bar + 24dp Buffer)
+                // We use a spacer view instead of margin on searchview to avoid layout issues
+                val spacerParams = drawerBinding.peekSpacer.layoutParams
+                val buffer = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60f, resources.displayMetrics).toInt()
+                spacerParams.height = systemBars.bottom + buffer
+                drawerBinding.peekSpacer.layoutParams = spacerParams
+                
+                drawerBehavior.peekHeight = basePeekHeight + systemBars.bottom
+            }
             insets
         }
 
@@ -1486,11 +1524,12 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 headerParams.topMargin = (slideOffset * statusBarSize).toInt()
                 drawerBinding.drawerHeader.layoutParams = headerParams
                 
-                // Animate peekSpacer: full height when collapsed (0), minimal when expanded (1)
+                // Animate peekSpacer: full height when collapsed (0), no space when expanded (1)
                 val maxSpacerHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 120f, resources.displayMetrics).toInt()
-                val minSpacerHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, resources.displayMetrics).toInt()
+                val minSpacerHeight = 0 // No space when fully open
                 val spacerParams = drawerBinding.peekSpacer.layoutParams
-                spacerParams.height = (maxSpacerHeight - (slideOffset * (maxSpacerHeight - minSpacerHeight))).toInt()
+                val newHeight = (maxSpacerHeight - (slideOffset * (maxSpacerHeight - minSpacerHeight))).toInt()
+                spacerParams.height = newHeight
                 drawerBinding.peekSpacer.layoutParams = spacerParams
             }
         })
@@ -1653,9 +1692,16 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         val editText = android.widget.EditText(context)
         editText.hint = context.getString(R.string.new_tag)
         editText.setSelectAllOnFocus(true)
+        editText.imeOptions = android.view.inputmethod.EditorInfo.IME_ACTION_DONE
+        editText.inputType = android.text.InputType.TYPE_CLASS_TEXT
 
-        // Collect existing tags
-        val existingTags = viewModel.appList.value?.map { it.customTag }?.filter { !it.isNullOrBlank() }?.distinct()?.sorted() ?: emptyList()
+        // Collect existing tags from all apps, splitting CSVs and trimming
+        val existingTags = viewModel.appList.value
+            ?.flatMap { it.customTag?.split(",") ?: emptyList() }
+            ?.map { it.trim() }
+            ?.filter { it.isNotBlank() }
+            ?.distinct()
+            ?.sorted() ?: emptyList()
 
         val container = android.widget.LinearLayout(context)
         container.orientation = android.widget.LinearLayout.VERTICAL
@@ -1678,13 +1724,13 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 isSingleLine = true
             }
             
+            val currentAppTags = tag.split(",").map { it.trim() }.filter { it.isNotBlank() }
+            
             existingTags.forEach { existingTag ->
                 val chip = com.google.android.material.chip.Chip(context)
                 chip.text = existingTag
-                val currentAppTags = tag.split(",").map { it.trim() }.filter { it.isNotBlank() }
                 chip.isCheckable = true
                 chip.isChecked = currentAppTags.contains(existingTag)
-                // Chip handles toggling itself because isCheckable = true
                 chipGroup.addView(chip)
             }
             scrollView.addView(chipGroup)
@@ -1699,35 +1745,62 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         editText.layoutParams = params
         container.addView(editText)
 
-        androidx.appcompat.app.AlertDialog.Builder(context)
-            .setTitle(R.string.tag)
-            .setView(container)
-            .setPositiveButton(R.string.save) { _, _ ->
-                val typedTags = editText.text.toString().split(",").map { it.trim() }.filter { it.isNotBlank() }
-                val chipGroup = container.findViewWithTag<com.google.android.material.chip.ChipGroup>("DIALOG_CHIP_GROUP")
-                val selectedChips = mutableListOf<String>()
+        // Wrap container in a ScrollView to prevent keyboard from hiding content
+        val scrollContainer = android.widget.ScrollView(context)
+        scrollContainer.addView(container)
+
+        // Save logic extracted to function for reuse
+        val saveAction = {
+            // Split by comma, trim, and filter blank
+            val typedTags = editText.text.toString()
+                .split(",")
+                .map { it.trim() }
+                .filter { it.isNotBlank() }
                 
-                if (chipGroup != null) {
-                    for (i in 0 until chipGroup.childCount) {
-                        val chip = chipGroup.getChildAt(i) as? com.google.android.material.chip.Chip
-                        if (chip?.isChecked == true) {
-                            selectedChips.add(chip.text.toString())
-                        }
+            val chipGroup = container.findViewWithTag<com.google.android.material.chip.ChipGroup>("DIALOG_CHIP_GROUP")
+            val selectedChips = mutableListOf<String>()
+            
+            if (chipGroup != null) {
+                for (i in 0 until chipGroup.childCount) {
+                    val chip = chipGroup.getChildAt(i) as? com.google.android.material.chip.Chip
+                    if (chip?.isChecked == true) {
+                        selectedChips.add(chip.text.toString().trim())
                     }
                 }
+            }
 
-                // Merge: selected chips + typed tags, maintaining order of chips then new ones
-                val finalTagsSet = (selectedChips + typedTags).distinct()
-                val finalTagString = finalTagsSet.joinToString(", ")
+            // Merge: selected chips + typed tags, maintaining order using a Set for uniqueness
+            val finalTagsSet = (selectedChips + typedTags).map { it.trim() }.filter { it.isNotBlank() }.distinct()
+            // join with simple comma, no spaces (more robust for splitting later)
+            val finalTagString = finalTagsSet.joinToString(",")
 
-                android.util.Log.d("TagEdit", "Final merged tags for $pkg: '$finalTagString'")
-                Prefs(context).setAppTag(pkg, finalTagString, user)
-                viewModel.clearAppCache()
-                viewModel.getAppList()
+            android.util.Log.d("TagEdit", "Final merged tags for $pkg: '$finalTagString'")
+            Prefs(context).setAppTag(pkg, finalTagString, user)
+            viewModel.clearAppCache()
+            viewModel.getAppList()
+        }
+
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(context)
+            .setTitle(R.string.tag)
+            .setView(scrollContainer)
+            .setPositiveButton(R.string.save) { _, _ ->
+                saveAction()
             }
             .setNegativeButton(R.string.cancel, null)
-            .show()
+            .create()
         
+        // Handle Enter/Done key press on keyboard
+        editText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE) {
+                saveAction()
+                dialog.dismiss()
+                true
+            } else {
+                false
+            }
+        }
+        
+        dialog.show()
         editText.requestFocus()
     }
 
@@ -1806,8 +1879,56 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             view?.post { onFilterChanged() }
         }
 
-        drawerBinding.filterBarContainer.isVisible = true
-        val chipGroup = drawerBinding.filterChipGroup
+        // Determine which layout mode to use
+        when (prefs.categoriesLayout) {
+            Constants.CategoriesLayout.Top -> {
+                setupCategoriesAsChips(drawerBinding, tags, shouldShowProfiles, shouldShowTags, onFilterChanged, isTop = true)
+            }
+            Constants.CategoriesLayout.Bottom -> {
+                setupCategoriesAsChips(drawerBinding, tags, shouldShowProfiles, shouldShowTags, onFilterChanged, isTop = false)
+            }
+            Constants.CategoriesLayout.Left -> {
+                setupCategoriesAsNavigationRail(drawerBinding, tags, shouldShowProfiles, shouldShowTags, onFilterChanged, isLeft = true)
+            }
+            Constants.CategoriesLayout.Right -> {
+                setupCategoriesAsNavigationRail(drawerBinding, tags, shouldShowProfiles, shouldShowTags, onFilterChanged, isLeft = false)
+            }
+        }
+        
+        drawerBinding.drawerRoot.requestLayout()
+    }
+
+    private fun setupCategoriesAsChips(
+        drawerBinding: FragmentAppDrawerBottomSheetBinding,
+        tags: List<String>,
+        shouldShowProfiles: Boolean,
+        shouldShowTags: Boolean,
+        onFilterChanged: () -> Unit,
+        isTop: Boolean = true
+    ) {
+        // Handle visibility of containers
+        drawerBinding.filterBarContainer.isVisible = isTop
+        drawerBinding.filterBarContainerBottom.isVisible = !isTop
+        drawerBinding.categoriesNavigationRail.isVisible = false
+        
+        val chipGroup = if (isTop) drawerBinding.filterChipGroup else drawerBinding.filterChipGroupBottom
+
+        // Adjust menuView constraints based on chip position
+        val menuViewParams = drawerBinding.menuView.layoutParams as RelativeLayout.LayoutParams
+        menuViewParams.removeRule(RelativeLayout.BELOW)
+        menuViewParams.removeRule(RelativeLayout.ABOVE)
+        menuViewParams.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        menuViewParams.removeRule(RelativeLayout.START_OF)
+        menuViewParams.removeRule(RelativeLayout.END_OF)
+        
+        if (isTop) {
+            menuViewParams.addRule(RelativeLayout.BELOW, drawerBinding.appDrawerTip.id.takeIf { drawerBinding.appDrawerTip.isVisible } ?: drawerBinding.filterBarContainer.id)
+            menuViewParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        } else {
+            menuViewParams.addRule(RelativeLayout.BELOW, drawerBinding.appDrawerTip.id.takeIf { drawerBinding.appDrawerTip.isVisible } ?: drawerBinding.search.id)
+            menuViewParams.addRule(RelativeLayout.ABOVE, drawerBinding.filterBarContainerBottom.id)
+        }
+        drawerBinding.menuView.layoutParams = menuViewParams
 
         // Clear existing chips
         chipGroup.removeAllViews()
@@ -1837,6 +1958,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             // "All" Chip
             val allChip = createFilterChip(View.generateViewId(), "All", currentProfileFilter == null)
             chipGroup.addView(allChip)
+            if (allChip.isChecked) chipGroup.check(allChip.id)
 
             profiles.forEach { profile ->
                 val label = when(profile) {
@@ -1848,15 +1970,18 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 val chip = createFilterChip(View.generateViewId(), label, profile == currentProfileFilter)
                 chip.tag = profile
                 chipGroup.addView(chip)
+                if (chip.isChecked) chipGroup.check(chip.id)
             }
         } else if (shouldShowTags) {
             // "All" Chip
             val allChip = createFilterChip(View.generateViewId(), "All", selectedTag == null)
             chipGroup.addView(allChip)
+            if (allChip.isChecked) chipGroup.check(allChip.id)
 
             tags.forEach { tag ->
                 val chip = createFilterChip(View.generateViewId(), tag, tag == selectedTag)
                 chipGroup.addView(chip)
+                if (chip.isChecked) chipGroup.check(chip.id)
             }
         }
         
@@ -1874,8 +1999,177 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 view?.post { onFilterChanged() }
             }
         }
+    }
+
+    private fun setupCategoriesAsNavigationRail(
+        drawerBinding: FragmentAppDrawerBottomSheetBinding,
+        tags: List<String>,
+        shouldShowProfiles: Boolean,
+        shouldShowTags: Boolean,
+        onFilterChanged: () -> Unit,
+        isLeft: Boolean = true
+    ) {
+        drawerBinding.filterBarContainer.isVisible = false
+        drawerBinding.filterBarContainerBottom.isVisible = false
+        drawerBinding.categoriesNavigationRail.isVisible = true
         
-        drawerBinding.drawerRoot.requestLayout()
+        val navRail = drawerBinding.categoriesNavigationRail
+        navRail.menu.clear()
+        
+        // 1. Disable global tint (allows Emojis to keep their colors)
+        navRail.itemIconTintList = null
+        
+        // 2. MANUAL HIGHLIGHT IS BACK (It works better!)
+        navRail.itemBackground = ContextCompat.getDrawable(requireContext(), R.drawable.selector_nav_rail_bg)
+        
+        try {
+            // 3. Disable System Active Indicator (conflicts with manual background)
+            navRail.isItemActiveIndicatorEnabled = false
+        } catch (e: NoSuchMethodError) {
+            // Fallback for older library versions
+        }
+
+        // Position the rail on left or right
+        val railParams = navRail.layoutParams as RelativeLayout.LayoutParams
+        railParams.removeRule(RelativeLayout.ALIGN_PARENT_START)
+        railParams.removeRule(RelativeLayout.ALIGN_PARENT_END)
+        if (isLeft) {
+            railParams.addRule(RelativeLayout.ALIGN_PARENT_START)
+        } else {
+            railParams.addRule(RelativeLayout.ALIGN_PARENT_END)
+        }
+        navRail.layoutParams = railParams
+
+        // Adjust RecyclerView position based on rail position
+        val menuViewParams = drawerBinding.menuView.layoutParams as RelativeLayout.LayoutParams
+        menuViewParams.removeRule(RelativeLayout.END_OF)
+        menuViewParams.removeRule(RelativeLayout.START_OF)
+        menuViewParams.removeRule(RelativeLayout.ABOVE)
+        menuViewParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        if (isLeft) {
+            menuViewParams.addRule(RelativeLayout.END_OF, navRail.id)
+        } else {
+            menuViewParams.addRule(RelativeLayout.START_OF, navRail.id)
+        }
+        drawerBinding.menuView.layoutParams = menuViewParams
+
+        var selectedIdToSet: Int = -1
+
+        // MANUAL COLOR FIX: Detect Dark Mode explicitly
+        val nightModeFlags = requireContext().resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+        val isDarkMode = nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
+
+        // If Dark Mode -> Text/Icons must be WHITE
+        // If Light Mode -> Text/Icons must be BLACK (Standard)
+        val themeTextColor = if (isDarkMode) Color.WHITE else Color.BLACK
+        val themeIconTint = ColorStateList.valueOf(themeTextColor)
+
+        // "All" item
+        val allId = View.generateViewId()
+        navRail.menu.add(0, allId, 0, "All").apply {
+            setIcon(R.drawable.ic_apps)
+            iconTintList = themeIconTint // Dynamic color
+            isCheckable = true
+            if (currentProfileFilter == null) {
+                selectedIdToSet = allId
+            }
+        }
+
+        if (shouldShowProfiles) {
+            val profiles = mutableListOf<String>()
+            if (prefs.getProfileCounter("SYSTEM") > 0) profiles.add("SYSTEM")
+            if (prefs.getProfileCounter("WORK") > 0) profiles.add("WORK")
+            if (prefs.getProfileCounter("PRIVATE") > 0 && !PrivateSpaceManager(requireContext()).isPrivateSpaceLocked()) profiles.add("PRIVATE")
+
+            profiles.forEachIndexed { index, profile ->
+                val label = when(profile) {
+                    "SYSTEM" -> "Personal"
+                    "WORK" -> "Work"
+                    "PRIVATE" -> "Private"
+                    else -> profile
+                }
+                val iconRes = when(profile) {
+                    "WORK" -> R.drawable.ic_work
+                    "PRIVATE" -> R.drawable.ic_hidden
+                    else -> R.drawable.ic_contacts
+                }
+                val pId = View.generateViewId()
+                navRail.menu.add(0, pId, index + 1, label).apply {
+                    setIcon(iconRes)
+                    iconTintList = themeIconTint // Dynamic color
+                    isCheckable = true
+                    if (profile == currentProfileFilter) {
+                        selectedIdToSet = pId
+                    }
+                    this.actionView?.tag = profile
+                }
+            }
+        } else if (shouldShowTags) {
+            tags.forEachIndexed { index, tag ->
+                val tId = View.generateViewId()
+                navRail.menu.add(0, tId, index + 1, tag).apply {
+                    val firstChar = getFirstCharacter(tag)
+                    // Pass the theme text color to draw the letter correctly
+                    val textDrawable = createTextDrawable(firstChar, themeTextColor)
+                    setIcon(textDrawable)
+                    
+                    // No tint for emojis to keep colors
+                    // But if it's NOT an emoji (just text), createTextDrawable uses the passed color, 
+                    // so we still don't need tint here.
+                    iconTintList = null 
+                    
+                    isCheckable = true
+                    if (tag == selectedTag) {
+                        selectedIdToSet = tId
+                    }
+                }
+            }
+        }
+
+        // IMPORTANT: Set selected ID AFTER adding all items
+        if (selectedIdToSet != -1) {
+            navRail.selectedItemId = selectedIdToSet
+        }
+
+        navRail.setOnItemSelectedListener { menuItem ->
+            val newTag = if (menuItem.title == "All") null else menuItem.title.toString()
+            if (selectedTag != newTag) {
+                selectedTag = newTag
+                view?.post { onFilterChanged() }
+            }
+            true
+        }
+    }
+
+    private fun getFirstCharacter(text: String): String {
+        if (text.isEmpty()) return "?"
+        // Use BreakIterator to correctly handle emojis (multi-codepoints)
+        val iterator = java.text.BreakIterator.getCharacterInstance()
+        iterator.setText(text)
+        val end = iterator.next()
+        return if (end != java.text.BreakIterator.DONE) text.substring(0, end) else text.take(1)
+    }
+
+    private fun createTextDrawable(text: String, textColor: Int): android.graphics.drawable.Drawable {
+        val size = (24 * resources.displayMetrics.density).toInt()
+        val bitmap = android.graphics.Bitmap.createBitmap(size, size, android.graphics.Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(bitmap)
+        
+        val paint = android.graphics.Paint().apply {
+            color = textColor
+            // Adjust text size based on whether it's an emoji or a letter
+            textSize = if (text.length > 2) 14 * resources.displayMetrics.density else 16 * resources.displayMetrics.density
+            textAlign = android.graphics.Paint.Align.CENTER
+            isAntiAlias = true
+        }
+        
+        val x = size / 2f
+        // Center the text vertically
+        val fontMetrics = paint.fontMetrics
+        val y = size / 2f - (fontMetrics.ascent + fontMetrics.descent) / 2f
+        canvas.drawText(text, x, y, paint)
+        
+        return android.graphics.drawable.BitmapDrawable(resources, bitmap)
     }
 
 

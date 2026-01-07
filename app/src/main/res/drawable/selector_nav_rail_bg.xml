@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- État sélectionné : Pillule utilisant la couleur de surbrillance système (Ripple color) -->
+    <!-- Cette couleur s'adapte automatiquement (gris clair trans. en Dark, gris foncé trans. en Light) -->
+    <item android:state_checked="true">
+        <inset android:insetTop="10dp" android:insetBottom="10dp" android:insetLeft="4dp" android:insetRight="4dp">
+            <shape android:shape="rectangle">
+                <corners android:radius="100dp"/>
+                <!-- colorControlHighlight est la couleur standard Android pour les sélections/ripples -->
+                <!-- Elle est garantie visible sur le fond par défaut -->
+                <solid android:color="?attr/colorControlHighlight"/>
+                <!-- Optionnel : petite bordure fine de la couleur d'accent pour renforcer la visibilité -->
+                <stroke android:width="1dp" android:color="?attr/colorAccent" />
+            </shape>
+        </inset>
+    </item>
+    
+    <!-- État pressé -->
+    <item android:state_pressed="true">
+        <inset android:insetTop="10dp" android:insetBottom="10dp" android:insetLeft="4dp" android:insetRight="4dp">
+            <shape android:shape="rectangle">
+                <corners android:radius="100dp"/>
+                <solid android:color="?attr/colorControlHighlight" />
+            </shape>
+        </inset>
+    </item>
+    
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent"/>
+        </shape>
+    </item>
+</selector>

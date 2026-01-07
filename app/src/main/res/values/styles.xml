@@ -46,6 +46,10 @@
         <item name="colorPrimaryDark">@android:color/system_accent1_800</item>
         <item name="colorAccent">@android:color/system_accent1_600</item>
         <item name="colorOnPrimary">@android:color/white</item>
+
+        <!-- Material 3 NavigationRail Active Indicator defaults -->
+        <item name="colorSecondaryContainer">?attr/primaryColor</item>
+        <item name="colorOnSecondaryContainer">@android:color/white</item>
     </style>
 
     <style name="Theme.mLauncher.Settings" parent="Theme.mLauncher">

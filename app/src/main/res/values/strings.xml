@@ -183,7 +183,6 @@
     <string name="enable_filter_strength">Enable Fuzzy Finder</string>
     <string name="filter_strength">Fuzzy Finder Strength</string>
     <string name="show_background">Show Background</string>
-    <string name="background_opacity">Background Transparency</string>
     <string name="total_screen_time">Total Screen Time</string>
 
     <string name="element_alignment">Element Alignment</string>
@@ -193,7 +192,14 @@
     <string name="alarm_alignment">Alarm</string>
     <string name="daily_word_alignment">Random Fact</string>
     <string name="home_alignment">Home Apps</string>
-    <string name="drawer_alignment">Drawer Apps</string>
+    <string name="list_layout">List Layout</string>
+    <string name="drawer_alignment">List Layout</string>
+    <string name="drawer_sort">Drawer Sort</string>
+    <string name="categories_layout">Categories Layout</string>
+    <string name="categories_top">Top</string>
+    <string name="categories_bottom">Bottom</string>
+    <string name="categories_left">Left</string>
+    <string name="categories_right">Right</string>
 
     <string name="element_colors">Element Colors</string>
 
@@ -531,4 +537,5 @@
         <item>Work</item>
     </string-array>
 
+    <string name="background_opacity">Background Opacity</string>
 </resources>

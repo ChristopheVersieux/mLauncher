@@ -2,14 +2,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory android:title="@string/widgets_add_widget">
-        <Preference
-            android:key="add_widget"
-            android:title="@string/widgets_add_widget"
-            android:summary="@string/widgets_not_added"
-            app:iconSpaceReserved="false" />
-    </PreferenceCategory>
-
     <PreferenceCategory android:title="@string/warning">
         <Preference
             android:key="experimental_warning"

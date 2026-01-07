@@ -438,6 +438,32 @@ object Constants {
         }
     }
 
+    enum class CategoriesLayout : EnumOption {
+        Top,
+        Bottom,
+        Left,
+        Right;
+
+        @Composable
+        override fun string(): String {
+            return when (this) {
+                Top -> stringResource(R.string.categories_top)
+                Bottom -> stringResource(R.string.categories_bottom)
+                Left -> stringResource(R.string.categories_left)
+                Right -> stringResource(R.string.categories_right)
+            }
+        }
+        
+        fun getString(context: Context): String {
+            return when (this) {
+                Top -> context.getString(R.string.categories_top)
+                Bottom -> context.getString(R.string.categories_bottom)
+                Left -> context.getString(R.string.categories_left)
+                Right -> context.getString(R.string.categories_right)
+            }
+        }
+    }
+
 
     enum class FontFamily : EnumOption {
         System,

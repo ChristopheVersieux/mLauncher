@@ -105,11 +105,6 @@
         tools:layout="@layout/fragment_location_search" />
 
     <fragment
-        android:id="@+id/lookFeelSettingsFragment"
-        android:name="app.wazabe.mlauncher.ui.LookFeelSettingsFragment"
-        android:label="@string/look_feel_settings_title" />
-
-    <fragment
         android:id="@+id/gesturesSettingsFragment"
         android:name="app.wazabe.mlauncher.ui.GesturesSettingsFragment"
         android:label="@string/gestures_settings_title">

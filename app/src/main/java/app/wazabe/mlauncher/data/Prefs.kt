@@ -590,6 +590,12 @@ class Prefs(val context: Context) {
         }
         set(value) = prefsNormal.edit { putString(DRAWER_TYPE, value.name) }
 
+    var categoriesLayout: Constants.CategoriesLayout
+        get() {
+            return getEnumSetting(CATEGORIES_LAYOUT, Constants.CategoriesLayout.Top)
+        }
+        set(value) = prefsNormal.edit { putString(CATEGORIES_LAYOUT, value.name) }
+
     var randomFactText: String
         get() = getSetting(RANDOM_FACT_TEXT, "")
         set(value) = prefsNormal.edit { putString(RANDOM_FACT_TEXT, value) }
