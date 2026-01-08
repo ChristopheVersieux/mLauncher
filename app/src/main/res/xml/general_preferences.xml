@@ -11,6 +11,15 @@
             android:defaultValue="System"
             app:useSimpleSummaryProvider="true" />
 
+        <ListPreference
+            android:key="APP_THEME_COLOR"
+            android:title="@string/app_color"
+            android:entries="@array/theme_color_names"
+            android:entryValues="@array/theme_color_values"
+            android:defaultValue="Green"
+            android:widgetLayout="@layout/preference_widget_color_preview"
+            app:useSimpleSummaryProvider="true" />
+
         <Preference
             android:key="pref_wallpaper_styles"
             android:title="@string/wallpaper_and_styles" />

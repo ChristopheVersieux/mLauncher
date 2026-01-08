@@ -2,6 +2,21 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <SwitchPreferenceCompat
+        android:key="SHOW_DAILY_WORD"
+        android:title="@string/show_daily_word"
+        android:defaultValue="true" />
+    <SeekBarPreference
+        android:key="MAIN_BACKGROUND_ALPHA"
+        android:title="@string/background_opacity"
+        android:max="100"
+        app:min="0"
+        android:defaultValue="40"
+        app:showSeekBarValue="true"
+        app:iconSpaceReserved="false" />
+
+
+
     <PreferenceCategory android:title="@string/home_management">
         <SeekBarPreference
             android:key="HOME_APPS_NUM"
@@ -11,6 +26,8 @@
             android:defaultValue="4"
             app:showSeekBarValue="true"
             app:iconSpaceReserved="false" />
+
+
 
         <SwitchPreferenceCompat
             android:key="HOME_LOCKED"
@@ -37,6 +54,9 @@
             android:defaultValue="true"
             app:disableDependentsState="true" />
 
+
+
+
         <ListPreference
             android:key="MANUAL_TEXT_COLOR"
             android:title="@string/manual_text_color"
@@ -46,14 +66,7 @@
             android:dependency="AUTO_TEXT_COLOR"
             app:useSimpleSummaryProvider="true" />
 
-        <SeekBarPreference
-            android:key="MAIN_BACKGROUND_ALPHA"
-            android:title="@string/background_opacity"
-            android:max="100"
-            app:min="0"
-            android:defaultValue="40"
-            app:showSeekBarValue="true"
-            app:iconSpaceReserved="false" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

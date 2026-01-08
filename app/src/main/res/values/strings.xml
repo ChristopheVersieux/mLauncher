@@ -195,7 +195,7 @@
     <string name="list_layout">List Layout</string>
     <string name="drawer_alignment">List Layout</string>
     <string name="drawer_sort">Drawer Sort</string>
-    <string name="categories_layout">Categories Layout</string>
+    <string name="categories_layout">Categories Position</string>
     <string name="categories_top">Top</string>
     <string name="categories_bottom">Bottom</string>
     <string name="categories_left">Left</string>
@@ -204,7 +204,6 @@
     <string name="element_colors">Element Colors</string>
 
     <string name="background_color">Background</string>
-    <string name="app_color">Apps</string>
     <string name="clock_color">Clock</string>
     <string name="date_color">Date</string>
     <string name="alarm_color">Alarm</string>
@@ -538,4 +537,5 @@
     </string-array>
 
     <string name="background_opacity">Background Opacity</string>
+    <string name="app_color">App Color</string>
 </resources>

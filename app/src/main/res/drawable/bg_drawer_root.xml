@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Base Layer: Surface Color (White/Black) -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="?attr/colorSurfaceVariant" />
+            <corners android:topLeftRadius="28dp" android:topRightRadius="28dp" />
+        </shape>
+    </item>
+    
+
+</layer-list>

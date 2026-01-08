@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    android:gravity="center">
+
+    <ImageView
+        android:id="@+id/color_preview"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/color_circle_shape"
+        app:tint="?attr/colorPrimary"
+        xmlns:app="http://schemas.android.com/apk/res-auto" />
+</LinearLayout>

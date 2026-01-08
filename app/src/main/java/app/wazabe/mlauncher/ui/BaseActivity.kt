@@ -13,6 +13,20 @@ import app.wazabe.mlauncher.Mlauncher
 open class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply Dynamic Theme Color
+        // Must be done BEFORE super.onCreate and BEFORE setFactory
+        val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+        val themeColor = prefs.getString("APP_THEME_COLOR", "Green") ?: "Green"
+        val themeResId = getThemeForColor(themeColor)
+        setTheme(themeResId)
+
+        val typedValue = android.util.TypedValue()
+        theme.resolveAttribute(android.R.attr.windowLightStatusBar, typedValue, true)
+        val isLightStatusBar = typedValue.data != 0
+        val iconColor = if (isLightStatusBar) "BLACK (for light background)" else "WHITE (for dark background)"
+        android.util.Log.d("ThemeDebug", "Applying theme for color: $themeColor, ThemeResId: $themeResId")
+        android.util.Log.d("ThemeDebug", "System thinks: Status Bar should be $iconColor [windowLightStatusBar=$isLightStatusBar]")
+
         // IMPORTANT: The Factory must be set BEFORE super.onCreate()
         // This intercepts the 'inflation' process as the XML is read.
         if (Mlauncher.prefs.launcherFont != "system") {
@@ -39,8 +53,20 @@ open class BaseActivity : AppCompatActivity() {
             })
         }
 
-
-
         super.onCreate(savedInstanceState)
+    }
+
+    open fun getThemeForColor(color: String): Int {
+        return when (color) {
+            "Red" -> app.wazabe.mlauncher.R.style.Theme_mLauncher_Red
+            "Blue" -> app.wazabe.mlauncher.R.style.Theme_mLauncher_Blue
+            "Orange" -> app.wazabe.mlauncher.R.style.Theme_mLauncher_Orange
+            "Purple" -> app.wazabe.mlauncher.R.style.Theme_mLauncher_Purple
+            "Pink" -> app.wazabe.mlauncher.R.style.Theme_mLauncher_Pink
+            "Lime" -> app.wazabe.mlauncher.R.style.Theme_mLauncher_Lime
+            "Cyan" -> app.wazabe.mlauncher.R.style.Theme_mLauncher_Cyan
+            "Yellow" -> app.wazabe.mlauncher.R.style.Theme_mLauncher_Yellow
+            else -> app.wazabe.mlauncher.R.style.Theme_mLauncher // Green (Default)
+        }
     }
 }

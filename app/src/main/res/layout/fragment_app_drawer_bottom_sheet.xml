@@ -4,7 +4,8 @@
     style="style/Widget.Material3.BottomSheet"
     android:id="@+id/drawerRoot"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_drawer_root">
     <!-- Drag Handle at the very top -->
     <!-- Header Container (Visible in Peek) -->
     <LinearLayout
@@ -13,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:orientation="vertical"
-        android:paddingTop="12dp"
+        android:paddingTop="8dp"
         android:paddingBottom="8dp">
 
         <!-- Drag Handle -->
@@ -29,7 +30,7 @@
     <FrameLayout
         android:id="@+id/peekSpacer"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="24dp"
         android:layout_below="@id/drawerHeader" />
 
     <androidx.appcompat.widget.SearchView
@@ -52,7 +53,8 @@
         android:layout_marginTop="8dp"
         android:visibility="gone"
         app:labelVisibilityMode="unlabeled"
-        app:menuGravity="top" />
+        app:menuGravity="top"
+        android:background="@android:color/transparent" />
 
     <!-- Filter Bar Container (horizontal chips) -->
     <FrameLayout
@@ -97,7 +99,10 @@
         android:layout_below="@id/appDrawerTip"
         android:layout_toEndOf="@id/categoriesNavigationRail"
         android:layout_alignParentBottom="true"
-        android:clipToPadding="false">
+        android:clipToPadding="false"
+        android:background="@drawable/bg_drawer_card"
+        android:paddingStart="12dp"
+        android:paddingTop="16dp">
 
         <!-- RecyclerView for apps -->
         <com.github.creativecodecat.components.views.FontRecyclerView

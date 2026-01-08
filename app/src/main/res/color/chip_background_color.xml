@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Selected state: colorPrimary -->
-    <item android:color="@color/colorPrimary" android:state_checked="true"/>
+    <item android:color="?attr/colorPrimary" android:state_checked="true"/>
     <!-- Unselected state: transparent -->
     <item android:color="@android:color/transparent"/>
 </selector>

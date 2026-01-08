@@ -400,6 +400,10 @@ class Prefs(val context: Context) {
         get() = getSetting(SHOW_ALARM, false)
         set(value) = prefsNormal.edit { putBoolean(SHOW_ALARM, value) }
 
+    var showDailyWord: Boolean
+        get() = getSetting(SHOW_DAILY_WORD, true)
+        set(value) = prefsNormal.edit { putBoolean(SHOW_DAILY_WORD, value) }
+
     var showFloating: Boolean
         get() = getSetting(SHOW_FLOATING, true)
         set(value) = prefsNormal.edit { putBoolean(SHOW_FLOATING, value) }

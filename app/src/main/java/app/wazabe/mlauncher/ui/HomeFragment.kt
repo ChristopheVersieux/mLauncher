@@ -238,6 +238,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     override fun onStart() {
         super.onStart()
+        AppLogger.d("BottomSheetDebug", "HomeFragment.onStart - drawerBehavior.state=${if (::drawerBehavior.isInitialized) drawerBehavior.state else "NOT_INIT"}")
         updateUIFromPreferences()
 
         // Handle status bar once per view creation
@@ -256,6 +257,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     override fun onResume() {
         super.onResume()
+        AppLogger.d("BottomSheetDebug", "HomeFragment.onResume - drawerBehavior.state=${if (::drawerBehavior.isInitialized) drawerBehavior.state else "NOT_INIT"}, peekHeight=${if (::drawerBehavior.isInitialized) drawerBehavior.peekHeight else "N/A"}")
         
         // Reset adapter flags to LaunchApp mode to prevent staying in edit mode
         if (::appsAdapter.isInitialized) {
@@ -284,6 +286,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     override fun onPause() {
         super.onPause()
+        AppLogger.d("BottomSheetDebug", "HomeFragment.onPause - drawerBehavior.state=${if (::drawerBehavior.isInitialized) drawerBehavior.state else "NOT_INIT"}")
         if (::appWidgetHost.isInitialized) {
             appWidgetHost.stopListening()
         }
@@ -291,6 +294,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     override fun onStop() {
         super.onStop()
+        AppLogger.d("BottomSheetDebug", "HomeFragment.onStop - drawerBehavior.state=${if (::drawerBehavior.isInitialized) drawerBehavior.state else "NOT_INIT"}")
         context?.let { ctx ->
             prefs.prefsNormal.unregisterOnSharedPreferenceChangeListener(this)
         }
@@ -299,7 +303,20 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     override fun onDestroyView() {
         super.onDestroyView()
+        AppLogger.d("BottomSheetDebug", "HomeFragment.onDestroyView")
         _binding = null
+    }
+
+    /**
+     * Called by MainActivity when Home button is pressed to prevent bottom sheet from hiding
+     */
+    fun resetBottomSheetOnHomePress() {
+        if (::drawerBehavior.isInitialized) {
+            AppLogger.d("BottomSheetDebug", "resetBottomSheetOnHomePress called, current state=${drawerBehavior.state}")
+            if (drawerBehavior.state != BottomSheetBehavior.STATE_COLLAPSED) {
+                drawerBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
     }
 
 
@@ -307,28 +324,52 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         updateBackgroundOpacity()
         binding.apply {
             // Static UI setup
-            dailyWord.textSize = prefs.appSize.toFloat()
             homeScreenPager.textSize = prefs.appSize.toFloat()
+            dailyWord.textSize = prefs.appSize.toFloat()
 
-            dailyWord.isVisible = dailyWord.text.toString().isNotBlank()
-            dailyWord.setTextColor(prefs.appColor)
-            
-            // Rounded corners for drawer
-            val radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 28f, resources.displayMetrics)
-            
-            // Drawer must be opaque to cover widgets
-            val bgColor = prefs.backgroundColor
-            val opaqueColor = android.graphics.Color.argb(255, 
-                android.graphics.Color.red(bgColor),
-                android.graphics.Color.green(bgColor),
-                android.graphics.Color.blue(bgColor)
-            )
-
-            val backgroundDrawable = GradientDrawable().apply {
-                setColor(opaqueColor)
-                cornerRadii = floatArrayOf(radius, radius, radius, radius, 0f, 0f, 0f, 0f)
+            dailyWord.isVisible = prefs.showDailyWord && dailyWord.text.toString().isNotBlank()
+            // Determine Text Color (Logic copied from HomeAppsAdapter)
+            val textColor = if (prefs.autoTextColor) {
+                app.wazabe.mlauncher.helper.utils.WallpaperColorAnalyzer.getRecommendedTextColor(requireContext())
+            } else {
+                if (prefs.manualTextColor == "light") {
+                    androidx.core.content.ContextCompat.getColor(requireContext(), R.color.white)
+                } else {
+                    androidx.core.content.ContextCompat.getColor(requireContext(), R.color.black)
+                }
             }
-            appDrawerLayout.root.background = backgroundDrawable
+
+            // Apply text color to dailyWord
+            dailyWord.setTextColor(textColor)
+
+            // Dynamic Status Bar Icon Color - Apply based on luminance of the calculated text color
+            // Use post to ensure window is ready and flags are applied after potential system resets
+            view?.post {
+                val window = requireActivity().window
+                val windowInsetsController = androidx.core.view.WindowInsetsControllerCompat(window, window.decorView)
+
+                // High Luminance Text (White) -> Dark Background -> Light Icons (White) -> LightStatusBars = false
+                // Low Luminance Text (Black) -> Light Background -> Dark Icons (Black) -> LightStatusBars = true
+                val isLightText = androidx.core.graphics.ColorUtils.calculateLuminance(textColor) > 0.5
+                val colorHex = String.format("#%06X", (0xFFFFFF and textColor))
+                
+                AppLogger.d("ThemeDebug", "HomeFragment: Resolved TextColor=$colorHex (Auto=${prefs.autoTextColor}, Manual=${prefs.manualTextColor}), IsLightText=$isLightText")
+                
+                if (isLightText) {
+                    // White Text -> White Icons
+                    AppLogger.d("ThemeDebug", "HomeFragment: Setting Status Bar to WHITE icons (isAppearanceLightStatusBars = false)")
+                    windowInsetsController.isAppearanceLightStatusBars = false
+                    windowInsetsController.isAppearanceLightNavigationBars = false
+                } else {
+                    // Black Text -> Black Icons
+                    AppLogger.d("ThemeDebug", "HomeFragment: Setting Status Bar to BLACK icons (isAppearanceLightStatusBars = true)")
+                    windowInsetsController.isAppearanceLightStatusBars = true
+                    windowInsetsController.isAppearanceLightNavigationBars = true
+                }
+            }
+            
+            // Removed programmatic background override to allow XML drawable (bg_drawer_root) to work
+            // appDrawerLayout.root.background = backgroundDrawable 
             mainLayout.setBackgroundColor(getHexForOpacity(prefs))
 
             dailyWord.gravity = Gravity.CENTER
@@ -528,7 +569,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
             randomFact.observe(viewLifecycleOwner) { fact ->
                 binding.dailyWord.text = fact
-                binding.dailyWord.isVisible = fact.isNotBlank()
+                binding.dailyWord.isVisible = prefs.showDailyWord && fact.isNotBlank()
             }
 
             homeAppsNum.observe(viewLifecycleOwner) { num ->
@@ -545,7 +586,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
-            "SHOW_DATE", "SHOW_CLOCK", "SHOW_ALARM", "SHOW_BATTERY",
+            "SHOW_DATE", "SHOW_CLOCK", "SHOW_ALARM", "SHOW_BATTERY", "SHOW_DAILY_WORD",
             "DATE_SIZE_TEXT", "CLOCK_SIZE_TEXT", "ALARM_SIZE_TEXT", "BATTERY_SIZE_TEXT", "APP_SIZE_TEXT",
             "DATE_COLOR", "CLOCK_COLOR", "ALARM_CLOCK_COLOR", "BATTERY_COLOR", "APP_COLOR",
             "BACKGROUND_COLOR", "APP_OPACITY", "SHOW_BACKGROUND", "TEXT_PADDING_SIZE",
@@ -1476,26 +1517,47 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
         this.drawerBinding = binding.appDrawerLayout
 
-        var statusBarSize = 0
-        ViewCompat.setOnApplyWindowInsetsListener(drawerBinding.root) { _, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            statusBarSize = systemBars.top // On stocke la valeur
+        // Shared state for spacer height synchronization
+        val defaultBuffer = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60f, resources.displayMetrics).toInt()
+        var maxSpacerHeight = defaultBuffer + 0 // will be updated with insets
 
-            // On garde uniquement la logique du bas ici
+        var statusBarSize = 0
+        ViewCompat.setOnApplyWindowInsetsListener(drawerBinding.root) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            statusBarSize = systemBars.top 
+            
+            // Revert manual layout params changes to fix peek and top gap issues
+            val params = view.layoutParams as? ViewGroup.MarginLayoutParams
+            if (params != null) {
+                params.topMargin = 0
+                params.height = ViewGroup.LayoutParams.MATCH_PARENT
+                view.layoutParams = params
+            }
+
+            // Use behavior property to respect status bar
+            drawerBehavior.expandedOffset = systemBars.top
+            drawerBehavior.isFitToContents = false 
+            drawerBehavior.halfExpandedRatio = 0.0001f // Disable "half expanded" stop logic 
+
             val basePeekHeight = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, 24f, resources.displayMetrics
             ).toInt()
             
-            // Only update peekSpacer if drawer is collapsed (not when keyboard appears)
+            // Calculate correct max spacer height based on current insets
+            maxSpacerHeight = systemBars.bottom + defaultBuffer
+
+            // ALWAYS ensure peekHeight is correct, regardless of state
+            val newPeekHeight = basePeekHeight + systemBars.bottom
+            drawerBehavior.peekHeight = newPeekHeight
+            
+            com.github.droidworksstudio.common.AppLogger.d("BottomSheetDebug", "Insets applied: systemBottom=${systemBars.bottom}, maxSpacerHeight=$maxSpacerHeight, peekHeight=$newPeekHeight, state=${drawerBehavior.state}")
+
+            // Only update peekSpacer layout if drawer is collapsed to avoid fighting with onSlide animation
             if (drawerBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
-                // Push search down prevents it from being visible in peek area (Nav Bar + 24dp Buffer)
-                // We use a spacer view instead of margin on searchview to avoid layout issues
                 val spacerParams = drawerBinding.peekSpacer.layoutParams
-                val buffer = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60f, resources.displayMetrics).toInt()
-                spacerParams.height = systemBars.bottom + buffer
+                spacerParams.height = maxSpacerHeight
                 drawerBinding.peekSpacer.layoutParams = spacerParams
-                
-                drawerBehavior.peekHeight = basePeekHeight + systemBars.bottom
+                com.github.droidworksstudio.common.AppLogger.d("BottomSheetDebug", "State COLLAPSED during insets: Updated spacer height to $maxSpacerHeight")
             }
             insets
         }
@@ -1503,6 +1565,31 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 // 2. On ajuste la marge en temps réel pendant le glissement
         drawerBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
+                val stateName = when(newState) {
+                    BottomSheetBehavior.STATE_DRAGGING -> "DRAGGING(1)"
+                    BottomSheetBehavior.STATE_SETTLING -> "SETTLING(2)"
+                    BottomSheetBehavior.STATE_EXPANDED -> "EXPANDED(3)"
+                    BottomSheetBehavior.STATE_COLLAPSED -> "COLLAPSED(4)"
+                    BottomSheetBehavior.STATE_HIDDEN -> "HIDDEN(5)"
+                    BottomSheetBehavior.STATE_HALF_EXPANDED -> "HALF_EXPANDED(6)"
+                    else -> "UNKNOWN($newState)"
+                }
+                com.github.droidworksstudio.common.AppLogger.d("BottomSheetDebug", "onStateChanged: newState=$newState ($stateName)")
+                
+                // Prevent HIDDEN state - force back to COLLAPSED
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    com.github.droidworksstudio.common.AppLogger.d("BottomSheetDebug", "⚠️ Preventing HIDDEN state, forcing COLLAPSED")
+                    drawerBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    return
+                }
+                
+                // Also prevent HALF_EXPANDED since we disabled it
+                if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED) {
+                    com.github.droidworksstudio.common.AppLogger.d("BottomSheetDebug", "⚠️ Preventing HALF_EXPANDED state, forcing COLLAPSED")
+                    drawerBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    return
+                }
+                
                 // Reset to normal launch mode when drawer collapses
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                     drawerBinding.search.clearFocus()
@@ -1510,6 +1597,13 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                     if (::appsAdapter.isInitialized) {
                         appsAdapter.flag = Constants.AppDrawerFlag.LaunchApp
                         appsAdapter.location = 0
+                    }
+                    // Ensure spacer is fully expanded when collapsed
+                    val spacerParams = drawerBinding.peekSpacer.layoutParams
+                    if (spacerParams.height != maxSpacerHeight) {
+                        com.github.droidworksstudio.common.AppLogger.d("BottomSheetDebug", "Correction on COLLAPSE: spacer ${spacerParams.height} -> $maxSpacerHeight")
+                        spacerParams.height = maxSpacerHeight
+                        drawerBinding.peekSpacer.layoutParams = spacerParams
                     }
                 }
             }
@@ -1525,12 +1619,20 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 drawerBinding.drawerHeader.layoutParams = headerParams
                 
                 // Animate peekSpacer: full height when collapsed (0), no space when expanded (1)
-                val maxSpacerHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 120f, resources.displayMetrics).toInt()
+                // Use the shared maxSpacerHeight variable
                 val minSpacerHeight = 0 // No space when fully open
                 val spacerParams = drawerBinding.peekSpacer.layoutParams
-                val newHeight = (maxSpacerHeight - (slideOffset * (maxSpacerHeight - minSpacerHeight))).toInt()
-                spacerParams.height = newHeight
-                drawerBinding.peekSpacer.layoutParams = spacerParams
+                
+                val currentMax = if (maxSpacerHeight > 0) maxSpacerHeight else defaultBuffer // fallback
+                val newHeight = (currentMax - (slideOffset * (currentMax - minSpacerHeight))).toInt()
+                
+                if (spacerParams.height != newHeight) {
+                    spacerParams.height = newHeight
+                    drawerBinding.peekSpacer.layoutParams = spacerParams
+                }
+                
+                // Log sparingly if needed, or verbose for debugging this specific issue
+                // com.github.droidworksstudio.common.AppLogger.d("BottomSheetDebug", "onSlide: offset=$slideOffset, spacerHeight=$newHeight")
             }
         })
 
@@ -2586,8 +2688,16 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                         GRID_COLUMNS, CELL_MARGIN, saved.cellsW, saved.cellsH
                     )
 
-                    wrapper.translationX = saved.col * (cellWidth + CELL_MARGIN).toFloat()
-                    wrapper.translationY = saved.row * (cellHeight + CELL_MARGIN).toFloat()
+                    val translationXCalc = saved.col * (cellWidth + CELL_MARGIN).toFloat()
+                    val translationYCalc = saved.row * (cellHeight + CELL_MARGIN).toFloat()
+                    
+                    AppLogger.d("WidgetRestore", "📥 Restoring Widget: appWidgetId=${saved.appWidgetId}")
+                    AppLogger.d("WidgetRestore", "  ├─ Saved: cells=${saved.cellsW}x${saved.cellsH}, pos=(${saved.col}, ${saved.row}), size=${saved.width}x${saved.height}px")
+                    AppLogger.d("WidgetRestore", "  ├─ Grid: cellSize=${cellWidth}x${cellHeight}px, margin=$CELL_MARGIN")
+                    AppLogger.d("WidgetRestore", "  └─ Placing: translation=(${translationXCalc}, ${translationYCalc}), layoutSize=${saved.width}x${saved.height}px")
+                    
+                    wrapper.translationX = translationXCalc
+                    wrapper.translationY = translationYCalc
                     wrapper.layoutParams = FrameLayout.LayoutParams(saved.width, saved.height)
 
                     binding.homeWidgetGrid.addView(wrapper)

@@ -37,6 +37,7 @@ import app.wazabe.mlauncher.helper.showStatusBar
 import app.wazabe.mlauncher.helper.utils.AppReloader
 import app.wazabe.mlauncher.helper.utils.SystemBarObserver
 import app.wazabe.mlauncher.ui.BaseActivity
+import app.wazabe.mlauncher.ui.HomeFragment
 import app.wazabe.mlauncher.ui.onboarding.OnboardingActivity
 import com.github.droidworksstudio.common.AppLogger
 import com.github.droidworksstudio.common.showLongToast
@@ -75,6 +76,8 @@ class MainActivity : BaseActivity() {
     private var widgetResultCallback: ((Int, Int, Intent?) -> Unit)? = null
     private var widgetConfigCallback: ((Int, Int) -> Unit)? = null
     private var widgetHost: AppWidgetHost? = null
+
+    private var currentThemeColor: String? = null
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         return when (keyCode) {
@@ -125,8 +128,27 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        AppLogger.d("BottomSheetDebug", "MainActivity.onNewIntent called - Home button pressed while on home screen")
+        AppLogger.d("BottomSheetDebug", "Intent action: ${intent.action}, flags: ${intent.flags}")
+        
+        // Notify fragments that we need to reset bottom sheet state
+        // This prevents the bottom sheet from going to HIDDEN state
+        supportFragmentManager.fragments.forEach { fragment ->
+            if (fragment is HomeFragment) {
+                fragment.resetBottomSheetOnHomePress()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // --- THEME CHECK INIT ---
+        // Initialize currentThemeColor using standard PreferenceManager to be safe
+        val defaultPrefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+        currentThemeColor = defaultPrefs.getString("APP_THEME_COLOR", "Green")
 
         // Enables edge-to-edge mode
         enableEdgeToEdge()
@@ -471,8 +493,16 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onResume() {
-        backToHomeScreen()
         super.onResume()
+        // Check if theme changed while we were away (e.g. in Settings)
+        val defaultPrefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+        val newColor = defaultPrefs.getString("APP_THEME_COLOR", "Green")
+        if (currentThemeColor != null && newColor != currentThemeColor) {
+            recreate()
+            return // Skip standard resume logic as we are restarting
+        }
+
+        backToHomeScreen()
     }
 
     override fun onUserLeaveHint() {

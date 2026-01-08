@@ -151,14 +151,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             prefs.hiddenApps = migratedSet.toMutableSet()
         }
         
-        // Invalidate old cache (version 1 = filtered cache)
+        // Invalidate old cache (version 2 = fixed profile detection)
         val cacheVersion = prefs.prefsNormal.getInt("CACHE_VERSION", 0)
-        if (cacheVersion != 1) {
+        if (cacheVersion != 2) {
             appsCacheFile.delete()
             contactsCacheFile.delete()
             appsMemoryCache = null
             contactsMemoryCache = null
-            prefs.prefsNormal.edit().putInt("CACHE_VERSION", 1).apply()
+            prefs.prefsNormal.edit().putInt("CACHE_VERSION", 2).apply()
         }
         
         prefsNormal.registerOnSharedPreferenceChangeListener(pinnedAppsListener)
@@ -673,6 +673,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         
         // 🔹 Profile apps in parallel
         val launcherApps = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
+        
+        // Reflection helper for isManagedProfile
+        fun isManagedProfile(user: UserHandle): Boolean {
+             return try {
+                 val userManager = context.getSystemService(Context.USER_SERVICE) as UserManager
+                 val getIdentifier = user.javaClass.getMethod("getIdentifier")
+                 val id = getIdentifier.invoke(user) as Int
+                 val isManaged = userManager.javaClass.getMethod("isManagedProfile", Int::class.javaPrimitiveType)
+                 isManaged.invoke(userManager, id) as Boolean
+             } catch (e: Exception) {
+                 user != Process.myUserHandle() // Fallback
+             }
+        }
+
         val deferreds = profiles.map { profile ->
             async {
                 if (privateManager.isPrivateSpaceProfile(profile) && privateManager.isPrivateSpaceLocked()) {
@@ -681,7 +695,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 } else {
                     val profileType = when {
                         privateManager.isPrivateSpaceProfile(profile) -> "PRIVATE"
-                        profile != Process.myUserHandle() -> "WORK"
+                        isManagedProfile(profile) -> "WORK"
                         else -> "SYSTEM"
                     }
 
@@ -753,6 +767,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
             )
             .toMutableList()
+
+        AppLogger.d("AutoTagDebug", "MainViewModel: App list refreshed. Total=${allApps.size}. Counts: ${allApps.groupingBy { it.profileType }.eachCount()}")
 
         // 🔹 Build scroll map only (filtering already done above)
         val scrollMap = mutableMapOf<String, Int>()
@@ -957,11 +973,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val text = String(bytes, Charset.forName("UTF-8"))
             val top = JSONObject(text)
             val array = top.getJSONArray("items")
+            
+            // Get current profiles to match hashes
+            val userManager = appContext.getSystemService(Context.USER_SERVICE) as UserManager
+            val profiles = userManager.userProfiles
+            
             val list = mutableListOf<AppListItem>()
             for (i in 0 until array.length()) {
                 val obj = array.getJSONObject(i)
-                // user handle restoration cannot be exact; use current user handle as best effort
-                val userHandle = Process.myUserHandle()
+                val userHash = obj.optInt("userHash", 0)
+                
+                // Find matching profile or default to myUserHandle
+                val userHandle = profiles.find { it.hashCode() == userHash } ?: Process.myUserHandle()
+                
                 val item = AppListItem(
                     activityLabel = obj.optString("label", ""),
                     activityPackage = obj.optString("package", ""),

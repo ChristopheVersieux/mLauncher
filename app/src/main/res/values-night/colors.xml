@@ -8,4 +8,21 @@
     <color name="about_screen_accent">#80CBC4</color> <!-- Teal 200 - Lighter for About screen in dark mode -->
     <color name="background_bubble">#FF2C2C2C</color>
     <color name="colorPrimaryBackground">@color/background_bubble</color>
+
+    <!-- Theme Surface Tints (12% opacity for Dark Mode) -->
+    <!-- Theme Surface Tints (Opaque Dark Tints for Dark Mode) -->
+    <color name="theme_green_surface_tint">#001A15</color>
+    <color name="theme_red_surface_tint">#1A0505</color>
+    <color name="theme_blue_surface_tint">#05101A</color>
+    <color name="theme_orange_surface_tint">#1A0D00</color>
+    <color name="theme_purple_surface_tint">#120515</color>
+    <color name="theme_pink_surface_tint">#15050A</color>
+    <color name="theme_lime_surface_tint">#151605</color>
+    <color name="theme_cyan_surface_tint">#001517</color>
+    <color name="theme_yellow_surface_tint">#1A1200</color>
+
+    <!-- Drawer Colors (Dark Mode) -->
+    <!-- Drawer Colors (Dark Mode) -->
+    <color name="drawer_card_bg">@color/background_bubble</color>
+    <color name="drawer_root_base">#000000</color>
 </resources>

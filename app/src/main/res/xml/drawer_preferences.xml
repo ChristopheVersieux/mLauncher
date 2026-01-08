@@ -2,16 +2,16 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
+
     <PreferenceCategory android:title="@string/search">
         <SwitchPreferenceCompat
             android:key="HIDE_SEARCH_VIEW"
             android:title="@string/hide_search_view"
             app:iconSpaceReserved="false" />
 
-        <SwitchPreferenceCompat
-            android:key="AUTO_SHOW_KEYBOARD"
-            android:title="@string/auto_show_keyboard"
-            app:iconSpaceReserved="false" />
+
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/layout_positioning">
@@ -50,5 +50,11 @@
             android:summary="@string/manage_hidden_apps_summary"
             app:iconSpaceReserved="false" />
     </PreferenceCategory>
-
+    <PreferenceCategory android:title="Tags">
+        <Preference
+            android:key="AUTO_TAG"
+            android:title="Auto Tag"
+            android:summary="work, private.. and whatever categories we find"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
 </PreferenceScreen>

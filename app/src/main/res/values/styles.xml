@@ -50,6 +50,7 @@
         <!-- Material 3 NavigationRail Active Indicator defaults -->
         <item name="colorSecondaryContainer">?attr/primaryColor</item>
         <item name="colorOnSecondaryContainer">@android:color/white</item>
+        <item name="colorSurfaceVariant">@color/theme_green_surface_tint</item>
     </style>
 
     <style name="Theme.mLauncher.Settings" parent="Theme.mLauncher">
@@ -150,19 +151,19 @@
     </style>
 
     <style name="AppPreferenceTheme" parent="@style/PreferenceThemeOverlay">
-        <item name="colorAccent">@color/preference_accent</item>
-        <item name="colorControlActivated">@color/preference_accent</item>
-        <item name="android:colorAccent">@color/preference_accent</item>
-        <item name="android:colorControlActivated">@color/preference_accent</item>
-        <item name="colorPrimary">@color/preference_accent</item>
-        <item name="android:colorPrimary">@color/preference_accent</item>
-        <item name="colorSecondary">@color/preference_accent</item>
+        <item name="colorAccent">?attr/colorAccent</item>
+        <item name="colorControlActivated">?attr/colorAccent</item>
+        <item name="android:colorAccent">?attr/colorAccent</item>
+        <item name="android:colorControlActivated">?attr/colorAccent</item>
+        <item name="colorPrimary">?attr/colorPrimary</item>
+        <item name="android:colorPrimary">?attr/colorPrimary</item>
+        <item name="colorSecondary">?attr/colorPrimary</item>
         <item name="switchPreferenceCompatStyle">@style/AppSwitchPreferenceStyle</item>
         <item name="preferenceCategoryStyle">@style/AppPreferenceCategoryStyle</item>
     </style>
 
     <style name="AppPreferenceCategoryStyle" parent="Preference.Category.Material">
-        <item name="android:textColor">@color/preference_accent</item>
+        <item name="android:textColor">?attr/colorAccent</item>
         <item name="android:layout_marginTop">16dp</item>
     </style>
 
@@ -177,5 +178,135 @@
         <item name="chipStrokeColor">@color/chip_stroke_color</item>
         <item name="chipStrokeWidth">1dp</item>
     </style>
+    <!-- Theme Variations -->
+
+    <!-- Red -->
+    <style name="Theme.mLauncher.Red" parent="Theme.mLauncher">
+        <item name="colorPrimary">@color/theme_red_primary</item>
+        <item name="colorAccent">@color/theme_red_accent</item>
+        <item name="android:colorPrimary">@color/theme_red_primary</item>
+        <item name="android:colorAccent">@color/theme_red_accent</item>
+        <item name="colorSurfaceVariant">@color/theme_red_surface_tint</item>
+    </style>
+    <style name="Theme.mLauncher.Settings.Red" parent="Theme.mLauncher.Settings">
+        <item name="colorPrimary">@color/theme_red_primary</item>
+        <item name="colorAccent">@color/theme_red_accent</item>
+        <item name="android:colorPrimary">@color/theme_red_primary</item>
+        <item name="android:colorAccent">@color/theme_red_accent</item>
+        <item name="colorSurfaceVariant">@color/theme_red_surface_tint</item>
+    </style>
+
+    <!-- Blue -->
+    <style name="Theme.mLauncher.Blue" parent="Theme.mLauncher">
+        <item name="colorPrimary">@color/theme_blue_primary</item>
+        <item name="colorAccent">@color/theme_blue_accent</item>
+        <item name="android:colorPrimary">@color/theme_blue_primary</item>
+        <item name="android:colorAccent">@color/theme_blue_accent</item>
+        <item name="colorSurfaceVariant">@color/theme_blue_surface_tint</item>
+    </style>
+    <style name="Theme.mLauncher.Settings.Blue" parent="Theme.mLauncher.Settings">
+        <item name="colorPrimary">@color/theme_blue_primary</item>
+        <item name="colorAccent">@color/theme_blue_accent</item>
+        <item name="android:colorPrimary">@color/theme_blue_primary</item>
+        <item name="android:colorAccent">@color/theme_blue_accent</item>
+        <item name="colorSurfaceVariant">@color/theme_blue_surface_tint</item>
+    </style>
+
+    <!-- Orange -->
+    <style name="Theme.mLauncher.Orange" parent="Theme.mLauncher">
+        <item name="colorPrimary">@color/theme_orange_primary</item>
+        <item name="colorAccent">@color/theme_orange_accent</item>
+        <item name="android:colorPrimary">@color/theme_orange_primary</item>
+        <item name="android:colorAccent">@color/theme_orange_accent</item>
+        <item name="colorSurfaceVariant">@color/theme_orange_surface_tint</item>
+    </style>
+    <style name="Theme.mLauncher.Settings.Orange" parent="Theme.mLauncher.Settings">
+        <item name="colorPrimary">@color/theme_orange_primary</item>
+        <item name="colorAccent">@color/theme_orange_accent</item>
+        <item name="android:colorPrimary">@color/theme_orange_primary</item>
+        <item name="android:colorAccent">@color/theme_orange_accent</item>
+        <item name="colorSurfaceVariant">@color/theme_orange_surface_tint</item>
+    </style>
+
+    <!-- Purple -->
+    <style name="Theme.mLauncher.Purple" parent="Theme.mLauncher">
+        <item name="colorPrimary">@color/theme_purple_primary</item>
+        <item name="colorAccent">@color/theme_purple_accent</item>
+        <item name="android:colorPrimary">@color/theme_purple_primary</item>
+        <item name="android:colorAccent">@color/theme_purple_accent</item>
+        <item name="colorSurfaceVariant">@color/theme_purple_surface_tint</item>
+    </style>
+    <style name="Theme.mLauncher.Settings.Purple" parent="Theme.mLauncher.Settings">
+        <item name="colorPrimary">@color/theme_purple_primary</item>
+        <item name="colorAccent">@color/theme_purple_accent</item>
+        <item name="android:colorPrimary">@color/theme_purple_primary</item>
+        <item name="android:colorAccent">@color/theme_purple_accent</item>
+        <item name="colorSurfaceVariant">@color/theme_purple_surface_tint</item>
+    </style>
+
+    <!-- Pink -->
+    <style name="Theme.mLauncher.Pink" parent="Theme.mLauncher">
+        <item name="colorPrimary">@color/theme_pink_primary</item>
+        <item name="colorAccent">@color/theme_pink_accent</item>
+        <item name="android:colorPrimary">@color/theme_pink_primary</item>
+        <item name="android:colorAccent">@color/theme_pink_accent</item>
+        <item name="colorSurfaceVariant">@color/theme_pink_surface_tint</item>
+    </style>
+    <style name="Theme.mLauncher.Settings.Pink" parent="Theme.mLauncher.Settings">
+        <item name="colorPrimary">@color/theme_pink_primary</item>
+        <item name="colorAccent">@color/theme_pink_accent</item>
+        <item name="android:colorPrimary">@color/theme_pink_primary</item>
+        <item name="android:colorAccent">@color/theme_pink_accent</item>
+        <item name="colorSurfaceVariant">@color/theme_pink_surface_tint</item>
+    </style>
+
+    <!-- Lime -->
+    <style name="Theme.mLauncher.Lime" parent="Theme.mLauncher">
+        <item name="colorPrimary">@color/theme_lime_primary</item>
+        <item name="colorAccent">@color/theme_lime_accent</item>
+        <item name="android:colorPrimary">@color/theme_lime_primary</item>
+        <item name="android:colorAccent">@color/theme_lime_accent</item>
+        <item name="colorSurfaceVariant">@color/theme_lime_surface_tint</item>
+    </style>
+    <style name="Theme.mLauncher.Settings.Lime" parent="Theme.mLauncher.Settings">
+        <item name="colorPrimary">@color/theme_lime_primary</item>
+        <item name="colorAccent">@color/theme_lime_accent</item>
+        <item name="android:colorPrimary">@color/theme_lime_primary</item>
+        <item name="android:colorAccent">@color/theme_lime_accent</item>
+        <item name="colorSurfaceVariant">@color/theme_lime_surface_tint</item>
+    </style>
+
+    <!-- Cyan -->
+    <style name="Theme.mLauncher.Cyan" parent="Theme.mLauncher">
+        <item name="colorPrimary">@color/theme_cyan_primary</item>
+        <item name="colorAccent">@color/theme_cyan_accent</item>
+        <item name="android:colorPrimary">@color/theme_cyan_primary</item>
+        <item name="android:colorAccent">@color/theme_cyan_accent</item>
+        <item name="colorSurfaceVariant">@color/theme_cyan_surface_tint</item>
+    </style>
+    <style name="Theme.mLauncher.Settings.Cyan" parent="Theme.mLauncher.Settings">
+        <item name="colorPrimary">@color/theme_cyan_primary</item>
+        <item name="colorAccent">@color/theme_cyan_accent</item>
+        <item name="android:colorPrimary">@color/theme_cyan_primary</item>
+        <item name="android:colorAccent">@color/theme_cyan_accent</item>
+        <item name="colorSurfaceVariant">@color/theme_cyan_surface_tint</item>
+    </style>
+    
+    <!-- Yellow -->
+    <style name="Theme.mLauncher.Yellow" parent="Theme.mLauncher">
+        <item name="colorPrimary">@color/theme_yellow_primary</item>
+        <item name="colorAccent">@color/theme_yellow_accent</item>
+        <item name="android:colorPrimary">@color/theme_yellow_primary</item>
+        <item name="android:colorAccent">@color/theme_yellow_accent</item>
+        <item name="colorSurfaceVariant">@color/theme_yellow_surface_tint</item>
+    </style>
+    <style name="Theme.mLauncher.Settings.Yellow" parent="Theme.mLauncher.Settings">
+        <item name="colorPrimary">@color/theme_yellow_primary</item>
+        <item name="colorAccent">@color/theme_yellow_accent</item>
+        <item name="android:colorPrimary">@color/theme_yellow_primary</item>
+        <item name="android:colorAccent">@color/theme_yellow_accent</item>
+        <item name="colorSurfaceVariant">@color/theme_yellow_surface_tint</item>
+    </style>
+
 </resources>
 

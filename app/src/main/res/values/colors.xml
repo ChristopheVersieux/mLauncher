@@ -89,4 +89,52 @@
     <color name="bg_icon_circle_orange">#FFA726</color>
     <color name="bg_icon_circle_purple">#AB47BC</color>
 
+    <!-- Theme Colors -->
+    <!-- Green (Default) is #00897B (Teal 600) -->
+    <color name="theme_green_primary">#00897B</color>
+    <color name="theme_green_surface_tint">#E0F2F1</color>
+
+    <!-- Red -->
+    <color name="theme_red_primary">#E53935</color>
+    <color name="theme_red_accent">#E53935</color>
+    <color name="theme_red_surface_tint">#FFEBEE</color>
+
+    <!-- Blue -->
+    <color name="theme_blue_primary">#1E88E5</color>
+    <color name="theme_blue_accent">#1E88E5</color>
+    <color name="theme_blue_surface_tint">#E3F2FD</color>
+
+    <!-- Orange -->
+    <color name="theme_orange_primary">#FB8C00</color>
+    <color name="theme_orange_accent">#FB8C00</color>
+    <color name="theme_orange_surface_tint">#FFF3E0</color>
+
+    <!-- Purple -->
+    <color name="theme_purple_primary">#8E24AA</color>
+    <color name="theme_purple_accent">#8E24AA</color>
+    <color name="theme_purple_surface_tint">#F3E5F5</color>
+
+    <!-- Pink -->
+    <color name="theme_pink_primary">#D81B60</color>
+    <color name="theme_pink_accent">#D81B60</color>
+    <color name="theme_pink_surface_tint">#FCE4EC</color>
+
+    <!-- Lime -->
+    <color name="theme_lime_primary">#C0CA33</color>
+    <color name="theme_lime_accent">#C0CA33</color>
+    <color name="theme_lime_surface_tint">#F9FBE7</color>
+
+    <!-- Cyan -->
+    <color name="theme_cyan_primary">#00ACC1</color>
+    <color name="theme_cyan_accent">#00ACC1</color>
+    <color name="theme_cyan_surface_tint">#E0F7FA</color>
+    
+    <!-- Yellow -->
+    <color name="theme_yellow_primary">#FFB300</color>
+    <color name="theme_yellow_accent">#FFB300</color>
+    <color name="theme_yellow_surface_tint">#FFFDE7</color>
+
+    <!-- Drawer Colors (Light Mode) -->
+    <color name="drawer_card_bg">#FFFFFF</color>
+    <color name="drawer_root_base">#9E9E9E</color>
 </resources>

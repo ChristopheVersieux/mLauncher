@@ -171,4 +171,26 @@
         <item>Left</item>
         <item>Right</item>
     </string-array>
+    <string-array name="theme_color_names">
+        <item>Green (Default)</item>
+        <item>Red</item>
+        <item>Blue</item>
+        <item>Orange</item>
+        <item>Purple</item>
+        <item>Pink</item>
+        <item>Lime</item>
+        <item>Cyan</item>
+        <item>Yellow</item>
+    </string-array>
+    <string-array name="theme_color_values">
+        <item>Green</item>
+        <item>Red</item>
+        <item>Blue</item>
+        <item>Orange</item>
+        <item>Purple</item>
+        <item>Pink</item>
+        <item>Lime</item>
+        <item>Cyan</item>
+        <item>Yellow</item>
+    </string-array>
 </resources>

@@ -14,8 +14,8 @@ import java.io.FileInputStream
 // Top of build.gradle.kts
 val major = 1
 val minor = 0
-val patch = 0
-val build = 7
+val patch = 1
+val build = 1
 
 val type = 0 // 1=beta, 2=alpha else=production
 
