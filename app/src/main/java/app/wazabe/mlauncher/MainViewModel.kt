@@ -419,8 +419,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         AppLogger.d("MainViewModel", "getHiddenApps called")
         viewModelScope.launch {
             try {
+                val prefs = Prefs(appContext)
+                val hiddenAppsSet = prefs.hiddenApps
+                AppLogger.d("MainViewModel", "hiddenAppsSet content: $hiddenAppsSet")
+                AppLogger.d("MainViewModel", "hiddenAppsSet size: ${hiddenAppsSet.size}")
+                
                 val freshList = getAppsList(appContext, includeRegularApps = false, includeHiddenApps = true, includeRecentApps = false)
                 AppLogger.d("MainViewModel", "getHiddenApps result: ${freshList.size} apps")
+                freshList.forEach { app ->
+                    AppLogger.d("MainViewModel", "Hidden app: ${app.activityPackage} | ${app.activityClass}")
+                }
                 withContext(Dispatchers.Main) {
                     hiddenApps.value = freshList
                 }
@@ -633,9 +641,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val privateManager = PrivateSpaceManager(context)
 
         fun appKey(pkg: String, cls: String, profileHash: Int) = "$pkg|$cls|$profileHash"
-        fun isHidden(pkg: String, key: String): Boolean = key in hiddenAppsSet
-
-        // Lightweight intermediate storage
+        fun isHidden(pkg: String, cls: String, key: String): Boolean {
+            // Check both short format (pkg|class) and long format (pkg|class|profileHash)
+            val keyShort = "$pkg|$cls"
+            return keyShort in hiddenAppsSet || key in hiddenAppsSet
+        }
         data class RawApp(
             val pkg: String,
             val cls: String,
@@ -713,7 +723,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                                     if (!seenAppKeys.add(key)) return@mapNotNull null
 
                                     // Skip hidden / regular apps based on toggles
-                                    val hidden = isHidden(pkg, key)
+                                    val hidden = isHidden(pkg, cls, key)
                                     if (hidden && !includeHiddenApps) {
                                         return@mapNotNull null
                                     }

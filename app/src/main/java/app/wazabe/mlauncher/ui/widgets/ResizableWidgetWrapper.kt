@@ -72,6 +72,21 @@ class ResizableWidgetWrapper(
     private var ghostView: View? = null
 
     init {
+        AppLogger.d("WidgetDebug", "🟦 Widget Init: appWidgetId=$appWidgetId, defaultCells=${defaultCellsW}x${defaultCellsH}")
+        
+        // ✅ Set initial layoutParams IMMEDIATELY to prevent invisible widget
+        // Use screen width as fallback for rough calculation
+        val screenWidth = context.resources.displayMetrics.widthPixels
+        val roughCellWidth = (screenWidth - (cellMargin * (gridColumns - 1))) / gridColumns
+        val initialWidth = (defaultCellsW * (roughCellWidth + cellMargin)) - cellMargin
+        // ✅ Apply height multiplier for rectangular cells
+        val heightMultiplier = 2.5
+        val roughCellHeight = (roughCellWidth * heightMultiplier).toInt()
+        val initialHeight = (defaultCellsH * (roughCellHeight + cellMargin)) - cellMargin
+        layoutParams = LayoutParams(initialWidth, initialHeight)
+        
+        AppLogger.d("WidgetDebug", "⚡ Initial size set: ${initialWidth}x${initialHeight}px (will be refined)")
+        
         // Calculate pixel width/height from cells
         post {
             val parentFrame = parent as? FrameLayout
@@ -83,12 +98,27 @@ class ResizableWidgetWrapper(
 
             // ✅ Calculate widget dimensions using the same logic as saving/loading
             val widthPx = (defaultCellsW * (cellWidth + cellMargin)) - cellMargin
-            val heightPx = (defaultCellsH * (cellHeight + cellMargin)) - cellMargin
+            // ✅ Make cells rectangular: each "cell" of height is actually 2.5x taller than width cells
+            val heightMultiplier = 2.5 // Widgets are 2.5x taller per cell
+            val effectiveCellHeight = (cellHeight * heightMultiplier).toInt()
+            val heightPx = (defaultCellsH * (effectiveCellHeight + cellMargin)) - cellMargin
+
+            AppLogger.d("WidgetDebug", "📐 Widget Size Calculation: appWidgetId=$appWidgetId")
+            AppLogger.d("WidgetDebug", "  ├─ Parent: ${parentWidth}px")
+            AppLogger.d("WidgetDebug", "  ├─ Cell: ${cellWidth}x${effectiveCellHeight}px (width x height)")
+            AppLogger.d("WidgetDebug", "  ├─ Cells: ${defaultCellsW}x${defaultCellsH}")
+            AppLogger.d("WidgetDebug", "  └─ Expected: ${widthPx}x${heightPx}px")
 
             layoutParams = LayoutParams(widthPx, heightPx)
+            AppLogger.d("WidgetDebug", "✅ Widget Created: appWidgetId=$appWidgetId, size=${widthPx}x${heightPx}px")
 
             // ✅ Ensure hostView fills wrapper and updates provider with current size
             fillHostView(widthPx, heightPx)
+            
+            // ✅ Now that size is set, save to database
+            if (defaultCellsW > 0 && defaultCellsH > 0) {
+                onUpdate()
+            }
         }
 
         addView(
@@ -147,6 +177,8 @@ class ResizableWidgetWrapper(
     })
     
     private fun fillHostView(parentWidth: Int = width, parentHeight: Int = height) {
+        AppLogger.d("WidgetDebug", "🔄 fillHostView: appWidgetId=$appWidgetId, size=${parentWidth}x${parentHeight}px")
+        
         // 1. Force hostView to fill THIS wrapper
         hostView.layoutParams = LayoutParams(
             LayoutParams.MATCH_PARENT,
@@ -154,9 +186,12 @@ class ResizableWidgetWrapper(
         )
         hostView.requestLayout()
 
-        // 2. Use parent’s width/height for widget sizing
+        // 2. Use parent's width/height for widget sizing
         post {
-            if (parentWidth <= 0 || parentHeight <= 0) return@post
+            if (parentWidth <= 0 || parentHeight <= 0) {
+                AppLogger.d("WidgetDebug", "⚠️ fillHostView skipped: invalid size ${parentWidth}x${parentHeight}px")
+                return@post
+            }
 
             try {
                 val options = Bundle().apply {
@@ -166,9 +201,15 @@ class ResizableWidgetWrapper(
                     putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, parentHeight)
                 }
 
+                AppLogger.d("WidgetDebug", "📦 Widget Options Updated: appWidgetId=$appWidgetId")
+                AppLogger.d("WidgetDebug", "  ├─ Min: ${parentWidth/4}x${parentHeight/4}px")
+                AppLogger.d("WidgetDebug", "  └─ Max: ${parentWidth}x${parentHeight}px")
+
                 val appWidgetManager = AppWidgetManager.getInstance(context)
                 appWidgetManager.updateAppWidgetOptions(hostView.appWidgetId, options)
-            } catch (_: Exception) { }
+            } catch (e: Exception) {
+                AppLogger.e("WidgetDebug", "❌ Failed to update widget options: ${e.message}")
+            }
         }
     }
 
@@ -339,6 +380,7 @@ class ResizableWidgetWrapper(
                                 }
                             }
 
+                            AppLogger.d("WidgetDebug", "📏 Resize Move: appWidgetId=$appWidgetId, handle=$resizeSide, newSize=${lp.width}x${lp.height}px")
                             layoutParams = lp
                             fillHostView(lp.width, lp.height)
                             lastX = event.rawX
@@ -347,7 +389,10 @@ class ResizableWidgetWrapper(
                     }
 
                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                        activeResizeHandle?.let { snapResizeToGrid(it) }
+                        activeResizeHandle?.let { handle ->
+                            AppLogger.d("WidgetDebug", "🎯 Resize End: appWidgetId=$appWidgetId, handle=$handle, beforeSnap=${lp.width}x${lp.height}px")
+                            snapResizeToGrid(handle)
+                        }
                         activeResizeHandle = null
                         onUpdate()
                     }
@@ -516,6 +561,8 @@ class ResizableWidgetWrapper(
 
         currentCol = col
         currentRow = row
+        
+        AppLogger.d("WidgetDebug", "📍 Snap to Grid: appWidgetId=$appWidgetId, position=($col, $row), translation=(${translationX}, ${translationY}), size=${width}x${height}px")
     }
 
     fun snapResizeToGrid(side: String) {
@@ -524,14 +571,23 @@ class ResizableWidgetWrapper(
 
         val parentWidth = parentFrame.width.coerceAtLeast(1)
         val parentHeight = parentFrame.height.coerceAtLeast(1)
-        val cellSize = ((parentWidth - (cellMargin * (gridColumns - 1))) / gridColumns).coerceAtLeast(1)
+        val cellWidth = ((parentWidth - (cellMargin * (gridColumns - 1))) / gridColumns).coerceAtLeast(1)
+        
+        // ✅ CRITICAL: Use the same heightMultiplier for snapping!
+        val heightMultiplier = 2.5
+        val effectiveCellHeight = (cellWidth * heightMultiplier).toInt()
 
         val maxWidth = (parentWidth - lp.leftMargin).coerceAtLeast(minSize)
         val maxHeight = (parentHeight - lp.topMargin).coerceAtLeast(minSize)
 
-        // Helper to snap a float coordinate to the nearest cell
-        fun snapToCell(value: Float): Int {
-            return ((value + cellSize / 2f) / (cellSize + cellMargin)).toInt() * (cellSize + cellMargin)
+        // Helper to snap horizontal coordinates to the nearest cell
+        fun snapToCellX(value: Float): Int {
+            return ((value + cellWidth / 2f) / (cellWidth + cellMargin)).toInt() * (cellWidth + cellMargin)
+        }
+        
+        // Helper to snap vertical coordinates to the nearest cell (using effectiveCellHeight!)
+        fun snapToCellY(value: Float): Int {
+            return ((value + effectiveCellHeight / 2f) / (effectiveCellHeight + cellMargin)).toInt() * (effectiveCellHeight + cellMargin)
         }
 
         // Compute the "visible" top and left by combining margin and translation
@@ -543,32 +599,32 @@ class ResizableWidgetWrapper(
         // Snap positions depending on which side was resized
         when (side) {
             "TOP" -> {
-                val snappedTop = snapToCell(currentTop)
+                val snappedTop = snapToCellY(currentTop)
                 val newHeight = (bottom - snappedTop).toInt().coerceAtLeast(minSize).coerceAtMost(maxHeight)
                 translationY += (snappedTop - currentTop)
                 lp.height = newHeight
             }
 
             "BOTTOM" -> {
-                val snappedBottom = snapToCell(bottom)
+                val snappedBottom = snapToCellY(bottom)
                 lp.height = (snappedBottom - currentTop).toInt().coerceAtLeast(minSize).coerceAtMost(maxHeight)
             }
 
             "LEFT" -> {
-                val snappedLeft = snapToCell(currentLeft)
+                val snappedLeft = snapToCellX(currentLeft)
                 val newWidth = (right - snappedLeft).toInt().coerceAtLeast(minSize).coerceAtMost(maxWidth)
                 translationX += (snappedLeft - currentLeft)
                 lp.width = newWidth
             }
 
             "RIGHT" -> {
-                val snappedRight = snapToCell(right)
+                val snappedRight = snapToCellX(right)
                 lp.width = (snappedRight - currentLeft).toInt().coerceAtLeast(minSize).coerceAtMost(maxWidth)
             }
 
             "TOP_LEFT" -> {
-                val snappedTop = snapToCell(currentTop)
-                val snappedLeft = snapToCell(currentLeft)
+                val snappedTop = snapToCellY(currentTop)
+                val snappedLeft = snapToCellX(currentLeft)
                 val newWidth = (right - snappedLeft).toInt().coerceAtLeast(minSize).coerceAtMost(maxWidth)
                 val newHeight = (bottom - snappedTop).toInt().coerceAtLeast(minSize).coerceAtMost(maxHeight)
                 translationX += (snappedLeft - currentLeft)
@@ -578,8 +634,8 @@ class ResizableWidgetWrapper(
             }
 
             "TOP_RIGHT" -> {
-                val snappedTop = snapToCell(currentTop)
-                val snappedRight = snapToCell(right)
+                val snappedTop = snapToCellY(currentTop)
+                val snappedRight = snapToCellX(right)
                 val newHeight = (bottom - snappedTop).toInt().coerceAtLeast(minSize).coerceAtMost(maxHeight)
                 val newWidth = (snappedRight - currentLeft).toInt().coerceAtLeast(minSize).coerceAtMost(maxWidth)
                 translationY += (snappedTop - currentTop)
@@ -588,8 +644,8 @@ class ResizableWidgetWrapper(
             }
 
             "BOTTOM_LEFT" -> {
-                val snappedBottom = snapToCell(bottom)
-                val snappedLeft = snapToCell(currentLeft)
+                val snappedBottom = snapToCellY(bottom)
+                val snappedLeft = snapToCellX(currentLeft)
                 val newWidth = (right - snappedLeft).toInt().coerceAtLeast(minSize).coerceAtMost(maxWidth)
                 val newHeight = (snappedBottom - currentTop).toInt().coerceAtLeast(minSize).coerceAtMost(maxHeight)
                 translationX += (snappedLeft - currentLeft)
@@ -598,13 +654,14 @@ class ResizableWidgetWrapper(
             }
 
             "BOTTOM_RIGHT" -> {
-                val snappedBottom = snapToCell(bottom)
-                val snappedRight = snapToCell(right)
+                val snappedBottom = snapToCellY(bottom)
+                val snappedRight = snapToCellX(right)
                 lp.width = (snappedRight - currentLeft).toInt().coerceAtLeast(minSize).coerceAtMost(maxWidth)
                 lp.height = (snappedBottom - currentTop).toInt().coerceAtLeast(minSize).coerceAtMost(maxHeight)
             }
         }
 
+        AppLogger.d("WidgetDebug", "📍 Snap Resize Complete: appWidgetId=$appWidgetId, side=$side, finalSize=${lp.width}x${lp.height}px, translation=(${translationX}, ${translationY})")
         layoutParams = lp
         fillHostView(lp.width, lp.height)
     }
@@ -728,8 +785,56 @@ class ResizableWidgetWrapper(
         }
     }
 
+    private var longPressHandler: android.os.Handler? = null
+    private var longPressRunnable: Runnable? = null
+    private var interceptDownX = 0f
+    private var interceptDownY = 0f
+    private var hasMovedTooMuch = false
+    
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         if (ev == null) return super.onInterceptTouchEvent(ev)
+
+        // ✅ Detect long press to enable resize mode (intercept before widget gets it)
+        when (ev.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                interceptDownX = ev.rawX
+                interceptDownY = ev.rawY
+                hasMovedTooMuch = false
+                
+                // Start long press detection
+                if (!isEditingProvider() && !isResizeMode) {
+                    longPressHandler = android.os.Handler(android.os.Looper.getMainLooper())
+                    longPressRunnable = Runnable {
+                        if (!hasMovedTooMuch) {
+                            AppLogger.d("WidgetDebug", "🔒 Long press detected on widget, enabling resize mode")
+                            performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+                            isResizeMode = true
+                            setHandlesVisible(true)
+                            // Request parent to not intercept further events
+                            parent?.requestDisallowInterceptTouchEvent(true)
+                        }
+                    }
+                    longPressHandler?.postDelayed(longPressRunnable!!, 500) // 500ms for long press
+                }
+            }
+            
+            MotionEvent.ACTION_MOVE -> {
+                // Cancel long press if user moves too much
+                val dx = ev.rawX - interceptDownX
+                val dy = ev.rawY - interceptDownY
+                if (abs(dx) > 10 || abs(dy) > 10) {
+                    hasMovedTooMuch = true
+                    longPressRunnable?.let { longPressHandler?.removeCallbacks(it) }
+                }
+            }
+            
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                // Cancel long press detection
+                longPressRunnable?.let { longPressHandler?.removeCallbacks(it) }
+                longPressHandler = null
+                longPressRunnable = null
+            }
+        }
 
         // ✅ Bypass all if global edit mode is enabled
         if (!isResizeMode && isEditingProvider()) {

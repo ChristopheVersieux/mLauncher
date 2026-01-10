@@ -15,7 +15,7 @@ import java.io.FileInputStream
 val major = 1
 val minor = 0
 val patch = 1
-val build = 1
+val build = 3
 
 val type = 0 // 1=beta, 2=alpha else=production
 

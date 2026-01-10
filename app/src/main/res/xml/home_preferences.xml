@@ -5,15 +5,16 @@
     <SwitchPreferenceCompat
         android:key="SHOW_DAILY_WORD"
         android:title="@string/show_daily_word"
+        android:icon="@drawable/ic_smiley"
         android:defaultValue="true" />
     <SeekBarPreference
         android:key="MAIN_BACKGROUND_ALPHA"
         android:title="@string/background_opacity"
+        android:icon="@drawable/ic_opacity"
         android:max="100"
         app:min="0"
         android:defaultValue="40"
-        app:showSeekBarValue="true"
-        app:iconSpaceReserved="false" />
+        app:showSeekBarValue="true" />
 
 
 
@@ -21,35 +22,36 @@
         <SeekBarPreference
             android:key="HOME_APPS_NUM"
             android:title="@string/apps_on_home_screen"
+            android:icon="@drawable/ic_apps"
             android:max="12"
             app:min="1"
             android:defaultValue="4"
-            app:showSeekBarValue="true"
-            app:iconSpaceReserved="false" />
+            app:showSeekBarValue="true" />
 
 
 
         <SwitchPreferenceCompat
             android:key="HOME_LOCKED"
             android:title="@string/lock_home_apps"
-            app:iconSpaceReserved="false" />
+            android:icon="@drawable/padlock" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/layout_positioning">
         <ListPreference
             android:key="HOME_ALIGNMENT"
             android:title="@string/home_alignment"
+            android:icon="@drawable/ic_align_center"
             android:entries="@array/alignment_names"
             android:entryValues="@array/alignment_values"
             android:defaultValue="Left"
-            app:useSimpleSummaryProvider="true"
-            app:iconSpaceReserved="false" />
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/visibility_display">
         <SwitchPreferenceCompat
             android:key="AUTO_TEXT_COLOR"
             android:title="@string/auto_text_color"
+            android:icon="@drawable/ic_contrast"
             android:summary="@string/auto_text_color_description"
             android:defaultValue="true"
             app:disableDependentsState="true" />
@@ -64,6 +66,7 @@
             android:entryValues="@array/text_color_values"
             android:defaultValue="light"
             android:dependency="AUTO_TEXT_COLOR"
+            app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true" />
 
 

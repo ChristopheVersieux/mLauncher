@@ -17,19 +17,37 @@
         android:gravity="center"
         android:textStyle="bold" />
 
-    <com.github.creativecodecat.components.views.FontRecyclerView
-        android:id="@+id/appsRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:padding="8dp" />
-
-    <!-- Hidden elements required by code binding -->
+    <!-- Content area: RecyclerView OR Empty State -->
     <FrameLayout
-        android:id="@+id/emptyStateContainer"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.github.creativecodecat.components.views.FontRecyclerView
+            android:id="@+id/appsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="8dp" />
+
+        <!-- Empty State -->
+        <FrameLayout
+            android:id="@+id/emptyStateContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+            
+            <com.github.creativecodecat.components.views.FontAppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:padding="32dp"
+                android:text="@string/hidden_apps_empty_hint"
+                android:textColor="?attr/primaryColor"
+                android:textSize="16sp"
+                android:alpha="0.6" />
+        </FrameLayout>
+    </FrameLayout>
     <FrameLayout
         android:id="@+id/sidebarContainer"
         android:layout_width="0dp"

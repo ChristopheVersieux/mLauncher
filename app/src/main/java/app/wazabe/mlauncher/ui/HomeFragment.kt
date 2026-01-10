@@ -123,9 +123,9 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     companion object {
         private const val TAG = "HomeFragment"
         private val APP_WIDGET_HOST_ID = "CascadeLauncher".hashCode().absoluteValue
-        private const val GRID_COLUMNS = 14
-        private const val CELL_MARGIN = 16
-        private const val MIN_CELL_W = 2
+        private const val GRID_COLUMNS = 12
+        private const val CELL_MARGIN = 8
+        private const val MIN_CELL_W = 1
         private const val MIN_CELL_H = 1
     }
 
@@ -2465,8 +2465,16 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                         }
                         addView(labelText)
                         
+                        // Calculate expected cells
+                        val parentWidth = binding.homeWidgetGrid.width.coerceAtLeast(1)
+                        val cellWidth = (parentWidth - CELL_MARGIN * (GRID_COLUMNS - 1)) / GRID_COLUMNS
+                        val calculatedCellsW = ceil(widgetInfo.minWidth.toDouble() / (cellWidth + CELL_MARGIN)).toInt().coerceAtLeast(1)
+                        val calculatedCellsH = ceil(widgetInfo.minHeight.toDouble() / (cellWidth + CELL_MARGIN)).toInt().coerceAtLeast(1)
+                        val cappedCellsW = calculatedCellsW.coerceAtMost(GRID_COLUMNS)
+                        val cappedCellsH = calculatedCellsH.coerceAtMost(3)
+                        
                         val sizeText = TextView(requireContext()).apply {
-                            text = "${widgetInfo.minWidth}x${widgetInfo.minHeight}"
+                            text = "${widgetInfo.minWidth}×${widgetInfo.minHeight} dp (${cappedCellsW}×${cappedCellsH} cells)"
                             textSize = 12f
                             alpha = 0.6f
                         }
@@ -2547,11 +2555,23 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             return
         }
 
-        val cellWidth = (binding.homeWidgetGrid.width - (GRID_COLUMNS - 1) * CELL_MARGIN) / GRID_COLUMNS
+        val gridWidth = binding.homeWidgetGrid.width
+        val gridHeight = binding.homeWidgetGrid.height
+        
+        AppLogger.d("WidgetDebug", "📦 Parent grid size: ${gridWidth}x${gridHeight}px")
+        
+        val cellWidth = (gridWidth - (GRID_COLUMNS - 1) * CELL_MARGIN) / GRID_COLUMNS
         val cellHeight = cellWidth
 
-        val cellsW = ceil(widgetInfo.minWidth.toDouble() / (cellWidth + CELL_MARGIN)).toInt().coerceAtLeast(MIN_CELL_W)
-        val cellsH = ceil(widgetInfo.minHeight.toDouble() / (cellHeight + CELL_MARGIN)).toInt().coerceAtLeast(MIN_CELL_H)
+        // Calculate cells from widget's minWidth/minHeight, but cap at reasonable size
+        val calculatedCellsW = ceil(widgetInfo.minWidth.toDouble() / (cellWidth + CELL_MARGIN)).toInt().coerceAtLeast(MIN_CELL_W)
+        val calculatedCellsH = ceil(widgetInfo.minHeight.toDouble() / (cellHeight + CELL_MARGIN)).toInt().coerceAtLeast(MIN_CELL_H)
+        
+        // ✅ Allow full width but limit height to 3 rows
+        val cellsW = calculatedCellsW.coerceAtMost(GRID_COLUMNS) // Max = grid width
+        val cellsH = calculatedCellsH.coerceAtMost(3) // Max 3 rows high
+        
+        AppLogger.d("WidgetDebug", "📏 Widget requested: ${calculatedCellsW}x${calculatedCellsH} → capped to: ${cellsW}x${cellsH}")
 
         val wrapper = ResizableWidgetWrapper(
             requireContext(), hostView, widgetInfo, appWidgetHost,
@@ -2632,11 +2652,34 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         val savedList = widgetWrappers.mapNotNull { wrapper ->
             val widgetId = wrapper.appWidgetId
             if (widgetId < 0) return@mapNotNull null
+            
+            // ✅ Use layoutParams dimensions, not view dimensions (view.width returns parent width!)
+            val lp = wrapper.layoutParams as? FrameLayout.LayoutParams
+            if (lp == null || lp.width <= 0 || lp.height <= 0) {
+                AppLogger.d("WidgetDebug", "⚠️ Skipping widget $widgetId: invalid layoutParams")
+                return@mapNotNull null
+            }
+            
             val col = ((wrapper.translationX + cellWidth / 2) / (cellWidth + CELL_MARGIN)).toInt().coerceIn(0, GRID_COLUMNS - 1)
             val row = ((wrapper.translationY + cellHeight / 2) / (cellHeight + CELL_MARGIN)).toInt().coerceAtLeast(0)
-            val cellsW = ((wrapper.width + CELL_MARGIN) / (cellWidth + CELL_MARGIN))
-            val cellsH = ((wrapper.height + CELL_MARGIN) / (cellHeight + CELL_MARGIN))
-            SavedWidgetEntity(widgetId, col, row, wrapper.width, wrapper.height, cellsW, cellsH)
+            
+            // ✅ Fix: Properly calculate cells from pixel dimensions
+            // Add cellMargin back before dividing to get accurate cell count
+            val cellsW = ((lp.width + CELL_MARGIN) / (cellWidth + CELL_MARGIN)).coerceAtLeast(1)
+            
+            // ✅ CRITICAL: Use the same heightMultiplier as in widget creation!
+            val heightMultiplier = 2.5
+            val effectiveCellHeight = (cellHeight * heightMultiplier).toInt()
+            val cellsH = ((lp.height + CELL_MARGIN) / (effectiveCellHeight + CELL_MARGIN)).coerceAtLeast(1)
+            
+            AppLogger.d("WidgetDebug", "💾 Saving Widget: appWidgetId=$widgetId")
+            AppLogger.d("WidgetDebug", "  ├─ Position: col=$col, row=$row")
+            AppLogger.d("WidgetDebug", "  ├─ Pixels: ${lp.width}x${lp.height}px (from layoutParams)")
+            AppLogger.d("WidgetDebug", "  ├─ effectiveCellHeight: ${effectiveCellHeight}px (${cellHeight}px * ${heightMultiplier})")
+            AppLogger.d("WidgetDebug", "  ├─ Translation: (${wrapper.translationX}, ${wrapper.translationY})")
+            AppLogger.d("WidgetDebug", "  └─ Cells: ${cellsW}x${cellsH}")
+            
+            SavedWidgetEntity(widgetId, col, row, lp.width, lp.height, cellsW, cellsH)
         }
 
         if (savedList.isEmpty()) return
@@ -2691,14 +2734,14 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                     val translationXCalc = saved.col * (cellWidth + CELL_MARGIN).toFloat()
                     val translationYCalc = saved.row * (cellHeight + CELL_MARGIN).toFloat()
                     
-                    AppLogger.d("WidgetRestore", "📥 Restoring Widget: appWidgetId=${saved.appWidgetId}")
-                    AppLogger.d("WidgetRestore", "  ├─ Saved: cells=${saved.cellsW}x${saved.cellsH}, pos=(${saved.col}, ${saved.row}), size=${saved.width}x${saved.height}px")
-                    AppLogger.d("WidgetRestore", "  ├─ Grid: cellSize=${cellWidth}x${cellHeight}px, margin=$CELL_MARGIN")
-                    AppLogger.d("WidgetRestore", "  └─ Placing: translation=(${translationXCalc}, ${translationYCalc}), layoutSize=${saved.width}x${saved.height}px")
+                    AppLogger.d("WidgetDebug", "📥 Restoring Widget: appWidgetId=${saved.appWidgetId}")
+                    AppLogger.d("WidgetDebug", "  ├─ Saved: cells=${saved.cellsW}x${saved.cellsH}, pos=(${saved.col}, ${saved.row}), size=${saved.width}x${saved.height}px")
+                    AppLogger.d("WidgetDebug", "  ├─ Grid: cellSize=${cellWidth}x${cellHeight}px, margin=$CELL_MARGIN")
+                    AppLogger.d("WidgetDebug", "  └─ Translation: (${translationXCalc}, ${translationYCalc})")
                     
                     wrapper.translationX = translationXCalc
                     wrapper.translationY = translationYCalc
-                    wrapper.layoutParams = FrameLayout.LayoutParams(saved.width, saved.height)
+                    // ✅ Don't set layoutParams here - wrapper.init() already sets it based on cellsW/cellsH
 
                     binding.homeWidgetGrid.addView(wrapper)
                     widgetWrappers.add(wrapper)

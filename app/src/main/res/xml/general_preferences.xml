@@ -6,6 +6,7 @@
         <ListPreference
             android:key="APP_THEME"
             android:title="@string/theme_mode"
+            android:icon="@drawable/ic_theme"
             android:entries="@array/theme_mode_entries"
             android:entryValues="@array/theme_mode_values"
             android:defaultValue="System"
@@ -17,20 +18,24 @@
             android:entries="@array/theme_color_names"
             android:entryValues="@array/theme_color_values"
             android:defaultValue="Green"
-            android:widgetLayout="@layout/preference_widget_color_preview"
+            app:iconSpaceReserved="true"
+            app:layout="@layout/preference_color_with_icon"
             app:useSimpleSummaryProvider="true" />
 
         <Preference
             android:key="pref_wallpaper_styles"
+            android:icon="@drawable/ic_look_feel"
             android:title="@string/wallpaper_and_styles" />
 
         <Preference
             android:key="pref_app_language"
             android:title="@string/app_language"
+            android:icon="@drawable/ic_translate"
             android:summary="@string/app_language_description" />
 
         <Preference
             android:key="LAUNCHER_FONT"
+            android:icon="@drawable/ic_edit"
             android:title="@string/font_family" />
     </PreferenceCategory>
 
@@ -38,6 +43,7 @@
         <SwitchPreferenceCompat
             android:key="HAPTIC_FEEDBACK"
             android:title="@string/haptic_feedback"
+            android:icon="@drawable/ic_gestures"
             android:defaultValue="true" />
     </PreferenceCategory>
 

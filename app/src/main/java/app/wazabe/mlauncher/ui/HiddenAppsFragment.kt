@@ -57,7 +57,9 @@ class HiddenAppsFragment : Fragment() {
         viewModel.getHiddenApps()
         
         viewModel.hiddenApps.observe(viewLifecycleOwner) { apps ->
-            binding.emptyStateContainer.isVisible = apps.isNullOrEmpty()
+            val isEmpty = apps.isNullOrEmpty()
+            binding.emptyStateContainer.isVisible = isEmpty
+            binding.appsRecyclerView.isVisible = !isEmpty
             apps?.let {
                 adapter.setAppList(it.toMutableList())
             }

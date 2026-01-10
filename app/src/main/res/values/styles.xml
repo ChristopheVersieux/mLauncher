@@ -158,8 +158,17 @@
         <item name="colorPrimary">?attr/colorPrimary</item>
         <item name="android:colorPrimary">?attr/colorPrimary</item>
         <item name="colorSecondary">?attr/colorPrimary</item>
-        <item name="switchPreferenceCompatStyle">@style/AppSwitchPreferenceStyle</item>
+        <item name="colorSecondaryContainer">?attr/colorPrimary</item>
+        <item name="colorOnSecondaryContainer">@android:color/white</item>
         <item name="preferenceCategoryStyle">@style/AppPreferenceCategoryStyle</item>
+        <item name="switchStyle">@style/AppSwitchStyle</item>
+        <item name="materialSwitchStyle">@style/AppSwitchStyle</item>
+    </style>
+
+    <style name="AppSwitchStyle" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="useMaterialThemeColors">false</item>
+        <item name="trackTint">@color/switch_track_color</item>
+        <item name="thumbTint">@color/switch_thumb_color</item>
     </style>
 
     <style name="AppPreferenceCategoryStyle" parent="Preference.Category.Material">
@@ -168,7 +177,8 @@
     </style>
 
     <style name="AppSwitchPreferenceStyle" parent="Preference.SwitchPreferenceCompat.Material">
-        <item name="android:widgetLayout">@layout/preference_widget_switch_compat</item>
+        <item name="android:background">@android:color/transparent</item>
+        <!-- Use default widget layout to avoid blue background -->
     </style>
 
     <style name="AppFilterChip" parent="Widget.Material3.Chip.Filter">
